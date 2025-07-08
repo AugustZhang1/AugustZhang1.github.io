@@ -5,47 +5,274 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>August Zhang | Portfolio</title>
   <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <header class="hero-header">
-    <div class="overlay">
-      <div class="hero-content">
-        <img src="img/oreo.jpg" alt="August Zhang" class="profile-img">
-        <h1>August Zhang</h1>
-        <p>Computer Engineer | Web Developer | AI Enthusiast</p>
-      </div>
+  <div class="portfolio">
+    <!-- Floating particles -->
+    <div class="particles">
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
     </div>
-  </header>
 
-  <nav class="main-nav">
-    <a href="#home">Home</a>
-    <a href="#projects">Projects</a>
-    <a href="#contact">Contact</a>
-  </nav>
+    <nav class="main-nav" id="navbar">
+      <a href="#home">Home</a>
+      <a href="#projects">Projects</a>
+      <a href="#skills">Skills</a>
+      <a href="#contact">Contact</a>
+    </nav>
 
-  <main>
-    <section id="search-bar">
-      <input type="text" placeholder="Search by project name...">
-      <select>
-        <option>Featured</option>
-        <option>Recent</option>
-      </select>
-      <select>
-        <option>All Categories</option>
-        <option>AI</option>
-        <option>Web Dev</option>
-        <option>Data</option>
-      </select>
-    </section>
+    <header class="hero-header" id="home">
+      <div class="overlay">
+        <div class="hero-content">
+          <img src="img/oreo.jpg" alt="August Zhang" class="profile-img">
+          <h1>August Zhang</h1>
+          <p>Computer Engineer </p>
+          <a href="#projects" class="cta-button">View My Work</a>
+        </div>
+      </div>
+    </header>
 
-    <section id="projects" class="grid-container">
-      <!-- PlaceHolder-->
-    </section>
-  </main>
+    <main>
+      <section id="search-bar" class="search-section fade-in">
+        <input type="text" id="searchInput" placeholder="🔍 Search by project name...">
+        <select id="sortSelect">
+          <option>⭐ Featured</option>
+          <option>🕒 Recent</option>
+        </select>
+        <select id="categorySelect">
+          <option>📁 All Categories</option>
+          <option>🤖 AI</option>
+          <option>💻 Web Dev</option>
+          <option>📊 Data</option>
+        </select>
+      </section>
 
-  <footer>
-    <p>© 2025 August Zhang | Connect with me on <a href="https://github.com/AugustZhang1" target="_blank">GitHub</a></p>
-  </footer>
+      <section id="projects" class="projects-section fade-in">
+        <h2>My Projects</h2>
+        <div class="projects-grid" id="projectsGrid">
+         
+        </div>
+      </section>
+
+      <section id="skills" class="skills-section fade-in">
+        <h2>Skills & Technologies</h2>
+        <div class="skills-grid">
+          <div class="skill-category">
+            <h3>💻 Programming Languages</h3>
+            <div class="skills-list">
+              <span class="skill-tag">JavaScript</span>
+              <span class="skill-tag">Python</span>
+              <span class="skill-tag">Java</span>
+              <span class="skill-tag">C++</span>
+              <span class="skill-tag">TypeScript</span>
+              <span class="skill-tag">SQL</span>
+            </div>
+          </div>
+
+          <div class="skill-category">
+            <h3>🌐 Web Development</h3>
+            <div class="skills-list">
+              <span class="skill-tag">React</span>
+              <span class="skill-tag">Next.js</span>
+              <span class="skill-tag">Node.js</span>
+              <span class="skill-tag">HTML/CSS</span>
+              <span class="skill-tag">Express.js</span>
+              <span class="skill-tag">Tailwind CSS</span>
+            </div>
+          </div>
+
+          <div class="skill-category">
+            <h3>🤖 AI & Machine Learning</h3>
+            <div class="skills-list">
+              <span class="skill-tag">TensorFlow</span>
+              <span class="skill-tag">PyTorch</span>
+              <span class="skill-tag">OpenAI API</span>
+              <span class="skill-tag">Scikit-learn</span>
+              <span class="skill-tag">Pandas</span>
+              <span class="skill-tag">NumPy</span>
+            </div>
+          </div>
+
+          <div class="skill-category">
+            <h3>🛠️ Tools & Technologies</h3>
+            <div class="skills-list">
+              <span class="skill-tag">Git</span>
+              <span class="skill-tag">Docker</span>
+              <span class="skill-tag">AWS</span>
+              <span class="skill-tag">MongoDB</span>
+              <span class="skill-tag">PostgreSQL</span>
+              <span class="skill-tag">VS Code</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>© 2025 August Zhang | Connect with me on <a href="https://github.com/AugustZhang1" target="_blank">GitHub</a></p>
+    </footer>
+  </div>
+
+  <script>
+    // Project data
+    const projects = [
+      {
+        id: 1,
+        title: "AI Snake Game",
+        description: "AI training framework based on self-reinforcement learning",
+        image: "img/snakegame.png",
+        category: "AI",
+        link: "https://github.com/AugustZhang1/PythonAI"
+      },
+      {
+        id: 2,
+        title: "Housing Price Prediction using ML",
+        description: "Developed a Machine Learning Algorithm to predict up to 100,000 houses using a Decision Tree Regressor Model",
+        image: "/placeholder.svg?height=200&width=300",
+        category: "AI",
+        link: "https://github.com/AugustZhang1/Housing-Price-Prediction"
+      },
+      {
+        id: 3,
+        title: "MediHub",
+        description: "Developed an Android healthcare appointment app that managed 500+ users by integrating Firebase for real-time data management to support booking, cancellation, and specialized appointment handling.",
+        image: "/placeholder.svg?height=200&width=300",
+        category: "Data",
+        link: "https://github.com/AugustZhang1/MediHub"
+      },
+      {
+        id: 4,
+        title: "Interactive Chat Bot",
+        description: "Built a chatbot with Discord integration that can interact with 1000 users simultaneously using Python",
+        image: "/placeholder.svg?height=200&width=300",
+        category: "AI",
+        link: "https://github.com/AugustZhang1/discord-bot"
+      },
+      {
+        id: 5,
+        title: "E-Hotel Management System",
+        description: "Developed a full-stack hotel management platform handling 100+ daily bookings and payments for managing hotels, rooms, and users.",
+        image: "/placeholder.svg?height=200&width=300",
+        category: "Web Dev",
+        link: "#"
+      },
+
+    ];
+
+    // DOM elements
+    const searchInput = document.getElementById('searchInput');
+    const categorySelect = document.getElementById('categorySelect');
+    const projectsGrid = document.getElementById('projectsGrid');
+    const navbar = document.getElementById('navbar');
+
+    // Create project card HTML
+    function createProjectCard(project) {
+      return `
+        <div class="project-card" onclick="window.open('${project.link}', '_blank')" style="animation-delay: ${Math.random() * 0.5}s">
+          <div class="project-image-container">
+            <img src="${project.image}" alt="${project.title}" class="project-image">
+            <div class="project-overlay">
+              <span class="view-project">View Project</span>
+            </div>
+          </div>
+          <div class="project-content">
+            <h3>${project.title}</h3>
+            <p class="project-category">${project.category}</p>
+            <p class="project-description">${project.description}</p>
+          </div>
+        </div>
+      `;
+    }
+
+    // Filter and display projects
+    function displayProjects() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const selectedCategory = categorySelect.value.replace(/[🤖💻📊📁⭐🕒]/g, '').trim();
+
+      const filteredProjects = projects.filter(project => {
+        const matchesSearch = project.title.toLowerCase().includes(searchTerm);
+        const matchesCategory = selectedCategory === 'All Categories' || project.category === selectedCategory;
+        return matchesSearch && matchesCategory;
+      });
+
+      projectsGrid.innerHTML = filteredProjects.map(createProjectCard).join('');
+    }
+
+    // Scroll animations
+    function handleScrollAnimations() {
+      const elements = document.querySelectorAll('.fade-in');
+      elements.forEach(element => {
+        const elementTop = element.getBoundingClientRect().top;
+        const elementVisible = 150;
+        
+        if (elementTop < window.innerHeight - elementVisible) {
+          element.classList.add('visible');
+        }
+      });
+    }
+
+    // Navbar scroll effect
+    function handleNavbarScroll() {
+      if (window.scrollY > 100) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    }
+
+    // Event listeners
+    searchInput.addEventListener('input', displayProjects);
+    categorySelect.addEventListener('change', displayProjects);
+    window.addEventListener('scroll', handleScrollAnimations);
+    window.addEventListener('scroll', handleNavbarScroll);
+
+    // Initial display
+    displayProjects();
+    handleScrollAnimations();
+
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+
+    // Add typing effect to hero text
+    function typeWriter(element, text, speed = 100) {
+      let i = 0;
+      element.innerHTML = '';
+      function type() {
+        if (i < text.length) {
+          element.innerHTML += text.charAt(i);
+          i++;
+          setTimeout(type, speed);
+        }
+      }
+      type();
+    }
+
+    // Initialize typing effect after page load
+    window.addEventListener('load', () => {
+      const heroTitle = document.querySelector('.hero-content h1');
+      const originalText = heroTitle.textContent;
+      setTimeout(() => {
+        typeWriter(heroTitle, originalText, 150);
+      }, 1000);
+    });
+  </script>
 </body>
 </html>
