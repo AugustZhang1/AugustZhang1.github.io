@@ -7,6 +7,9 @@
   <meta name="description" content="August Zhang — computer engineer. Selected work in AI, web, and data." />
   <link rel="stylesheet" href="style.css" />
   <script>
+    // Mark JS as available so reveal-on-scroll can hide content (CSS gates the
+    // hide behind html.js — without JS the page stays fully visible).
+    document.documentElement.classList.add('js');
     // Set theme before first paint to avoid a flash. Stored choice wins,
     // otherwise follow the OS preference.
     (function () {
@@ -124,19 +127,6 @@
         projects built with <em>all</em> of them.
       </p>
 
-      <!-- Liquid-glass refraction filter (ported from the liquid-glass-button
-           component): turbulence + displacement distorts the deck seen through
-           each keycap. Applied via backdrop-filter: url(#liquid-glass). -->
-      <svg width="0" height="0" aria-hidden="true" style="position:absolute">
-        <defs>
-          <filter id="liquid-glass" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
-            <feTurbulence type="fractalNoise" baseFrequency="0.013 0.013" numOctaves="2" seed="7" result="noise" />
-            <feGaussianBlur in="noise" stdDeviation="2.2" result="blurred" />
-            <feDisplacementMap in="SourceGraphic" in2="blurred" scale="22" xChannelSelector="R" yChannelSelector="G" />
-          </filter>
-        </defs>
-      </svg>
-
       <div class="keyboard" id="keyboard" role="group" aria-label="Filter projects by skill"></div>
 
       <div class="kb-status">
@@ -190,8 +180,7 @@
       <a class="contact-email" href="mailto:augustzhang878@gmail.com">augustzhang878@gmail.com</a>
       <ul class="contact-links">
         <li><a href="https://github.com/AugustZhang1" target="_blank" rel="noopener">GitHub <span aria-hidden="true">&#8599;</span></a></li>
-        <!-- TODO: replace # with August's real LinkedIn URL -->
-        <li><a href="#">LinkedIn <span aria-hidden="true">&#8599;</span></a></li>
+        <li><a href="https://www.linkedin.com/in/august-zhang-122918274/" target="_blank" rel="noopener">LinkedIn <span aria-hidden="true">&#8599;</span></a></li>
         <li><a href="mailto:augustzhang878@gmail.com">Email <span aria-hidden="true">&#8599;</span></a></li>
       </ul>
     </section>
@@ -259,7 +248,7 @@
         image: "img/hotel.jpg",
         category: "Web Dev",
         tech: ["JavaScript", "React", "Node.js", "Express", "PostgreSQL"],
-        link: "#"
+        link: "https://github.com/AugustZhang1"
       }
     ];
 
@@ -281,12 +270,13 @@
       const num = pad(index + 1);
       const external = /^https?:/.test(project.link);
       const linkAttrs = external ? ' target="_blank" rel="noopener"' : '';
+      const logoCls = project.category === 'Experience' ? ' work-thumb--logo' : '';
       const thumb = project.image
-        ? `<div class="work-thumb" data-mono="${monogram(project.title)}">
+        ? `<div class="work-thumb${logoCls}" data-mono="${monogram(project.title)}">
               <img src="${project.image}" alt="${project.title}" loading="lazy"
                    onerror="this.parentElement.classList.add('no-img'); this.remove();" />
             </div>`
-        : `<div class="work-thumb no-img" data-mono="${monogram(project.title)}"></div>`;
+        : `<div class="work-thumb no-img${logoCls}" data-mono="${monogram(project.title)}"></div>`;
       return `
         <li class="work-item" style="--i:${index}">
           <a class="work-link" href="${project.link}"${linkAttrs}>
@@ -386,7 +376,7 @@
       {
         title: "Sinai Foundation — Software Developer Intern",
         description: "Migrated 3 sites into a shared React component library, engineered a GitHub Actions CI/CD pipeline with Jest testing, and configured Pages CMS for non-technical publishing.",
-        image: "",
+        image: "img/sinai.jpg",
         category: "Experience",
         tech: ["React", "JavaScript", "Jest", "GitHub Actions", "Git"],
         link: "#experience"
@@ -394,7 +384,7 @@
       {
         title: "SenseWay — Software Developer Intern",
         description: "Built a Go telemetry REST API on PostgreSQL/Docker/AWS, a native Kotlin Android app with WebSocket feeds and Roboflow detection, and a live Vue.js dashboard.",
-        image: "",
+        image: "img/senseway.png",
         category: "Experience",
         tech: ["Go", "PostgreSQL", "Docker", "AWS", "Kotlin", "Android", "Vue.js"],
         link: "#experience"
@@ -679,7 +669,8 @@
     const root = document.documentElement;
     const themeToggle = document.getElementById('themeToggle');
     const AURORA_SCALE = 0.6;
-    let aGL = null, aProg = null, aUni = null, aCanvas = null, aRAF = 0, aT0 = 0, auroraReady = false;
+    let aGL = null, aProg = null, aUni = null, aCanvas = null, aRAF = 0, aT0 = 0;
+    let auroraReady = false, auroraTried = false;
 
     function initAurora() {
       aCanvas = document.createElement('canvas');
@@ -777,10 +768,15 @@
         themeToggle.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
         themeToggle.textContent = dark ? '☀' : '☾';
       }
-      if (dark) ensureAurora(); else stopAurora();
+      if (dark) { if (ensureAuroraInit()) ensureAurora(); } else stopAurora();
     }
 
-    auroraReady = initAurora();
+    // Create the WebGL context only the first time dark mode is needed.
+    function ensureAuroraInit() {
+      if (!auroraTried) { auroraTried = true; auroraReady = initAurora(); }
+      return auroraReady;
+    }
+
     window.addEventListener('resize', resizeAurora);
     document.addEventListener('visibilitychange', () => { if (isDark()) ensureAurora(); });
     if (themeToggle) themeToggle.addEventListener('click', () => applyTheme(!isDark()));
