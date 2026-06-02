@@ -3,277 +3,339 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>August Zhang | Portfolio</title>
+  <title>August Zhang — Computer Engineer</title>
+  <meta name="description" content="August Zhang — computer engineer. Selected work in AI, web, and data." />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="portfolio">
-    <!-- Floating particles -->
-    <div class="particles">
-      <div class="particle"></div>
-      <div class="particle"></div>
-      <div class="particle"></div>
-      <div class="particle"></div>
-      <div class="particle"></div>
-      <div class="particle"></div>
-      <div class="particle"></div>
-      <div class="particle"></div>
-      <div class="particle"></div>
-    </div>
+  <div class="grid-paper" aria-hidden="true"></div>
 
-    <nav class="main-nav" id="navbar">
-      <a href="#home">Home</a>
-      <a href="#projects">Projects</a>
+  <header class="topbar" id="top">
+    <a class="wordmark" href="#top">AUGUST&nbsp;ZHANG</a>
+    <nav class="topnav">
+      <a href="#work">Work</a>
       <a href="#skills">Skills</a>
       <a href="#contact">Contact</a>
     </nav>
+  </header>
 
-    <header class="hero-header" id="home">
-      <div class="overlay">
-        <div class="hero-content">
-          <img src="img/me.png" alt="August Zhang" class="profile-img">
-          <h1>August Zhang</h1>
-          <p>Computer Engineer </p>
-          <a href="#projects" class="cta-button">View My Work</a>
+  <main>
+    <!-- HERO -->
+    <section class="hero reveal" id="home">
+      <div class="hero-text">
+        <p class="eyebrow">Computer Engineer &middot; Portfolio 2026</p>
+        <h1 class="display">
+          Building systems<br />that <em>learn</em>.
+        </h1>
+        <p class="lede">
+          I design and ship software across AI, full-stack web, and data —
+          from self-training game agents to healthcare platforms used by
+          hundreds of people.
+        </p>
+        <div class="hero-links">
+          <a href="#work" class="link-arrow">View work <span aria-hidden="true">&darr;</span></a>
+          <a href="https://github.com/AugustZhang1" target="_blank" rel="noopener" class="link-arrow">GitHub <span aria-hidden="true">&#8599;</span></a>
+          <a href="mailto:augustzhang878@gmail.com" class="link-arrow">Email <span aria-hidden="true">&#8599;</span></a>
         </div>
       </div>
-    </header>
 
-    <main>
-      <section id="search-bar" class="search-section fade-in">
-        <input type="text" id="searchInput" placeholder="🔍 Search by project name...">
-        <select id="sortSelect">
-          <option>⭐ Featured</option>
-          <option>🕒 Recent</option>
-        </select>
-        <select id="categorySelect">
-          <option>📁 All Categories</option>
-          <option>🤖 AI</option>
-          <option>💻 Web Dev</option>
-          <option>📊 Data</option>
-        </select>
-      </section>
+      <figure class="hero-portrait">
+        <img src="img/me.png" alt="Portrait of August Zhang" />
+        <figcaption>BASED IN CANADA</figcaption>
+      </figure>
+    </section>
 
-      <section id="projects" class="projects-section fade-in">
-        <h2>My Projects</h2>
-        <div class="projects-grid" id="projectsGrid">
-         
-        </div>
-      </section>
+    <!-- DIVIDER -->
+    <div class="rule-label">
+      <span>Selected Work</span>
+      <span class="rule-line" aria-hidden="true"></span>
+      <span>2024 / 2025</span>
+    </div>
 
-      <section id="skills" class="skills-section fade-in">
-        <h2>Skills & Technologies</h2>
-        <div class="skills-grid">
-          <div class="skill-category">
-            <h3>💻 Programming Languages</h3>
-            <div class="skills-list">
-              <span class="skill-tag">JavaScript</span>
-              <span class="skill-tag">Python</span>
-              <span class="skill-tag">Java</span>
-              <span class="skill-tag">C++</span>
-              <span class="skill-tag">TypeScript</span>
-              <span class="skill-tag">SQL</span>
-              <span class="skill-tag">Ruby</span>
-            </div>
-          </div>
+    <!-- WORK -->
+    <section class="work reveal" id="work">
+      <div class="work-controls">
+        <input type="text" id="searchInput" placeholder="Search projects" aria-label="Search projects" />
+        <label class="control">
+          Category
+          <select id="categorySelect">
+            <option>All Categories</option>
+            <option>AI</option>
+            <option>Web Dev</option>
+            <option>Data</option>
+          </select>
+        </label>
+        <label class="control">
+          Order
+          <select id="sortSelect">
+            <option value="featured">Featured</option>
+            <option value="recent">Recent</option>
+          </select>
+        </label>
+      </div>
 
-          <div class="skill-category">
-            <h3>🌐 Web Development</h3>
-            <div class="skills-list">
-              <span class="skill-tag">React</span>
-              <span class="skill-tag">Next.js</span>
-              <span class="skill-tag">Node.js</span>
-              <span class="skill-tag">HTML/CSS</span>
-              <span class="skill-tag">Express.js</span>
-              <span class="skill-tag">Tailwind CSS</span>
-            </div>
-          </div>
+      <ol class="work-list" id="projectsGrid"></ol>
+      <p class="work-empty" id="workEmpty" hidden>No projects match that search.</p>
+    </section>
 
-          <div class="skill-category">
-            <h3>🤖 AI & Machine Learning</h3>
-            <div class="skills-list">
-              <span class="skill-tag">TensorFlow</span>
-              <span class="skill-tag">PyTorch</span>
-              <span class="skill-tag">NumPy</span>
-              <span class="skill-tag">OpenAI API</span>
-              <span class="skill-tag">Scikit-learn</span>
-              <span class="skill-tag">Pandas</span>
-            </div>
-          </div>
+    <!-- SKILLS / KEYBOARD FILTER -->
+    <section class="skills reveal" id="skills">
+      <div class="section-head">
+        <span class="section-no">02</span>
+        <h2 class="display-sm">Skills &amp; Tools</h2>
+      </div>
+      <p class="skills-hint">
+        Tap keys to filter. Selected keys stay pressed and the list below shows
+        projects built with <em>all</em> of them.
+      </p>
 
-          <div class="skill-category">
-            <h3>🛠️ Tools & Technologies</h3>
-            <div class="skills-list">
-              <span class="skill-tag">Git</span>
-              <span class="skill-tag">Docker</span>
-              <span class="skill-tag">AWS</span>
-              <span class="skill-tag">MongoDB</span>
-              <span class="skill-tag">PostgreSQL</span>
-              <span class="skill-tag">VS Code</span>
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
+      <div class="keyboard" id="keyboard" role="group" aria-label="Filter projects by skill"></div>
 
-    <footer>
-      <p>© 2025 August Zhang | Connect with me on <a href="augustzhang1.github.io" target="_blank">LinkedIN</a></p>
-    </footer>
-  </div>
+      <div class="kb-status">
+        <span id="kbCount" class="kb-count">Showing all projects</span>
+        <button type="button" id="kbClear" class="kb-clear" hidden>Clear keys</button>
+      </div>
+
+      <ol class="work-list" id="skillResults"></ol>
+      <p class="work-empty" id="skillEmpty" hidden>No project uses every selected skill.</p>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="contact reveal" id="contact">
+      <div class="section-head">
+        <span class="section-no">03</span>
+        <h2 class="display-sm">Let's talk</h2>
+      </div>
+      <a class="contact-email" href="mailto:augustzhang878@gmail.com">augustzhang878@gmail.com</a>
+      <ul class="contact-links">
+        <li><a href="https://github.com/AugustZhang1" target="_blank" rel="noopener">GitHub <span aria-hidden="true">&#8599;</span></a></li>
+        <!-- TODO: replace # with August's real LinkedIn URL -->
+        <li><a href="#">LinkedIn <span aria-hidden="true">&#8599;</span></a></li>
+        <li><a href="mailto:augustzhang878@gmail.com">Email <span aria-hidden="true">&#8599;</span></a></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>&copy; 2026 August Zhang</span>
+    <span>Designed &amp; built by hand</span>
+  </footer>
 
   <script>
     // Project data
+    // NOTE: `tech` arrays are inferred from each project's description/repo.
+    // Edit them to match each project's real stack — they drive the keyboard filter.
     const projects = [
       {
         id: 1,
         title: "AI Snake Game",
-        description: "AI training framework based on self-reinforcement learning",
+        description: "AI training framework based on self-reinforcement learning.",
         image: "img/snakegame.PNG",
         category: "AI",
+        tech: ["Python", "PyTorch", "NumPy"],
         link: "https://github.com/AugustZhang1/PythonAI"
       },
       {
         id: 2,
-        title: "Housing Price Prediction using ML",
-        description: "Developed a Machine Learning Algorithm to predict up to 100,000 houses using a Decision Tree Regressor Model",
+        title: "Housing Price Prediction",
+        description: "Machine learning pipeline predicting prices across 100,000+ houses with a Decision Tree Regressor.",
         image: "img/house.jpg",
         category: "AI",
+        tech: ["Python", "Scikit-learn", "Pandas", "NumPy"],
         link: "https://github.com/AugustZhang1/Housing-Price-Prediction"
       },
       {
         id: 3,
         title: "MediHub",
-        description: "Developed an Android healthcare appointment app that managed 500+ users by integrating Firebase for real-time data management to support booking, cancellation, and specialized appointment handling.",
+        description: "Android healthcare appointment app serving 500+ users, with Firebase real-time booking, cancellation, and specialist handling.",
         image: "img/medihub.jpg",
         category: "Data",
+        tech: ["Java"],
         link: "https://github.com/AugustZhang1/MediHub"
       },
       {
         id: 4,
         title: "Interactive Chat Bot",
-        description: "Built a chatbot with Discord integration that can interact with 1000 users simultaneously using Python",
+        description: "Discord-integrated chatbot handling 1,000 simultaneous users, built in Python.",
         image: "img/discordlogo.png",
         category: "AI",
+        tech: ["Python"],
         link: "https://github.com/AugustZhang1/discord-bot"
       },
       {
         id: 5,
         title: "E-Hotel Management System",
-        description: "Developed a full-stack hotel management platform handling 100+ daily bookings and payments for managing hotels, rooms, and users.",
+        description: "Full-stack hotel platform handling 100+ daily bookings and payments across rooms, guests, and staff.",
         image: "img/hotel.jpg",
         category: "Web Dev",
+        tech: ["JavaScript", "React", "Node.js", "Express", "PostgreSQL"],
         link: "#"
-      },
-
+      }
     ];
 
-    // DOM elements
     const searchInput = document.getElementById('searchInput');
     const categorySelect = document.getElementById('categorySelect');
+    const sortSelect = document.getElementById('sortSelect');
     const projectsGrid = document.getElementById('projectsGrid');
-    const navbar = document.getElementById('navbar');
+    const workEmpty = document.getElementById('workEmpty');
 
-    // Create project card HTML
-    function createProjectCard(project) {
+    function pad(n) {
+      return String(n).padStart(2, '0');
+    }
+
+    function createProjectCard(project, index) {
+      const num = pad(index + 1);
       return `
-        <div class="project-card" onclick="window.open('${project.link}', '_blank')" style="animation-delay: ${Math.random() * 0.5}s">
-          <div class="project-image-container">
-            <img src="${project.image}" alt="${project.title}" class="project-image">
-            <div class="project-overlay">
-              <span class="view-project">View Project</span>
+        <li class="work-item" style="--i:${index}">
+          <a class="work-link" href="${project.link}" target="_blank" rel="noopener">
+            <span class="work-no">${num}</span>
+            <div class="work-thumb">
+              <img src="${project.image}" alt="${project.title}" loading="lazy" />
             </div>
-          </div>
-          <div class="project-content">
-            <h3>${project.title}</h3>
-            <p class="project-category">${project.category}</p>
-            <p class="project-description">${project.description}</p>
-          </div>
-        </div>
+            <div class="work-meta">
+              <h3 class="work-title">${project.title}</h3>
+              <p class="work-cat">${project.category}</p>
+              <p class="work-desc">${project.description}</p>
+            </div>
+            <span class="work-arrow" aria-hidden="true">&rarr;</span>
+          </a>
+        </li>
       `;
     }
 
-    // Filter and display projects
     function displayProjects() {
-      const searchTerm = searchInput.value.toLowerCase();
-      const selectedCategory = categorySelect.value.replace(/[🤖💻📊📁⭐🕒]/g, '').trim();
+      const searchTerm = searchInput.value.toLowerCase().trim();
+      const selectedCategory = categorySelect.value;
+      const order = sortSelect.value;
 
-      const filteredProjects = projects.filter(project => {
-        const matchesSearch = project.title.toLowerCase().includes(searchTerm);
-        const matchesCategory = selectedCategory === 'All Categories' || project.category === selectedCategory;
+      let filtered = projects.filter(project => {
+        const matchesSearch =
+          project.title.toLowerCase().includes(searchTerm) ||
+          project.description.toLowerCase().includes(searchTerm);
+        const matchesCategory =
+          selectedCategory === 'All Categories' || project.category === selectedCategory;
         return matchesSearch && matchesCategory;
       });
 
-      projectsGrid.innerHTML = filteredProjects.map(createProjectCard).join('');
-    }
-
-    // Scroll animations
-    function handleScrollAnimations() {
-      const elements = document.querySelectorAll('.fade-in');
-      elements.forEach(element => {
-        const elementTop = element.getBoundingClientRect().top;
-        const elementVisible = 150;
-        
-        if (elementTop < window.innerHeight - elementVisible) {
-          element.classList.add('visible');
-        }
-      });
-    }
-
-    // Navbar scroll effect
-    function handleNavbarScroll() {
-      if (window.scrollY > 100) {
-        navbar.classList.add('scrolled');
-      } else {
-        navbar.classList.remove('scrolled');
+      if (order === 'recent') {
+        filtered = [...filtered].reverse();
       }
+
+      projectsGrid.innerHTML = filtered.map(createProjectCard).join('');
+      workEmpty.hidden = filtered.length !== 0;
     }
 
-    // Event listeners
     searchInput.addEventListener('input', displayProjects);
     categorySelect.addEventListener('change', displayProjects);
-    window.addEventListener('scroll', handleScrollAnimations);
-    window.addEventListener('scroll', handleNavbarScroll);
-
-    // Initial display
+    sortSelect.addEventListener('change', displayProjects);
     displayProjects();
-    handleScrollAnimations();
 
-    // Smooth scrolling for navigation links
+    // ----- Skill keyboard: multi-select filter (AND across selected keys) -----
+    const SKILLS = [
+      { name: "JavaScript", slug: "javascript" },
+      { name: "TypeScript", slug: "typescript" },
+      { name: "Python", slug: "python" },
+      { name: "Java", slug: "openjdk" },
+      { name: "C++", slug: "cplusplus" },
+      { name: "Ruby", slug: "ruby" },
+      { name: "React", slug: "react" },
+      { name: "Next.js", slug: "nextdotjs" },
+      { name: "Node.js", slug: "nodedotjs" },
+      { name: "Express", slug: "express" },
+      { name: "HTML/CSS", slug: "html5" },
+      { name: "Tailwind", slug: "tailwindcss" },
+      { name: "TensorFlow", slug: "tensorflow" },
+      { name: "PyTorch", slug: "pytorch" },
+      { name: "NumPy", slug: "numpy" },
+      { name: "Pandas", slug: "pandas" },
+      { name: "Scikit-learn", slug: "scikitlearn" },
+      { name: "OpenAI", slug: "openai" },
+      { name: "Git", slug: "git" },
+      { name: "Docker", slug: "docker" },
+      { name: "AWS", slug: "amazonwebservices" },
+      { name: "MongoDB", slug: "mongodb" },
+      { name: "PostgreSQL", slug: "postgresql" }
+    ];
+    const ICON_BASE = "https://cdn.jsdelivr.net/npm/simple-icons@13/icons/";
+
+    const keyboard = document.getElementById('keyboard');
+    const skillResults = document.getElementById('skillResults');
+    const skillEmpty = document.getElementById('skillEmpty');
+    const kbCount = document.getElementById('kbCount');
+    const kbClear = document.getElementById('kbClear');
+    const selectedSkills = new Set();
+
+    keyboard.innerHTML = SKILLS.map(s => `
+      <button type="button" class="keycap" data-skill="${s.name}" aria-pressed="false">
+        <span class="key-icon" style="--icon:url('${ICON_BASE}${s.slug}.svg')" aria-hidden="true"></span>
+        <span class="key-label">${s.name}</span>
+      </button>
+    `).join('');
+
+    function renderSkillResults() {
+      const picks = [...selectedSkills];
+      const matches = picks.length === 0
+        ? projects
+        : projects.filter(p => picks.every(t => p.tech.includes(t)));
+
+      skillResults.innerHTML = matches.map(createProjectCard).join('');
+      skillEmpty.hidden = matches.length !== 0;
+      kbClear.hidden = picks.length === 0;
+      kbCount.textContent = picks.length === 0
+        ? 'Showing all projects'
+        : `${matches.length} project${matches.length === 1 ? '' : 's'} · ${picks.join(' + ')}`;
+    }
+
+    keyboard.addEventListener('click', e => {
+      const key = e.target.closest('.keycap');
+      if (!key) return;
+      const name = key.dataset.skill;
+      const on = !selectedSkills.has(name);
+      if (on) selectedSkills.add(name); else selectedSkills.delete(name);
+      key.classList.toggle('is-selected', on);
+      key.setAttribute('aria-pressed', String(on));
+      renderSkillResults();
+    });
+
+    kbClear.addEventListener('click', () => {
+      selectedSkills.clear();
+      keyboard.querySelectorAll('.is-selected').forEach(k => {
+        k.classList.remove('is-selected');
+        k.setAttribute('aria-pressed', 'false');
+      });
+      renderSkillResults();
+    });
+
+    renderSkillResults();
+
+    // Smooth scrolling for in-page navigation
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
+        const href = this.getAttribute('href');
+        if (href === '#') return;
+        const target = document.querySelector(href);
         if (target) {
-          target.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          });
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       });
     });
 
-    // Add typing effect to hero text
-    function typeWriter(element, text, speed = 100) {
-      let i = 0;
-      element.innerHTML = '';
-      function type() {
-        if (i < text.length) {
-          element.innerHTML += text.charAt(i);
-          i++;
-          setTimeout(type, speed);
-        }
-      }
-      type();
+    // Quiet reveal-on-scroll (replaces particle/scroll-listener effects)
+    const reveals = document.querySelectorAll('.reveal');
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            obs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      reveals.forEach(el => io.observe(el));
+    } else {
+      reveals.forEach(el => el.classList.add('is-visible'));
     }
-
-    // Initialize typing effect after page load
-    window.addEventListener('load', () => {
-      const heroTitle = document.querySelector('.hero-content h1');
-      const originalText = heroTitle.textContent;
-      setTimeout(() => {
-        typeWriter(heroTitle, originalText, 150);
-      }, 1000);
-    });
   </script>
 </body>
 </html>
