@@ -6,6 +6,20 @@
   <title>August Zhang — Computer Engineer</title>
   <meta name="description" content="August Zhang — computer engineer. Selected work in AI, web, and data." />
   <link rel="stylesheet" href="style.css" />
+  <script>
+    // Set theme before first paint to avoid a flash. Stored choice wins,
+    // otherwise follow the OS preference.
+    (function () {
+      try {
+        var saved = localStorage.getItem('theme');
+        var dark = saved ? saved === 'dark'
+          : window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
 </head>
 <body>
   <div class="grid-paper" aria-hidden="true"></div>
@@ -14,8 +28,10 @@
     <a class="wordmark" href="#top">AUGUST&nbsp;ZHANG</a>
     <nav class="topnav">
       <a href="#work">Work</a>
+      <a href="#experience">Experience</a>
       <a href="#skills">Skills</a>
       <a href="#contact">Contact</a>
+      <button type="button" id="themeToggle" class="theme-toggle" aria-label="Switch to dark mode" aria-pressed="false">☾</button>
     </nav>
   </header>
 
@@ -28,9 +44,9 @@
           Building systems<br />that <em>learn</em>.
         </h1>
         <p class="lede">
-          I design and ship software across AI, full-stack web, and data —
-          from self-training game agents to healthcare platforms used by
-          hundreds of people.
+          I design and ship software across full-stack web, real-time
+          systems, and AI — from concurrent Go services and live telemetry
+          dashboards to healthcare platforms used by thousands.
         </p>
         <div class="hero-links">
           <a href="#work" class="link-arrow">View work <span aria-hidden="true">&darr;</span></a>
@@ -45,11 +61,98 @@
       </figure>
     </section>
 
+    <!-- EXPERIENCE -->
+    <section class="experience reveal" id="experience">
+      <div class="section-head">
+        <span class="section-no">01</span>
+        <h2 class="display-sm">Experience</h2>
+      </div>
+
+      <ol class="exp-list">
+        <li class="exp-item">
+          <div class="exp-head">
+            <div class="exp-id">
+              <span class="exp-logo">
+                <img src="img/sinai.jpg" alt="Sinai Foundation logo" loading="lazy" />
+              </span>
+              <div class="exp-role">
+                <h3 class="exp-title">Software Developer Intern</h3>
+                <p class="exp-org">Sinai Foundation &middot; Toronto, ON</p>
+              </div>
+            </div>
+            <p class="exp-dates">May 2026 &mdash; Present</p>
+          </div>
+          <ul class="exp-points">
+            <li>Architecting and refactoring 3 organizational websites by migrating legacy JavaScript into a shared React component library, cutting duplicate code across sites by 30%.</li>
+            <li>Engineered a GitHub Actions CI/CD pipeline automating build, Jest testing, and release workflows across 3 sites, reducing deployment time by 80%.</li>
+            <li>Configured Pages CMS with a <code>.pages.yml</code> schema so non-technical staff publish directly to GitHub and trigger automated deploys, saving ~4 engineering hours per week.</li>
+            <li>Delivered features across 3 sites in an Agile environment, running sprint planning and iterative releases to align development velocity with organizational requirements.</li>
+          </ul>
+        </li>
+
+        <li class="exp-item">
+          <div class="exp-head">
+            <div class="exp-id">
+              <span class="exp-logo exp-logo--dark">
+                <img src="img/senseway.png" alt="SenseWay logo" loading="lazy" />
+              </span>
+              <div class="exp-role">
+                <h3 class="exp-title">Software Developer Intern</h3>
+                <p class="exp-org">SenseWay &middot; Ottawa, ON</p>
+              </div>
+            </div>
+            <p class="exp-dates">Sept 2025 &mdash; April 2026</p>
+          </div>
+          <ul class="exp-points">
+            <li>Engineered a Go REST API with error-handling and validation middleware to ingest biometric telemetry (heart rate, GPS, battery), reducing error rates for concurrent device streams.</li>
+            <li>Optimized PostgreSQL schemas with targeted indexing and containerized services with Docker, deploying to AWS EC2 to support 10,000+ concurrent device connections.</li>
+            <li>Architected a native Kotlin Android app integrating real-time WebSocket telemetry and a Roboflow object-detection model (90% confidence thresholding) to identify crosswalks and trigger voice alerts for mobility-aid users.</li>
+            <li>Shipped a Vue.js dashboard with WebSocket-driven updates rendering live GPS tracks and alerts at 0.8s display latency.</li>
+          </ul>
+        </li>
+      </ol>
+    </section>
+
+    <!-- SKILLS / KEYBOARD FILTER -->
+    <section class="skills reveal" id="skills">
+      <div class="section-head">
+        <span class="section-no">02</span>
+        <h2 class="display-sm">Skills &amp; Tools</h2>
+      </div>
+      <p class="skills-hint">
+        Tap keys to filter. Selected keys stay pressed and the list below shows
+        projects built with <em>all</em> of them.
+      </p>
+
+      <!-- Liquid-glass refraction filter (ported from the liquid-glass-button
+           component): turbulence + displacement distorts the deck seen through
+           each keycap. Applied via backdrop-filter: url(#liquid-glass). -->
+      <svg width="0" height="0" aria-hidden="true" style="position:absolute">
+        <defs>
+          <filter id="liquid-glass" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
+            <feTurbulence type="fractalNoise" baseFrequency="0.013 0.013" numOctaves="2" seed="7" result="noise" />
+            <feGaussianBlur in="noise" stdDeviation="2.2" result="blurred" />
+            <feDisplacementMap in="SourceGraphic" in2="blurred" scale="22" xChannelSelector="R" yChannelSelector="G" />
+          </filter>
+        </defs>
+      </svg>
+
+      <div class="keyboard" id="keyboard" role="group" aria-label="Filter projects by skill"></div>
+
+      <div class="kb-status">
+        <span id="kbCount" class="kb-count">Showing all projects</span>
+        <button type="button" id="kbClear" class="kb-clear" hidden>Clear keys</button>
+      </div>
+
+      <ol class="work-list" id="skillResults"></ol>
+      <p class="work-empty" id="skillEmpty" hidden>No project uses every selected skill.</p>
+    </section>
+
     <!-- DIVIDER -->
     <div class="rule-label">
       <span>Selected Work</span>
       <span class="rule-line" aria-hidden="true"></span>
-      <span>2024 / 2025</span>
+      <span>2024 / 2026</span>
     </div>
 
     <!-- WORK -->
@@ -76,28 +179,6 @@
 
       <ol class="work-list" id="projectsGrid"></ol>
       <p class="work-empty" id="workEmpty" hidden>No projects match that search.</p>
-    </section>
-
-    <!-- SKILLS / KEYBOARD FILTER -->
-    <section class="skills reveal" id="skills">
-      <div class="section-head">
-        <span class="section-no">02</span>
-        <h2 class="display-sm">Skills &amp; Tools</h2>
-      </div>
-      <p class="skills-hint">
-        Tap keys to filter. Selected keys stay pressed and the list below shows
-        projects built with <em>all</em> of them.
-      </p>
-
-      <div class="keyboard" id="keyboard" role="group" aria-label="Filter projects by skill"></div>
-
-      <div class="kb-status">
-        <span id="kbCount" class="kb-count">Showing all projects</span>
-        <button type="button" id="kbClear" class="kb-clear" hidden>Clear keys</button>
-      </div>
-
-      <ol class="work-list" id="skillResults"></ol>
-      <p class="work-empty" id="skillEmpty" hidden>No project uses every selected skill.</p>
     </section>
 
     <!-- CONTACT -->
@@ -128,24 +209,15 @@
     const projects = [
       {
         id: 1,
-        title: "AI Snake Game",
-        description: "AI training framework based on self-reinforcement learning.",
-        image: "img/snakegame.PNG",
-        category: "AI",
-        tech: ["Python", "PyTorch", "NumPy"],
-        link: "https://github.com/AugustZhang1/PythonAI"
+        title: "Sports Odds Arbitrage Engine",
+        description: "Concurrent Go service monitoring live odds across 5+ bookmakers every 5 minutes, flagging arbitrage where combined implied probabilities fall below 100%; time-series PostgreSQL schema tracks line movement for backtesting.",
+        image: "img/odds.jpg",
+        category: "Web Dev",
+        tech: ["Go", "Vue.js", "PostgreSQL"],
+        link: "https://github.com/AugustZhang1"
       },
       {
         id: 2,
-        title: "Housing Price Prediction",
-        description: "Machine learning pipeline predicting prices across 100,000+ houses with a Decision Tree Regressor.",
-        image: "img/house.jpg",
-        category: "AI",
-        tech: ["Python", "Scikit-learn", "Pandas", "NumPy"],
-        link: "https://github.com/AugustZhang1/Housing-Price-Prediction"
-      },
-      {
-        id: 3,
         title: "MediHub",
         description: "Android healthcare appointment app serving 500+ users, with Firebase real-time booking, cancellation, and specialist handling.",
         image: "img/medihub.jpg",
@@ -154,16 +226,34 @@
         link: "https://github.com/AugustZhang1/MediHub"
       },
       {
-        id: 4,
-        title: "Interactive Chat Bot",
-        description: "Discord-integrated chatbot handling 1,000 simultaneous users, built in Python.",
-        image: "img/discordlogo.png",
+        id: 3,
+        title: "AI Snake Game",
+        description: "AI training framework based on self-reinforcement learning.",
+        image: "img/snakegame.PNG",
         category: "AI",
-        tech: ["Python"],
-        link: "https://github.com/AugustZhang1/discord-bot"
+        tech: ["Python", "PyTorch", "NumPy"],
+        link: "https://github.com/AugustZhang1/PythonAI"
+      },
+      {
+        id: 4,
+        title: "Real-Time Chat Platform",
+        description: "Flask + WebSocket chat handling 1,000+ daily interactions, with a row-locked PostgreSQL session store hardening against concurrent-write races and persisting history across reconnects. Deployed on Render.",
+        image: "img/chat.jpg",
+        category: "Web Dev",
+        tech: ["Python", "Flask", "PostgreSQL"],
+        link: "https://github.com/AugustZhang1"
       },
       {
         id: 5,
+        title: "Housing Price Prediction",
+        description: "Machine learning pipeline predicting prices across 100,000+ houses with a Decision Tree Regressor.",
+        image: "img/house.jpg",
+        category: "AI",
+        tech: ["Python", "Scikit-learn", "Pandas", "NumPy"],
+        link: "https://github.com/AugustZhang1/Housing-Price-Prediction"
+      },
+      {
+        id: 6,
         title: "E-Hotel Management System",
         description: "Full-stack hotel platform handling 100+ daily bookings and payments across rooms, guests, and staff.",
         image: "img/hotel.jpg",
@@ -183,15 +273,25 @@
       return String(n).padStart(2, '0');
     }
 
+    function monogram(title) {
+      return title.split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+    }
+
     function createProjectCard(project, index) {
       const num = pad(index + 1);
+      const external = /^https?:/.test(project.link);
+      const linkAttrs = external ? ' target="_blank" rel="noopener"' : '';
+      const thumb = project.image
+        ? `<div class="work-thumb" data-mono="${monogram(project.title)}">
+              <img src="${project.image}" alt="${project.title}" loading="lazy"
+                   onerror="this.parentElement.classList.add('no-img'); this.remove();" />
+            </div>`
+        : `<div class="work-thumb no-img" data-mono="${monogram(project.title)}"></div>`;
       return `
         <li class="work-item" style="--i:${index}">
-          <a class="work-link" href="${project.link}" target="_blank" rel="noopener">
+          <a class="work-link" href="${project.link}"${linkAttrs}>
             <span class="work-no">${num}</span>
-            <div class="work-thumb">
-              <img src="${project.image}" alt="${project.title}" loading="lazy" />
-            </div>
+            ${thumb}
             <div class="work-meta">
               <h3 class="work-title">${project.title}</h3>
               <p class="work-cat">${project.category}</p>
@@ -235,13 +335,19 @@
       { name: "JavaScript", slug: "javascript" },
       { name: "TypeScript", slug: "typescript" },
       { name: "Python", slug: "python" },
+      { name: "Go", slug: "go" },
       { name: "Java", slug: "openjdk" },
+      { name: "Kotlin", slug: "kotlin" },
       { name: "C++", slug: "cplusplus" },
       { name: "Ruby", slug: "ruby" },
       { name: "React", slug: "react" },
+      { name: "Vue.js", slug: "vuedotjs" },
       { name: "Next.js", slug: "nextdotjs" },
       { name: "Node.js", slug: "nodedotjs" },
       { name: "Express", slug: "express" },
+      { name: "Flask", slug: "flask" },
+      { name: "Jest", slug: "jest" },
+      { name: "Android", slug: "android" },
       { name: "HTML/CSS", slug: "html5" },
       { name: "Tailwind", slug: "tailwindcss" },
       { name: "TensorFlow", slug: "tensorflow" },
@@ -249,12 +355,15 @@
       { name: "NumPy", slug: "numpy" },
       { name: "Pandas", slug: "pandas" },
       { name: "Scikit-learn", slug: "scikitlearn" },
-      { name: "OpenAI", slug: "openai" },
       { name: "Git", slug: "git" },
+      { name: "GitHub Actions", slug: "githubactions" },
       { name: "Docker", slug: "docker" },
+      { name: "Linux", slug: "linux" },
       { name: "AWS", slug: "amazonwebservices" },
+      { name: "Render", slug: "render" },
       { name: "MongoDB", slug: "mongodb" },
-      { name: "PostgreSQL", slug: "postgresql" }
+      { name: "PostgreSQL", slug: "postgresql" },
+      { name: "SQLite", slug: "sqlite" }
     ];
     const ICON_BASE = "https://cdn.jsdelivr.net/npm/simple-icons@13/icons/";
 
@@ -272,18 +381,243 @@
       </button>
     `).join('');
 
+    // Experience entries are filterable by skill too. `tech` mirrors the resume.
+    const experiences = [
+      {
+        title: "Sinai Foundation — Software Developer Intern",
+        description: "Migrated 3 sites into a shared React component library, engineered a GitHub Actions CI/CD pipeline with Jest testing, and configured Pages CMS for non-technical publishing.",
+        image: "",
+        category: "Experience",
+        tech: ["React", "JavaScript", "Jest", "GitHub Actions", "Git"],
+        link: "#experience"
+      },
+      {
+        title: "SenseWay — Software Developer Intern",
+        description: "Built a Go telemetry REST API on PostgreSQL/Docker/AWS, a native Kotlin Android app with WebSocket feeds and Roboflow detection, and a live Vue.js dashboard.",
+        image: "",
+        category: "Experience",
+        tech: ["Go", "PostgreSQL", "Docker", "AWS", "Kotlin", "Android", "Vue.js"],
+        link: "#experience"
+      }
+    ];
+
     function renderSkillResults() {
       const picks = [...selectedSkills];
       const matches = picks.length === 0
         ? projects
-        : projects.filter(p => picks.every(t => p.tech.includes(t)));
+        : [...projects, ...experiences].filter(p => picks.every(t => p.tech.includes(t)));
 
       skillResults.innerHTML = matches.map(createProjectCard).join('');
       skillEmpty.hidden = matches.length !== 0;
       kbClear.hidden = picks.length === 0;
       kbCount.textContent = picks.length === 0
         ? 'Showing all projects'
-        : `${matches.length} project${matches.length === 1 ? '' : 's'} · ${picks.join(' + ')}`;
+        : `${matches.length} result${matches.length === 1 ? '' : 's'} · ${picks.join(' + ')}`;
+    }
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // ----- RGX shader ripple: raw WebGL energy burst, ported from the
+    // reference GLSL. One canvas behind the keys; each click spawns a
+    // localized burst that expands and fades. The render loop only runs
+    // while bursts are alive, so the board costs nothing when idle. -----
+    const MAX_BURSTS = 5;
+    const BURST_LIFE = 1.1; // seconds
+    let gl, glProg, glUni, rgxCanvas, rgxRunning = false;
+    let rgxW = 0, rgxH = 0, rgxDpr = 1;
+    let rgxTint = [1.0, 0.55, 0.38]; // warm in light; set to aurora blue in dark
+    const bursts = []; // { x, y, t0 } — x/y in CSS px relative to the deck
+
+    function compileShader(type, src) {
+      const s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+        console.warn('RGX shader:', gl.getShaderInfoLog(s));
+        return null;
+      }
+      return s;
+    }
+
+    function initRGXShader() {
+      rgxCanvas = document.createElement('canvas');
+      rgxCanvas.className = 'rgx-canvas';
+      rgxCanvas.setAttribute('aria-hidden', 'true');
+      keyboard.insertBefore(rgxCanvas, keyboard.firstChild);
+
+      gl = rgxCanvas.getContext('webgl', { premultipliedAlpha: false, antialias: true });
+      if (!gl) { rgxCanvas.remove(); return false; }
+
+      const vs = 'attribute vec2 p; void main(){ gl_Position = vec4(p, 0.0, 1.0); }';
+      const fs = `
+        precision highp float;
+        uniform vec2  u_res;
+        uniform int   u_count;
+        uniform vec2  u_origin[${MAX_BURSTS}];
+        uniform float u_age[${MAX_BURSTS}];
+        uniform vec3  u_tint;
+        #define LIFE ${BURST_LIFE.toFixed(2)}
+
+        // Expanding shockwave: a leading edge plus trailing concentric rings
+        // that travel out to the deck diagonal so the wave crosses every key.
+        float ring(vec2 uv, float prog, float maxR) {
+          float lead = prog * maxR * 1.2;    // leading-edge radius (uv units)
+          float L = length(uv);
+          float v = 0.0;
+          for (int i = 0; i < 6; i++) {
+            float r = lead - float(i) * 0.14; // trailing rings behind the edge
+            if (r < 0.0) continue;
+            v += 0.022 / (abs(L - r) + 0.018);
+          }
+          return v;
+        }
+
+        void main() {
+          float m = min(u_res.x, u_res.y);
+          float maxR = length(u_res) / m;     // diagonal reach in uv units
+          vec3 col = vec3(0.0);
+          float a = 0.0;
+          for (int i = 0; i < ${MAX_BURSTS}; i++) {
+            if (i >= u_count) break;
+            float age = u_age[i];
+            if (age < 0.0 || age > LIFE) continue;
+            vec2 uv = (gl_FragCoord.xy - u_origin[i]) / m;
+            float prog = age / LIFE;           // 0 -> 1 across the burst life
+            float fade = 1.0 - prog;
+            fade *= fade;                       // ease-out tail
+            // subtle per-channel offset => chromatic shimmer, tinted warm
+            float r = ring(uv, prog + 0.000, maxR);
+            float g = ring(uv, prog + 0.020, maxR);
+            float b = ring(uv, prog + 0.040, maxR);
+            vec3 line = vec3(r, g, b) * fade * u_tint;
+            col += line;
+            a += (r + g + b) * 0.5 * fade;
+          }
+          gl_FragColor = vec4(clamp(col, 0.0, 1.0), clamp(a, 0.0, 1.0));
+        }
+      `;
+
+      const v = compileShader(gl.VERTEX_SHADER, vs);
+      const f = compileShader(gl.FRAGMENT_SHADER, fs);
+      if (!v || !f) { rgxCanvas.remove(); return false; }
+      glProg = gl.createProgram();
+      gl.attachShader(glProg, v);
+      gl.attachShader(glProg, f);
+      gl.linkProgram(glProg);
+      if (!gl.getProgramParameter(glProg, gl.LINK_STATUS)) {
+        console.warn('RGX link:', gl.getProgramInfoLog(glProg));
+        rgxCanvas.remove();
+        return false;
+      }
+      gl.useProgram(glProg);
+
+      // Single full-screen triangle.
+      const buf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+      const loc = gl.getAttribLocation(glProg, 'p');
+      gl.enableVertexAttribArray(loc);
+      gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+      glUni = {
+        res: gl.getUniformLocation(glProg, 'u_res'),
+        count: gl.getUniformLocation(glProg, 'u_count'),
+        origin: gl.getUniformLocation(glProg, 'u_origin'),
+        age: gl.getUniformLocation(glProg, 'u_age'),
+        tint: gl.getUniformLocation(glProg, 'u_tint'),
+      };
+
+      gl.enable(gl.BLEND);
+      gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+      resizeRGX();
+      return true;
+    }
+
+    function resizeRGX() {
+      if (!gl) return;
+      const r = keyboard.getBoundingClientRect();
+      rgxDpr = Math.min(window.devicePixelRatio || 1, 2);
+      rgxW = Math.round(r.width);
+      rgxH = Math.round(r.height);
+      rgxCanvas.width = Math.round(rgxW * rgxDpr);
+      rgxCanvas.height = Math.round(rgxH * rgxDpr);
+      gl.viewport(0, 0, rgxCanvas.width, rgxCanvas.height);
+    }
+
+    function renderRGX() {
+      const now = performance.now() / 1000;
+      for (let i = bursts.length - 1; i >= 0; i--) {
+        if (now - bursts[i].t0 > BURST_LIFE) bursts.splice(i, 1);
+      }
+
+      gl.clearColor(0, 0, 0, 0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+
+      const n = Math.min(bursts.length, MAX_BURSTS);
+      const origins = new Float32Array(MAX_BURSTS * 2);
+      const ages = new Float32Array(MAX_BURSTS);
+      for (let i = 0; i < n; i++) {
+        const b = bursts[i];
+        origins[i * 2] = b.x * rgxDpr;
+        origins[i * 2 + 1] = (rgxH - b.y) * rgxDpr; // flip Y for gl_FragCoord
+        ages[i] = now - b.t0;
+      }
+      gl.uniform2f(glUni.res, rgxCanvas.width, rgxCanvas.height);
+      gl.uniform1i(glUni.count, n);
+      gl.uniform2fv(glUni.origin, origins);
+      gl.uniform1fv(glUni.age, ages);
+      gl.uniform3fv(glUni.tint, rgxTint);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+      if (bursts.length) {
+        requestAnimationFrame(renderRGX);
+      } else {
+        rgxRunning = false;
+        gl.clear(gl.COLOR_BUFFER_BIT);
+      }
+    }
+
+    function spawnBurst(x, y) {
+      if (!gl) return;
+      bursts.push({ x, y, t0: performance.now() / 1000 });
+      if (bursts.length > MAX_BURSTS) bursts.shift();
+      if (!rgxRunning) {
+        rgxRunning = true;
+        requestAnimationFrame(renderRGX);
+      }
+    }
+
+    const rgxReady = !reduceMotion && initRGXShader();
+    if (rgxReady && 'ResizeObserver' in window) {
+      new ResizeObserver(resizeRGX).observe(keyboard);
+    }
+
+    // RGX ripple: a shader burst expands from the click point while an accent
+    // pulse propagates key-to-key, staggered by distance (transform/opacity).
+    function emitRGX(ev) {
+      if (reduceMotion) return;
+      const kb = keyboard.getBoundingClientRect();
+      const ox = ev.clientX - kb.left;
+      const oy = ev.clientY - kb.top;
+
+      spawnBurst(ox, oy);
+
+      const keys = [...keyboard.querySelectorAll('.keycap')];
+      // Read phase: measure distances, then clear any in-flight wave.
+      const waves = keys.map(k => {
+        const r = k.getBoundingClientRect();
+        const cx = r.left - kb.left + r.width / 2;
+        const cy = r.top - kb.top + r.height / 2;
+        return { k, d: Math.hypot(cx - ox, cy - oy) };
+      });
+      keys.forEach(k => k.classList.remove('is-wave'));
+      // Write phase: one rAF so the class removal lands, restarting the anim.
+      requestAnimationFrame(() => {
+        waves.forEach(({ k, d }) => {
+          k.style.setProperty('--wave-delay', Math.min(d * 1.1, 540) + 'ms');
+          k.classList.add('is-wave');
+        });
+      });
     }
 
     keyboard.addEventListener('click', e => {
@@ -294,6 +628,7 @@
       if (on) selectedSkills.add(name); else selectedSkills.delete(name);
       key.classList.toggle('is-selected', on);
       key.setAttribute('aria-pressed', String(on));
+      emitRGX(e);
       renderSkillResults();
     });
 
@@ -336,6 +671,120 @@
     } else {
       reveals.forEach(el => el.classList.add('is-visible'));
     }
+
+    // ===== Aurora background (raw WebGL) + dark-mode theme system =====
+    // A full-screen domain-warped fbm aurora. Renders only in dark mode and
+    // only while the tab is visible. Drawn at reduced resolution (soft glow
+    // hides it) so a 4K screen stays cheap. Reduced-motion => single frame.
+    const root = document.documentElement;
+    const themeToggle = document.getElementById('themeToggle');
+    const AURORA_SCALE = 0.6;
+    let aGL = null, aProg = null, aUni = null, aCanvas = null, aRAF = 0, aT0 = 0, auroraReady = false;
+
+    function initAurora() {
+      aCanvas = document.createElement('canvas');
+      aCanvas.id = 'aurora-canvas';
+      aCanvas.setAttribute('aria-hidden', 'true');
+      document.body.insertBefore(aCanvas, document.body.firstChild);
+      aGL = aCanvas.getContext('webgl', { antialias: false, depth: false, alpha: false });
+      if (!aGL) { aCanvas.remove(); return false; }
+
+      const vs = 'attribute vec2 p; void main(){ gl_Position = vec4(p,0.0,1.0); }';
+      const fs = `
+        precision highp float;
+        uniform vec2 u_res;
+        uniform float u_time;
+        float hash(vec2 p){ p=fract(p*vec2(123.34,345.45)); p+=dot(p,p+34.345); return fract(p.x*p.y); }
+        float noise(vec2 p){
+          vec2 i=floor(p), f=fract(p);
+          float a=hash(i), b=hash(i+vec2(1.0,0.0)), c=hash(i+vec2(0.0,1.0)), d=hash(i+vec2(1.0,1.0));
+          vec2 u=f*f*(3.0-2.0*f);
+          return mix(mix(a,b,u.x),mix(c,d,u.x),u.y);
+        }
+        float fbm(vec2 p){ float s=0.0,a=0.5; for(int i=0;i<5;i++){ s+=a*noise(p); p*=2.0; a*=0.5; } return s; }
+        void main(){
+          vec2 uv = gl_FragCoord.xy/u_res.xy;
+          vec2 p = uv; p.x *= u_res.x/u_res.y;
+          float t = u_time*0.04;
+          vec2 q = vec2(fbm(p*1.5 + t), fbm(p*1.5 - t + 5.0));
+          float n = fbm(p*2.0 + q*1.6 + vec2(0.0, t*1.4));
+          float band = smoothstep(0.2,1.0,n) * (0.5 + 0.7*uv.y);
+          vec3 base   = vec3(0.015,0.025,0.055);
+          vec3 blue   = vec3(0.05,0.35,0.85);
+          vec3 cyan   = vec3(0.10,0.75,0.85);
+          vec3 violet = vec3(0.42,0.24,0.72);
+          vec3 col = base;
+          col += blue   * band * 0.42;
+          col += cyan   * smoothstep(0.55,1.0,n) * 0.30;
+          col += violet * pow(n,3.0) * 0.36;
+          col += vec3(0.9,0.72,0.32) * pow(max(n-0.86,0.0),2.0) * 0.12; // rare gold glint
+          float vig = smoothstep(1.25,0.2,length(uv-0.5));
+          col *= 0.5 + 0.5*vig;
+          gl_FragColor = vec4(col,1.0);
+        }
+      `;
+      const mk = (type, src) => { const s = aGL.createShader(type); aGL.shaderSource(s, src); aGL.compileShader(s);
+        return aGL.getShaderParameter(s, aGL.COMPILE_STATUS) ? s : (console.warn('aurora:', aGL.getShaderInfoLog(s)), null); };
+      const v = mk(aGL.VERTEX_SHADER, vs), f = mk(aGL.FRAGMENT_SHADER, fs);
+      if (!v || !f) { aCanvas.remove(); return false; }
+      aProg = aGL.createProgram(); aGL.attachShader(aProg, v); aGL.attachShader(aProg, f); aGL.linkProgram(aProg);
+      if (!aGL.getProgramParameter(aProg, aGL.LINK_STATUS)) { aCanvas.remove(); return false; }
+      aGL.useProgram(aProg);
+      const buf = aGL.createBuffer(); aGL.bindBuffer(aGL.ARRAY_BUFFER, buf);
+      aGL.bufferData(aGL.ARRAY_BUFFER, new Float32Array([-1,-1,3,-1,-1,3]), aGL.STATIC_DRAW);
+      const loc = aGL.getAttribLocation(aProg, 'p'); aGL.enableVertexAttribArray(loc);
+      aGL.vertexAttribPointer(loc, 2, aGL.FLOAT, false, 0, 0);
+      aUni = { res: aGL.getUniformLocation(aProg, 'u_res'), time: aGL.getUniformLocation(aProg, 'u_time') };
+      resizeAurora();
+      return true;
+    }
+
+    function resizeAurora() {
+      if (!aGL) return;
+      aCanvas.width = Math.max(2, Math.floor(window.innerWidth * AURORA_SCALE));
+      aCanvas.height = Math.max(2, Math.floor(window.innerHeight * AURORA_SCALE));
+      aGL.viewport(0, 0, aCanvas.width, aCanvas.height);
+      if (!aRAF) drawAurora(performance.now()); // refresh a static frame on resize
+    }
+
+    function drawAurora(now) {
+      if (!aGL) return;
+      aGL.uniform2f(aUni.res, aCanvas.width, aCanvas.height);
+      aGL.uniform1f(aUni.time, (now - aT0) / 1000);
+      aGL.drawArrays(aGL.TRIANGLES, 0, 3);
+    }
+
+    function auroraLoop(now) {
+      if (!isDark() || document.hidden) { aRAF = 0; return; }
+      drawAurora(now);
+      aRAF = requestAnimationFrame(auroraLoop);
+    }
+
+    function ensureAurora() {
+      if (!auroraReady) return;
+      if (reduceMotion) { aT0 = aT0 || performance.now(); drawAurora(performance.now()); return; }
+      if (!aRAF) { aT0 = aT0 || performance.now(); aRAF = requestAnimationFrame(auroraLoop); }
+    }
+    function stopAurora() { if (aRAF) { cancelAnimationFrame(aRAF); aRAF = 0; } }
+
+    function isDark() { return root.getAttribute('data-theme') === 'dark'; }
+    function applyTheme(dark) {
+      root.setAttribute('data-theme', dark ? 'dark' : 'light');
+      try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch (e) {}
+      rgxTint = dark ? [0.35, 0.78, 1.0] : [1.0, 0.55, 0.38];
+      if (themeToggle) {
+        themeToggle.setAttribute('aria-pressed', String(dark));
+        themeToggle.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+        themeToggle.textContent = dark ? '☀' : '☾';
+      }
+      if (dark) ensureAurora(); else stopAurora();
+    }
+
+    auroraReady = initAurora();
+    window.addEventListener('resize', resizeAurora);
+    document.addEventListener('visibilitychange', () => { if (isDark()) ensureAurora(); });
+    if (themeToggle) themeToggle.addEventListener('click', () => applyTheme(!isDark()));
+    applyTheme(isDark()); // sync with the pre-paint theme set in <head>
   </script>
 </body>
 </html>
