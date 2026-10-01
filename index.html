@@ -48,8 +48,8 @@
         </h1>
         <p class="lede">
           I design and ship software across full-stack web, real-time
-          systems, and AI — from concurrent Go services and live telemetry
-          dashboards to healthcare platforms used by thousands.
+          systems, and AI — from Raspberry Pi mobility hardware and
+          concurrent Go services to CI/CD pipelines and RAG evaluation tooling.
         </p>
         <div class="hero-links">
           <a href="#work" class="link-arrow">View work <span aria-hidden="true">&darr;</span></a>
@@ -83,13 +83,13 @@
                 <p class="exp-org">Sinai Foundation &middot; Toronto, ON</p>
               </div>
             </div>
-            <p class="exp-dates">May 2026 &mdash; Present</p>
+            <p class="exp-dates">May 2026 &mdash; Aug 2026</p>
           </div>
           <ul class="exp-points">
-            <li>Architecting and refactoring 3 organizational websites by migrating legacy JavaScript into a shared React component library, cutting duplicate code across sites by 30%.</li>
-            <li>Engineered a GitHub Actions CI/CD pipeline automating build, Jest testing, and release workflows across 3 sites, reducing deployment time by 80%.</li>
-            <li>Configured Pages CMS with a <code>.pages.yml</code> schema so non-technical staff publish directly to GitHub and trigger automated deploys, saving ~4 engineering hours per week.</li>
-            <li>Delivered features across 3 sites in an Agile environment, running sprint planning and iterative releases to align development velocity with organizational requirements.</li>
+            <li>Cut deployment time by 90% across 3 production websites serving 5,000+ monthly visitors by engineering a GitHub Actions CI/CD pipeline automating builds, Jest tests, and releases.</li>
+            <li>Integrated Stripe payments across all 3 sites — checkout, webhook validation, confirmation, and failure handling — moving the organization's donation pipeline online.</li>
+            <li>Saved ~4 engineering hours/week by configuring Pages CMS with a <code>.pages.yml</code> schema, enabling non-technical staff to publish directly to GitHub and trigger automated deploys.</li>
+            <li>Cut code duplication by 30% across 3 legacy websites by rebuilding UIs in React and consolidating duplicated JavaScript into a shared component library.</li>
           </ul>
         </li>
 
@@ -107,10 +107,10 @@
             <p class="exp-dates">Sept 2025 &mdash; April 2026</p>
           </div>
           <ul class="exp-points">
-            <li>Engineered a Go REST API with error-handling and validation middleware to ingest biometric telemetry (heart rate, GPS, battery), reducing error rates for concurrent device streams.</li>
-            <li>Optimized PostgreSQL schemas with targeted indexing and containerized services with Docker, deploying to AWS EC2 to support 10,000+ concurrent device connections.</li>
-            <li>Architected a native Kotlin Android app integrating real-time WebSocket telemetry and a Roboflow object-detection model (90% confidence thresholding) to identify crosswalks and trigger voice alerts for mobility-aid users.</li>
-            <li>Shipped a Vue.js dashboard with WebSocket-driven updates rendering live GPS tracks and alerts at 0.8s display latency.</li>
+            <li>Designed and integrated a hardware/software mobility system combining Raspberry Pi, camera, LiDAR, IMU, GPS, Bluetooth, Android software, backend services, and a web dashboard for real-time crosswalk detection and alerts.</li>
+            <li>Improved system reliability under intermittent connectivity by implementing telemetry validation, error handling, and automatic reconnection across real-time communication interfaces.</li>
+            <li>Improved backend scalability to 10,000+ concurrent WebSocket connections by load-testing services and optimizing PostgreSQL indexes, reducing hot-path query latency by 85%.</li>
+            <li>Built a Vue.js dashboard for real-time GPS, biometric, and alert data, preserving live updates through automatic WebSocket reconnection.</li>
           </ul>
         </li>
       </ol>
@@ -199,11 +199,47 @@
       {
         id: 1,
         title: "Sports Odds Arbitrage Engine",
-        description: "Concurrent Go service monitoring live odds across 5+ bookmakers every 5 minutes, flagging arbitrage where combined implied probabilities fall below 100%; time-series PostgreSQL schema tracks line movement for backtesting.",
+        description: "Concurrent Go service ingesting live betting lines from 5+ bookmakers in near real time, converting odds to implied probabilities and flagging arbitrage where combined margins fall below 100%; a time-series PostgreSQL schema tracks historical line movement for trend analysis and backtesting.",
         image: "img/odds.jpg",
         category: "Web Dev",
         tech: ["Go", "Vue.js", "PostgreSQL"],
-        link: "https://github.com/AugustZhang1"
+        link: "https://github.com/AugustZhang1/Sports-arbitage"
+      },
+      {
+        id: 7,
+        title: "RAG Evaluation & Observability Toolkit",
+        description: "Zero-cost RAG evaluation platform: pgvector hybrid search, LLM-as-judge scoring on versioned gold sets, and LangFuse tracing. Cut hallucinated answers from 11/33 to 7/33 by tuning chunk size and retrieval-k; the eval harness runs in CI on every commit and Presidio guardrails with Luhn validation keep secrets and PII out of traces.",
+        image: "img/rag.jpg",
+        category: "AI",
+        tech: ["Python", "FastAPI", "PostgreSQL", "Docker", "GitHub Actions", "TypeScript", "Next.js"],
+        link: "https://github.com/AugustZhang1/Rag-Project"
+      },
+      {
+        id: 8,
+        title: "AudiobookFree",
+        description: "Local PDF-to-M4B audiobook converter with chapter detection and 28 Kokoro TTS voices — no accounts, API keys, or uploads. Runs on CPU in the browser at localhost, or on a free Colab T4 GPU; verifies embedded chapters after encoding.",
+        image: "img/audiobook.jpg",
+        category: "AI",
+        tech: ["Python", "PyTorch", "JavaScript", "HTML/CSS"],
+        link: "https://github.com/AugustZhang1/AudiobookFree"
+      },
+      {
+        id: 9,
+        title: "Ark Eagle Volunteer Scheduler",
+        description: "Mobile-first volunteer operations system that auto-generates weekly assignments, sends reminders, and handles urgent replacements so coordinators only manage exceptions. TypeScript modular monolith with a separate worker, PostgreSQL audit history, and Docker Compose deployment.",
+        image: "img/scheduler.jpg",
+        category: "Web Dev",
+        tech: ["TypeScript", "React", "Next.js", "Node.js", "PostgreSQL", "Docker", "GitHub Actions", "Tailwind"],
+        link: "https://github.com/AugustZhang1/Volunteer-Scheduler"
+      },
+      {
+        id: 10,
+        title: "ArkProject — Fridge-to-Recipe PWA",
+        description: "Canada-first progressive web app that turns what's in your fridge into recipes. React + TypeScript + Vite frontend, Hono API on Cloudflare Workers, and Supabase PostgreSQL with Auth.",
+        image: "img/recipe.jpg",
+        category: "Web Dev",
+        tech: ["TypeScript", "React", "Node.js", "PostgreSQL", "Docker"],
+        link: "https://github.com/AugustZhang1/ArkProject"
       },
       {
         id: 2,
@@ -336,8 +372,11 @@
       { name: "Node.js", slug: "nodedotjs" },
       { name: "Express", slug: "express" },
       { name: "Flask", slug: "flask" },
+      { name: "FastAPI", slug: "fastapi" },
       { name: "Jest", slug: "jest" },
       { name: "Android", slug: "android" },
+      { name: "Raspberry Pi", slug: "raspberrypi" },
+      { name: "Stripe", slug: "stripe" },
       { name: "HTML/CSS", slug: "html5" },
       { name: "Tailwind", slug: "tailwindcss" },
       { name: "TensorFlow", slug: "tensorflow" },
@@ -375,18 +414,18 @@
     const experiences = [
       {
         title: "Sinai Foundation — Software Developer Intern",
-        description: "Migrated 3 sites into a shared React component library, engineered a GitHub Actions CI/CD pipeline with Jest testing, and configured Pages CMS for non-technical publishing.",
+        description: "Cut deploy time 90% across 3 production sites with a GitHub Actions CI/CD pipeline and Jest tests, integrated Stripe donations end-to-end, rebuilt UIs in a shared React component library, and configured Pages CMS for non-technical publishing.",
         image: "img/sinai.jpg",
         category: "Experience",
-        tech: ["React", "JavaScript", "Jest", "GitHub Actions"],
+        tech: ["React", "JavaScript", "Jest", "GitHub Actions", "Stripe"],
         link: "#experience"
       },
       {
         title: "SenseWay — Software Developer Intern",
-        description: "Built a Go telemetry REST API on PostgreSQL/Docker/AWS, a native Kotlin Android app with WebSocket feeds and Roboflow detection, and a live Vue.js dashboard.",
+        description: "Integrated a Raspberry Pi + LiDAR/IMU/GPS/camera mobility system with an Android app, Go backend, and Vue.js dashboard; scaled to 10,000+ concurrent WebSocket connections and cut hot-path PostgreSQL latency 85%.",
         image: "img/senseway.png",
         category: "Experience",
-        tech: ["Go", "PostgreSQL", "Docker", "AWS", "Kotlin", "Android", "Vue.js"],
+        tech: ["Go", "PostgreSQL", "Docker", "AWS", "Kotlin", "Android", "Vue.js", "Raspberry Pi"],
         link: "#experience"
       }
     ];
