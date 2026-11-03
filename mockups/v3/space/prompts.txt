@@ -1,0 +1,78 @@
+CONCEPT MOCKUPS
+Built-in image generation. Static 16:9 hover-state concepts.
+Similarity numbers are illustrative samples, not measured portfolio facts.
+
+FILE: space-deep.png
+Use case: ui-mockup.
+Create ONE finished, high-fidelity desktop portfolio website concept image, exactly 16:9 landscape, preferably 2560x1440. Flat straight-on screen design filling entire image, no laptop/device/browser frame, no presentation board or extra title. This is August Zhang's portfolio as a 2D embedding space, an explorable spatial map, not a dashboard. Static captured moment of slowly drifting points, hover open on SenseWay; eventual click would zoom into a detail panel, but do not display a second panel in this hover-state image.
+
+HEADER, ONLY these six text elements: "August Zhang", "Computer Engineering @ uOttawa", "Resume", "GitHub", "LinkedIn", "Email". Name and subtitle compact at top left; four simple text links on one horizontal line at top right. Header height under 80px equivalent at 1440px desktop. Restrained, highly legible contemporary sans-serif typography inspired by ABC Diatype / Neue Montreal, no serif. Name about 28px at 1440px-wide equivalent, not an enormous hero. No other header copy whatsoever.
+
+Map occupies the whole remaining viewport, generous negative space, asymmetric composition. Exactly TWELVE labeled interactive points, each shown once on the map. Exactly four small quiet sentence-case cluster names, with these memberships:
+"ML / data": "LeagueVODreview", "RAG Evaluation & Observability Toolkit", "Housing Price Prediction", "AI Snake Game".
+"real-time systems": "SenseWay", "Sports Odds Arbitrage Engine".
+"generative tools": "AI Builder for Minecraft", "AudiobookFree".
+"web / platforms": "Sinai Foundation", "MediHub", "Ark Eagle Volunteer Scheduler", "ArkProject".
+Use exact names, do not abbreviate or invent or duplicate any project. Long labels may wrap neatly to two lines. Sinai Foundation and SenseWay are experiences, other ten are projects; no legend needed. Labels must be readable and clearly associated with their points, not clashing with lines or one another. Decorative astronomical texture is noninteractive and unlabelled, never additional portfolio nodes.
+
+SenseWay selected around centre-right. Its floating hover card opens to the right in reserved empty space, without covering any project or cluster label. Only ONE info card. Opaque solid near-black/graphite fill, fine neutral border, sharp rectangular corners, no glass, no transparency. Carefully typeset and generously padded, visually about 340-400px wide at 1440-wide equivalent. Verbatim card text with hierarchy:
+"SenseWay"
+"Software Developer Intern"
+"Sept 2025 – April 2026"
+"Ottawa"
+"10,000+"
+"concurrent WebSocket connections"
+"85% lower"
+"hot-path query latency"
+"Go · PostgreSQL · Vue.js · Raspberry Pi"
+The two metrics are plain typographic groups, not nested cards, no pill chips. The final tech line can wrap only at separators and stay readable. Dates and technology separators explicitly preserve the user's verbatim copy despite general design-skill punctuation rules.
+
+From SenseWay, show three faint thin neighbour lines terminating precisely at Sports Odds Arbitrage Engine, RAG Evaluation & Observability Toolkit, and Ark Eagle Volunteer Scheduler. Each has a small upright readable score beside the line: "0.91 sample", "0.84 sample", "0.72 sample" respectively. These are explicitly sample interaction values, not claims about measured project similarity or performance. Place labels clear of other text. Connection hierarchy understated.
+
+Taste discipline: restrained custom art direction, intentional asymmetry, no equal card grids, no giant display heading, no visual clutter. One consistent sharp-corner shape system. Consistent dark theme. High text contrast, quiet but readable secondary labels. Space and typography establish hierarchy. The hover card alone deserves a container.
+
+ABSOLUTE EXCLUSIONS: no status line, no seeking internship, no "portfolio_vectors", no rows or dimension text, no "Explore by proximity", no instructions or scroll cues, no footer, no "2D projection", no "cosine similarity", no legend, no navigation except the four required links, no theme title printed on the UI. No fake micro-metadata, version stamps, coordinates, axes, grid decoration, dashboard widgets, extra statistics, extra technologies, extra projects. No neon glow or bloom, navy-and-cyan cyberpunk palette, glassmorphism, letterspaced uppercase labels, rounded pill chips, dashed cluster boundaries, beige paper, scientific-journal serif aesthetic. Do not use glowing colored interfaces.
+
+THEME: Deep field.
+A real astrophotography feel like a beautifully restrained Hubble or JWST deep-field exposure. Near-black neutral background #08090b, real optical depth with fine faint star noise and tiny distant galaxy smudges, not a videogame starfield or gradient blob. The twelve portfolio points are stars of varying apparent size and color temperature: warm white, a little pale blue, and amber. Only the brightest one or two stars have delicate physically realistic diffraction spikes, subtle and short, not starburst icons. SenseWay is a warm white star with a restrained amber selection ring, without bloom.
+The four groupings read through extremely faint natural nebula dust filaments and dispersed galaxy groupings, no outlines or cloud-shaped blobs. Dust mostly desaturated silver-grey and subtly warm brown, very low contrast. Dark space dominates. Place ML/data in upper left-middle, generative tools lower left, web/platforms lower middle, real-time systems upper middle-right; hover card in rightmost clear space. Neighbor lines are exceptionally fine low-opacity constellation lines. Editorial space-publication typography with meticulous sans-serif hierarchy and uncluttered label placement. Photographic depth must be evident at full size, while labels remain crisp and readable. The header sits over calm darkness. No heavy photographic haze behind text. One amber UI accent only; natural pale-blue stars are photographic color temperature, not UI accents. Art-directed, quiet, credible.
+
+FILE: space-orbital.png
+Use case: ui-mockup.
+Create ONE finished, high-fidelity desktop portfolio website concept image, exactly 16:9 landscape, preferably 2560x1440. Flat straight-on screen design filling entire image, no laptop/device/browser frame, no presentation board or extra title. This is August Zhang's portfolio as a 2D embedding space, an explorable spatial map, not a dashboard. Static captured moment of slowly drifting points, hover open on SenseWay; eventual click would zoom into a detail panel, but do not display a second panel in this hover-state image.
+
+HEADER, ONLY these six text elements: "August Zhang", "Computer Engineering @ uOttawa", "Resume", "GitHub", "LinkedIn", "Email". Name and subtitle compact at top left; four simple text links on one horizontal line at top right. Header height under 80px equivalent at 1440px desktop. Restrained, highly legible contemporary sans-serif typography inspired by ABC Diatype / Neue Montreal, no serif. Name about 28px at 1440px-wide equivalent, not an enormous hero. No other header copy whatsoever.
+
+Map occupies the whole remaining viewport, generous negative space, asymmetric composition. Exactly TWELVE labeled interactive points, each shown once on the map. Exactly four small quiet sentence-case cluster names, with these memberships:
+"ML / data": "LeagueVODreview", "RAG Evaluation & Observability Toolkit", "Housing Price Prediction", "AI Snake Game".
+"real-time systems": "SenseWay", "Sports Odds Arbitrage Engine".
+"generative tools": "AI Builder for Minecraft", "AudiobookFree".
+"web / platforms": "Sinai Foundation", "MediHub", "Ark Eagle Volunteer Scheduler", "ArkProject".
+Use exact names, do not abbreviate or invent or duplicate any project. Long labels may wrap neatly to two lines. Sinai Foundation and SenseWay are experiences, other ten are projects; no legend needed. Labels must be readable and clearly associated with their points, not clashing with lines or one another. Decorative astronomical texture is noninteractive and unlabelled, never additional portfolio nodes.
+
+SenseWay selected around centre-right. Its floating hover card opens to the right in reserved empty space, without covering any project or cluster label. Only ONE info card. Opaque solid near-black/graphite fill, fine neutral border, sharp rectangular corners, no glass, no transparency. Carefully typeset and generously padded, visually about 340-400px wide at 1440-wide equivalent. Verbatim card text with hierarchy:
+"SenseWay"
+"Software Developer Intern"
+"Sept 2025 – April 2026"
+"Ottawa"
+"10,000+"
+"concurrent WebSocket connections"
+"85% lower"
+"hot-path query latency"
+"Go · PostgreSQL · Vue.js · Raspberry Pi"
+The two metrics are plain typographic groups, not nested cards, no pill chips. The final tech line can wrap only at separators and stay readable. Dates and technology separators explicitly preserve the user's verbatim copy despite general design-skill punctuation rules.
+
+From SenseWay, show three faint thin neighbour lines terminating precisely at Sports Odds Arbitrage Engine, RAG Evaluation & Observability Toolkit, and Ark Eagle Volunteer Scheduler. Each has a small upright readable score beside the line: "0.91 sample", "0.84 sample", "0.72 sample" respectively. These are explicitly sample interaction values, not claims about measured project similarity or performance. Place labels clear of other text. Connection hierarchy understated.
+
+Taste discipline: restrained custom art direction, intentional asymmetry, no equal card grids, no giant display heading, no visual clutter. One consistent sharp-corner shape system. Consistent dark theme. High text contrast, quiet but readable secondary labels. Space and typography establish hierarchy. The hover card alone deserves a container.
+
+ABSOLUTE EXCLUSIONS: no status line, no seeking internship, no "portfolio_vectors", no rows or dimension text, no "Explore by proximity", no instructions or scroll cues, no footer, no "2D projection", no "cosine similarity", no legend, no navigation except the four required links, no theme title printed on the UI. No fake micro-metadata, version stamps, coordinates, axes, grid decoration, dashboard widgets, extra statistics, extra technologies, extra projects. No neon glow or bloom, navy-and-cyan cyberpunk palette, glassmorphism, letterspaced uppercase labels, rounded pill chips, dashed cluster boundaries, beige paper, scientific-journal serif aesthetic. Do not use glowing colored interfaces.
+
+THEME: Orbital.
+Clean modern JPL-like orbital diagram, precisely drafted, no institutional logo or mission branding. Flat dark graphite #17191c backdrop, very subtle fine material grain, no star photo, no gradient, no glow. Each of the four clusters is its own small star system. Small cluster name sits at that system's CENTRE; the labelled portfolio points are SMALL PLANETS ON thin elliptical orbit paths surrounding that centre. Exactly four independent systems in an asymmetric spatial arrangement, not one shared solar system and not four cards. Different ellipse tilts and sizes, restrained technically precise hairline strokes #484c50; unobtrusive orbital centres without adding labelled project nodes. Planet discs are flat or subtly physically shaded muted silver-gray, not colorful photorealistic planet illustrations, no Saturn rings.
+Layout: ML/data upper left, generative tools lower left, web/platforms lower middle, real-time systems upper centre-right, with SenseWay selected on its ellipse's right-hand arc and the hover card to its right. Reserve enough horizontal and vertical separation to show all twelve labels and all four centre names clearly; keep orbit lines out of the card. SenseWay is the ONLY warm accent, muted orange #d69b6c, tiny planet disc with a precise thin selection ring. Neighbor lines are fine straight warm-gray chords cutting across orbits; scores clear and understated. No trails, arrows, compass rose, coordinate ticks, measuring rulers, axis labels, stars, decorative crosshairs, instruments or dashboard furniture. The elliptical paths themselves communicate slow orbital movement. Restrained geometric sans typography; perhaps IBM Plex Mono only for the three sample score numbers. Hierarchy from weight, spacing, and stroke precision. Diagram should feel meticulously composed by a professional designer, not a dense flight-control screen.
+
+DEEP FIELD REFINEMENT (built-in image edit of initial generated concept):
+Refine this generated portfolio mockup. Preserve composition, all exact text, typography, labels, header, card, star-field photography, constellation neighbour lines, scores, positions and 16:9 size. Single targeted correction: only TWO stars may have diffraction spikes, SenseWay and Sinai Foundation. Remove all cross-shaped spikes from the other ten labeled portfolio stars; make them small realistic round stellar point-spread dots of varying warm-white, pale-blue and amber temperature, without cross shapes, without outer glow or bloom. In particular LeagueVODreview, RAG Evaluation & Observability Toolkit, Housing Price Prediction, AI Snake Game, Sports Odds Arbitrage Engine, AI Builder for Minecraft, AudiobookFree, MediHub, Ark Eagle Volunteer Scheduler and ArkProject must be round stars with NO diffraction spikes. Keep every word unchanged and readable. Do not add or remove any project. Maintain all the restrained art direction.
+
+Export: each generated 1672 x 941 image was centre-trimmed by 8 horizontal and 5 vertical edge pixels to exactly 1664 x 936 (16:9), without resampling.

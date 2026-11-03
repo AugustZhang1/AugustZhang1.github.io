@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>August Zhang</title>
+<meta name="description" content="August Zhang, computer engineer. Selected work in AI, web and data.">
+<script>
+  (function () {
+    var s = null;
+    try { s = localStorage.getItem('theme'); } catch (e) {}
+    var dark = s ? s === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  })();
+</script>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #eef1f6;
+    --ink: #161c2a;
+    --muted: #66728a;
+    --rule: rgba(22, 28, 42, 0.14);
+    --accent: #e0603f;
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0f1626;
+    --ink: #e6ebf3;
+    --muted: #8d9ab3;
+    --rule: rgba(201, 212, 230, 0.16);
+    --accent: #ff8a66;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+
+  #cloud {
+    position: fixed; inset: 0;
+    width: 100%; height: 100%;
+    display: block;
+    touch-action: none;
+  }
+  #cloud { cursor: grab; }
+  #cloud.pointer { cursor: pointer; }
+  #cloud.grabbing { cursor: grabbing; }
+
+  .top {
+    position: fixed; top: 0; left: 0; right: 0;
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 24px;
+    padding: 28px 36px;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .top > * { pointer-events: auto; }
+  .ident { display: flex; flex-direction: column; gap: 4px; }
+  .name { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+  .role { margin: 0; font-size: 13px; color: var(--muted); }
+
+  .nav {
+    display: flex; align-items: center; flex-wrap: wrap;
+    gap: 22px;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .nav a { text-decoration: none; opacity: 0.7; transition: opacity .2s ease, color .2s ease; }
+  .nav a:hover, .nav a:focus-visible { opacity: 1; color: var(--accent); outline: none; }
+
+  .theme {
+    width: 28px; height: 28px;
+    padding: 0;
+    border: 1px solid var(--rule);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--ink);
+    display: grid; place-items: center;
+    cursor: pointer;
+  }
+  .theme:focus-visible { outline: 1px solid var(--accent); outline-offset: 2px; }
+  .theme .dot {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+  :root[data-theme="dark"] .theme .dot { background: transparent; border: 1.5px solid currentColor; }
+
+  .detail {
+    position: fixed;
+    right: 36px; top: 112px; bottom: 36px;
+    width: 340px;
+    overflow-y: auto;
+    padding-right: 4px;
+    opacity: 0;
+    transform: translateY(6px);
+    pointer-events: none;
+    transition: opacity .45s ease, transform .45s ease;
+    z-index: 2;
+  }
+  .detail.open { opacity: 1; transform: none; pointer-events: auto; }
+
+  .back {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--muted);
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .back:hover, .back:focus-visible { color: var(--accent); outline: none; }
+
+  .d-cat {
+    margin: 26px 0 0;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .d-sub { margin: 6px 0 0; font-size: 13px; color: var(--muted); }
+  .d-title {
+    margin: 12px 0 18px;
+    font-size: 21px; font-weight: 600; line-height: 1.25;
+    letter-spacing: -0.015em;
+  }
+  .d-stats {
+    list-style: none; margin: 0 0 20px; padding: 16px 0;
+    border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 16px;
+  }
+  .d-stats b { display: block; font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .d-stats span { display: block; margin-top: 4px; font-size: 12px; line-height: 1.4; color: var(--muted); }
+  .d-desc { margin: 0 0 20px; font-size: 14px; line-height: 1.65; opacity: 0.88; }
+  .d-tech {
+    list-style: none; margin: 0 0 20px; padding: 0;
+    display: flex; flex-wrap: wrap; gap: 6px 14px;
+    font-size: 12px; color: var(--muted);
+  }
+  .scrub { margin: 0 0 22px; }
+  .scrub-label {
+    margin: 0 0 8px;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted);
+  }
+  #scrubCanvas {
+    display: block; width: 100%; height: 120px;
+    cursor: ew-resize; touch-action: none; outline: none;
+  }
+  #scrubCanvas:focus-visible { outline: 1px solid var(--accent); outline-offset: 4px; }
+  .d-links { margin: 0; font-size: 13px; }
+  .d-links a {
+    display: inline-block; margin: 0 18px 8px 0; padding-bottom: 2px;
+    text-decoration: none; border-bottom: 1px solid var(--rule);
+    transition: color .2s ease, border-color .2s ease;
+  }
+  .d-links a:hover, .d-links a:focus-visible { color: var(--accent); border-color: var(--accent); outline: none; }
+
+  .query {
+    position: fixed; left: 50%; bottom: 32px;
+    transform: translateX(-50%);
+    width: min(360px, 80vw);
+    z-index: 1;
+  }
+  .query input {
+    width: 100%;
+    padding: 8px 2px;
+    border: 0; border-bottom: 1px solid var(--rule);
+    border-radius: 0;
+    background: transparent;
+    color: var(--ink);
+    font: 13px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    text-align: center;
+    outline: none;
+    transition: border-color .2s ease;
+  }
+  .query input::placeholder { color: var(--muted); }
+  .query input:focus { border-color: var(--accent); }
+
+  .peek {
+    position: fixed; left: 0; top: 0;
+    width: 280px; aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: var(--bg);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s ease;
+    z-index: 1;
+  }
+  .peek.on { opacity: 1; }
+  .peek > * { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: none; }
+  .peek > .show { display: block; }
+  .peek iframe {
+    width: 1280px; height: 800px; border: 0;
+    transform: scale(0.21875); transform-origin: 0 0;
+  }
+
+  @media (max-width: 720px) {
+    .top { flex-direction: column; padding: 22px 22px; gap: 14px; }
+    .nav { gap: 16px 18px; }
+    .detail {
+      left: 0; right: 0; top: auto; bottom: 0;
+      width: auto; max-height: 56vh;
+      padding: 0 24px 28px;
+      background: var(--bg);
+      transform: translateY(100%);
+    }
+    .detail.open { transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="cloud" role="img" aria-label="Point cloud of August's work"></canvas>
+
+<header class="top">
+  <div class="ident">
+    <p class="name">August Zhang</p>
+    <p class="role">Computer Engineering @ uOttawa</p>
+  </div>
+  <nav class="nav" aria-label="Links">
+    <a href="AugustZhang_Resume_Final.pdf">Resume</a>
+    <a href="https://github.com/AugustZhang1" target="_blank" rel="noopener">GitHub</a>
+    <a href="https://www.linkedin.com/in/august-zhang-122918274/" target="_blank" rel="noopener">LinkedIn</a>
+    <a href="mailto:augustzhang878@gmail.com">Email</a>
+    <button type="button" class="theme" id="themeBtn" aria-label="Switch to dark theme"><span class="dot"></span></button>
+  </nav>
+</header>
+
+<div class="peek" id="peek" aria-hidden="true">
+  <img id="peekImg" alt="">
+  <video id="peekVid" muted loop playsinline preload="none"></video>
+</div>
+
+<form class="query" id="queryForm" role="search" onsubmit="return false">
+  <label for="q" hidden>Search my work</label>
+  <input id="q" type="search" placeholder="Search my work" autocomplete="off" spellcheck="false">
+</form>
+
+<aside class="detail" id="detail">
+  <button type="button" class="back" id="backBtn">Back</button>
+  <p class="d-cat" id="dCat"></p>
+  <p class="d-sub" id="dSub"></p>
+  <h2 class="d-title" id="dTitle"></h2>
+  <ul class="d-stats" id="dStats"></ul>
+  <p class="d-desc" id="dDesc"></p>
+  <ul class="d-tech" id="dTech"></ul>
+  <div class="scrub" id="scrubWrap" hidden>
+    <p class="scrub-label">Win probability</p>
+    <canvas id="scrubCanvas" tabindex="0" role="slider" aria-label="Win probability over match time" aria-valuemin="0" aria-valuemax="60" aria-valuenow="30"></canvas>
+  </div>
+  <p class="d-links" id="dLinks"></p>
+</aside>
+
+<script>
+(() => {
+  'use strict';
+
+  // ---------------------------------------------------------------------
+  // DATA
+  // CHUNKS mirrors the future JSON file. `pos` values are fake embeddings
+  // (seeded: cluster anchor + small gaussian jitter). Swap in real
+  // embeddings later without touching the rest of the code.
+  // ---------------------------------------------------------------------
+  const CHUNKS = [
+  { id: "league-01", project: "league", kind: "project", text: "Chess.com-style game review for League of Legends.", pos: [-0.68, 0.42, 0.16] },
+  { id: "league-02", project: "league", kind: "project", text: "A LightGBM model scores your win chance every 15 seconds and grades each fight and objective by how much it swung the game.", pos: [-0.58, 0.42, 0.25] },
+  { id: "league-03", project: "league", kind: "project", text: "A 24/7 crawler on Google Cloud collected 200K+ high-elo matches at the Riot API rate limit.", pos: [-0.52, 0.3, 0.22] },
+  { id: "league-04", project: "league", kind: "project", text: "The model is calibrated to within about 1 point on 60K games.", pos: [-0.56, 0.37, 0.16] },
+  { id: "minecraft-01", project: "minecraft", kind: "project", text: "In-game AI builder for Minecraft Java servers: an op types !design with a prompt or image link.", pos: [-0.43, 0.44, -0.31] },
+  { id: "minecraft-02", project: "minecraft", kind: "project", text: "Claude or Gemini writes OpenSCAD code, and the rendered meshes are voxelized into blocks and placed over RCON in seconds.", pos: [-0.48, 0.48, -0.36] },
+  { id: "minecraft-03", project: "minecraft", kind: "project", text: "Builds pixel art and 1.4M-block 3D statues from a single picture, with no mods or plugins.", pos: [-0.44, 0.4, -0.35] },
+  { id: "arbitrage-01", project: "arbitrage", kind: "project", text: "Concurrent Go service ingesting live betting lines from 5+ bookmakers in near real time.", pos: [0.49, -0.07, -0.25] },
+  { id: "arbitrage-02", project: "arbitrage", kind: "project", text: "Converts odds to implied probabilities and flags arbitrage where combined margins fall below 100%.", pos: [0.48, -0.04, -0.14] },
+  { id: "arbitrage-03", project: "arbitrage", kind: "project", text: "A time-series PostgreSQL schema tracks historical line movement for trend analysis and backtesting.", pos: [0.43, -0.13, -0.23] },
+  { id: "rag-01", project: "rag", kind: "project", text: "Zero-cost RAG evaluation platform with pgvector hybrid search and LangFuse tracing.", pos: [-0.79, -0.06, -0.15] },
+  { id: "rag-02", project: "rag", kind: "project", text: "LLM-as-judge scoring runs on versioned gold sets, and the eval harness runs in CI on every commit.", pos: [-0.78, 0.02, -0.13] },
+  { id: "rag-03", project: "rag", kind: "project", text: "Cut hallucinated answers from 11/33 to 7/33 by tuning chunk size and retrieval-k.", pos: [-0.71, 0, -0.15] },
+  { id: "rag-04", project: "rag", kind: "project", text: "Presidio guardrails with Luhn validation keep secrets and PII out of traces.", pos: [-0.83, 0.02, -0.03] },
+  { id: "audiobook-01", project: "audiobook", kind: "project", text: "Local PDF-to-M4B audiobook converter with chapter detection and 28 Kokoro TTS voices.", pos: [-0.5, -0.23, 0.41] },
+  { id: "audiobook-02", project: "audiobook", kind: "project", text: "No accounts, API keys, or uploads.", pos: [-0.53, -0.12, 0.45] },
+  { id: "audiobook-03", project: "audiobook", kind: "project", text: "Runs on CPU in the browser at localhost, or on a free Colab T4 GPU.", pos: [-0.6, -0.18, 0.4] },
+  { id: "audiobook-04", project: "audiobook", kind: "project", text: "Verifies embedded chapters after encoding.", pos: [-0.65, -0.22, 0.51] },
+  { id: "ark-eagle-01", project: "ark-eagle", kind: "project", text: "Mobile-first volunteer operations system that auto-generates weekly assignments and reminders.", pos: [1, -0.16, 0.02] },
+  { id: "ark-eagle-02", project: "ark-eagle", kind: "project", text: "Handles urgent replacements so coordinators only manage exceptions.", pos: [0.76, -0.17, -0.06] },
+  { id: "ark-eagle-03", project: "ark-eagle", kind: "project", text: "TypeScript modular monolith with a separate worker, PostgreSQL audit history, and Docker Compose deployment.", pos: [0.84, -0.1, 0.02] },
+  { id: "arkproject-01", project: "arkproject", kind: "project", text: "Canada-first progressive web app that turns what is in your fridge into recipes.", pos: [0.82, 0.22, 0.33] },
+  { id: "arkproject-02", project: "arkproject", kind: "project", text: "React, TypeScript and Vite frontend with a Hono API on Cloudflare Workers.", pos: [0.82, 0.19, 0.38] },
+  { id: "arkproject-03", project: "arkproject", kind: "project", text: "Supabase PostgreSQL with Auth.", pos: [0.76, 0.29, 0.36] },
+  { id: "medihub-01", project: "medihub", kind: "project", text: "Android healthcare appointment app serving 500+ users.", pos: [0.32, -0.47, 0.22] },
+  { id: "medihub-02", project: "medihub", kind: "project", text: "Firebase real-time booking, cancellation, and specialist handling.", pos: [0.32, -0.56, 0.29] },
+  { id: "snake-01", project: "snake", kind: "project", text: "AI training framework based on self-reinforcement learning.", pos: [-0.45, -0.39, -0.27] },
+  { id: "housing-01", project: "housing", kind: "project", text: "Machine learning pipeline predicting prices across 100,000+ houses.", pos: [-0.25, -0.22, 0.04] },
+  { id: "housing-02", project: "housing", kind: "project", text: "Built with a Decision Tree Regressor.", pos: [-0.28, -0.17, 0.04] },
+  { id: "sinai-01", project: "sinai", kind: "experience", text: "Cut deployment time by 90% across 3 production websites serving 5,000+ monthly visitors, using a GitHub Actions CI/CD pipeline for builds, Jest tests, and releases.", pos: [0.48, 0.55, -0.45] },
+  { id: "sinai-02", project: "sinai", kind: "experience", text: "Integrated Stripe payments across all 3 sites, including checkout, webhook validation, confirmation, and failure handling.", pos: [0.51, 0.51, -0.44] },
+  { id: "sinai-03", project: "sinai", kind: "experience", text: "Saved about 4 engineering hours a week by configuring Pages CMS, so non-technical staff can publish directly.", pos: [0.5, 0.55, -0.36] },
+  { id: "sinai-04", project: "sinai", kind: "experience", text: "Cut code duplication by 30% across 3 legacy websites by rebuilding the UIs in React and sharing one component library.", pos: [0.47, 0.44, -0.43] },
+  { id: "senseway-01", project: "senseway", kind: "experience", text: "Designed and integrated a Raspberry Pi mobility system with camera, LiDAR, IMU, GPS, Android, backend services, and a web dashboard for real-time crosswalk detection.", pos: [0.27, -0.62, -0.28] },
+  { id: "senseway-02", project: "senseway", kind: "experience", text: "Kept the system reliable under intermittent connectivity with telemetry validation, error handling, and automatic reconnection.", pos: [0.31, -0.62, -0.23] },
+  { id: "senseway-03", project: "senseway", kind: "experience", text: "Scaled backend services to 10,000+ concurrent WebSocket connections and cut hot-path query latency by 85% through PostgreSQL index tuning.", pos: [0.28, -0.65, -0.32] },
+  { id: "senseway-04", project: "senseway", kind: "experience", text: "Built a Vue.js dashboard for real-time GPS, biometric, and alert data with live updates.", pos: [0.3, -0.51, -0.4] }
+  ];
+
+  // Project details (from index.html). Keys match CHUNKS[].project.
+  const META = {
+    league: {
+      label: 'LeagueVODreview', title: 'LeagueVODreview Live Demo', cat: 'AI', scrub: true,
+      desc: 'Chess.com-style game review for League of Legends: a LightGBM model scores your win chance every 15 seconds and grades each fight and objective by how much it swung the game. A 24/7 crawler on Google Cloud collected 200K+ high-elo matches at the Riot API rate limit; the model is calibrated to within about 1 point on 60K games.',
+      stats: [['200K+', 'high-elo matches crawled'], ['15 s', 'per win-chance update'], ['60K', 'games used for calibration']],
+      tech: ['Python', 'FastAPI', 'React', 'Scikit-learn', 'Pandas', 'SQLite', 'GitHub Actions', 'Linux'],
+      links: [['Live review', 'https://augustzhang1.github.io/LeagueVODreview/review/NA1_5650873814?p=1']]
+    },
+    minecraft: {
+      label: 'AI Builder for Minecraft', title: 'AI Builder for Minecraft', cat: 'AI',
+      desc: 'In-game AI builder for Minecraft Java servers: an op types !design with a prompt or image link, Claude or Gemini writes OpenSCAD code, and the rendered meshes are voxelized into blocks and placed over RCON in seconds. Also builds pixel art and 1.4M-block 3D statues from a single picture, with no mods or plugins needed.',
+      stats: [['1.4M', 'blocks in a single statue']],
+      tech: ['Python', 'Docker', 'Linux'],
+      links: [['GitHub', 'https://github.com/AugustZhang1/AI-Builder-Minecraft']]
+    },
+    arbitrage: {
+      label: 'Sports Odds Arbitrage Engine', title: 'Sports Odds Arbitrage Engine', cat: 'Web Dev',
+      desc: 'Concurrent Go service ingesting live betting lines from 5+ bookmakers in near real time, converting odds to implied probabilities and flagging arbitrage where combined margins fall below 100%. A time-series PostgreSQL schema tracks historical line movement for trend analysis and backtesting.',
+      stats: [['5+', 'bookmakers ingested live']],
+      tech: ['Go', 'Vue.js', 'PostgreSQL'],
+      links: [['GitHub', 'https://github.com/AugustZhang1/Sports-arbitage']]
+    },
+    rag: {
+      label: 'RAG Evaluation Toolkit', title: 'RAG Evaluation and Observability Toolkit', cat: 'AI',
+      desc: 'Zero-cost RAG evaluation platform: pgvector hybrid search, LLM-as-judge scoring on versioned gold sets, and LangFuse tracing. Cut hallucinated answers from 11/33 to 7/33 by tuning chunk size and retrieval-k; the eval harness runs in CI on every commit and Presidio guardrails with Luhn validation keep secrets and PII out of traces.',
+      stats: [['11 to 7', 'hallucinated answers out of 33']],
+      tech: ['Python', 'FastAPI', 'PostgreSQL', 'Docker', 'GitHub Actions', 'TypeScript', 'Next.js'],
+      links: [['GitHub', 'https://github.com/AugustZhang1/Rag-Project']]
+    },
+    audiobook: {
+      label: 'AudiobookFree', title: 'AudiobookFree', cat: 'AI',
+      desc: 'Local PDF-to-M4B audiobook converter with chapter detection and 28 Kokoro TTS voices. No accounts, API keys, or uploads. Runs on CPU in the browser at localhost, or on a free Colab T4 GPU, and verifies embedded chapters after encoding.',
+      stats: [['28', 'Kokoro TTS voices']],
+      tech: ['Python', 'PyTorch', 'JavaScript', 'HTML/CSS'],
+      links: [['GitHub', 'https://github.com/AugustZhang1/AudiobookFree']]
+    },
+    'ark-eagle': {
+      label: 'Ark Eagle Volunteer Scheduler', title: 'Ark Eagle Volunteer Scheduler', cat: 'Web Dev',
+      desc: 'Mobile-first volunteer operations system that auto-generates weekly assignments, sends reminders, and handles urgent replacements so coordinators only manage exceptions. TypeScript modular monolith with a separate worker, PostgreSQL audit history, and Docker Compose deployment.',
+      stats: [],
+      tech: ['TypeScript', 'React', 'Next.js', 'Node.js', 'PostgreSQL', 'Docker', 'GitHub Actions', 'Tailwind'],
+      links: [['GitHub', 'https://github.com/AugustZhang1/Volunteer-Scheduler']]
+    },
+    arkproject: {
+      label: 'ArkProject', title: 'ArkProject Fridge-to-Recipe PWA', cat: 'Web Dev',
+      desc: "Canada-first progressive web app that turns what's in your fridge into recipes. React, TypeScript and Vite frontend, Hono API on Cloudflare Workers, and Supabase PostgreSQL with Auth.",
+      stats: [],
+      tech: ['TypeScript', 'React', 'Node.js', 'PostgreSQL', 'Docker'],
+      links: [['GitHub', 'https://github.com/AugustZhang1/ArkProject']]
+    },
+    medihub: {
+      label: 'MediHub', title: 'MediHub', cat: 'Data',
+      desc: 'Android healthcare appointment app serving 500+ users, with Firebase real-time booking, cancellation, and specialist handling.',
+      stats: [['500+', 'users']],
+      tech: ['Java'],
+      links: [['GitHub', 'https://github.com/AugustZhang1/MediHub']]
+    },
+    snake: {
+      label: 'AI Snake Game', title: 'AI Snake Game', cat: 'AI',
+      desc: 'AI training framework based on self-reinforcement learning.',
+      stats: [],
+      tech: ['Python', 'PyTorch', 'NumPy'],
+      links: [['GitHub', 'https://github.com/AugustZhang1/PythonAI']]
+    },
+    housing: {
+      label: 'Housing Price Prediction', title: 'Housing Price Prediction', cat: 'AI',
+      desc: 'Machine learning pipeline predicting prices across 100,000+ houses with a Decision Tree Regressor.',
+      stats: [['100K+', 'houses in the dataset']],
+      tech: ['Python', 'Scikit-learn', 'Pandas', 'NumPy'],
+      links: [['GitHub', 'https://github.com/AugustZhang1/Housing-Price-Prediction']]
+    },
+    sinai: {
+      label: 'Sinai Foundation', title: 'Software Developer Intern', cat: 'Experience',
+      sub: 'Sinai Foundation, Toronto, ON · May to Aug 2026',
+      desc: 'Cut deploy time 90% across 3 production sites with a GitHub Actions CI/CD pipeline and Jest tests, integrated Stripe donations end to end, rebuilt UIs in a shared React component library, and configured Pages CMS for non-technical publishing.',
+      stats: [['90%', 'faster deploys'], ['3', 'production websites'], ['5,000+', 'monthly visitors'], ['30%', 'less duplicated code']],
+      tech: ['React', 'JavaScript', 'Jest', 'GitHub Actions', 'Stripe'],
+      links: []
+    },
+    senseway: {
+      label: 'SenseWay', title: 'Software Developer Intern', cat: 'Experience',
+      sub: 'SenseWay, Ottawa, ON · Sept 2025 to Apr 2026',
+      desc: 'Integrated a Raspberry Pi and LiDAR/IMU/GPS/camera mobility system with an Android app, Go backend, and Vue.js dashboard; scaled to 10,000+ concurrent WebSocket connections and cut hot-path PostgreSQL latency 85%.',
+      stats: [['10,000+', 'concurrent WebSocket connections'], ['85%', 'lower hot-path query latency']],
+      tech: ['Go', 'PostgreSQL', 'Docker', 'AWS', 'Kotlin', 'Android', 'Vue.js', 'Raspberry Pi'],
+      links: []
+    }
+  };
+
+  // ---------------------------------------------------------------------
+  // HELPERS
+  // ---------------------------------------------------------------------
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  const rnd = mulberry32(7);
+  function gauss() {
+    let u = 0; while (!u) u = rnd();
+    return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * rnd());
+  }
+  const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+  const easeOut = t => 1 - Math.pow(1 - t, 3);
+  const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+  const rgba = (c, a) => `rgba(${c[0]},${c[1]},${c[2]},${clamp(a).toFixed(3)})`;
+  const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
+
+  const PAL = {
+    light: { dot: [93, 111, 143], accent: [224, 96, 63], line: [22, 28, 42], edge: 0.12 },
+    dark:  { dot: [143, 163, 196], accent: [255, 138, 102], line: [201, 212, 230], edge: 0.14 }
+  };
+
+  // ---------------------------------------------------------------------
+  // INDEXES: members per project, centroids, neighbours, hairline edges
+  // ---------------------------------------------------------------------
+  // Tighten: pull each chunk toward its project centre, and projects toward the middle.
+  (() => {
+    const acc = {};
+    CHUNKS.forEach(c => {
+      const a = acc[c.project] || (acc[c.project] = [0, 0, 0, 0]);
+      a[0] += c.pos[0]; a[1] += c.pos[1]; a[2] += c.pos[2]; a[3]++;
+    });
+    // Spread project centres through the volume (not on a hollow ring):
+    // keep each direction, remap distance from centre by rank.
+    const keys = Object.keys(acc);
+    const cen = {};
+    keys.forEach(k => { cen[k] = acc[k].slice(0, 3).map(v => v / acc[k][3]); });
+    const len = v => Math.hypot(v[0], v[1], v[2]) || 1;
+    keys.slice().sort((a, b) => len(cen[a]) - len(cen[b])).forEach((k, i, arr) => {
+      const r = 0.12 + 0.6 * Math.pow(i / (arr.length - 1), 0.8);
+      const l = len(cen[k]);
+      cen[k] = cen[k].map(v => (v / l) * r);
+    });
+    // Detail points orbit their project at a small, visible distance.
+    CHUNKS.forEach(c => {
+      const a = acc[c.project];
+      const m = a.slice(0, 3).map(v => v / a[3]);
+      let off = c.pos.map((v, i) => v - m[i]);
+      const ol = len(off);
+      const want = 0.07 + 0.05 * rnd();
+      off = ol < 1e-3 ? [gauss(), gauss(), gauss()].map(v => v * want * 0.6) : off.map(v => (v / ol) * want);
+      c.pos = cen[c.project].map((v, i) => v + off[i]);
+    });
+    // One main point per project, at its centre.
+    keys.forEach(k => CHUNKS.push({ id: k + '-main', project: k, main: true, text: '', pos: cen[k] }));
+  })();
+
+  // Point colour by domain of work.
+  const DOMAIN = {
+    league: 'ml', rag: 'ml', housing: 'ml', snake: 'ml',
+    senseway: 'rt', arbitrage: 'rt',
+    sinai: 'web', medihub: 'web', 'ark-eagle': 'web', arkproject: 'web',
+    minecraft: 'gen', audiobook: 'gen'
+  };
+  const DOM_COL = {
+    dark:  { ml: [157, 180, 255], rt: [127, 209, 199], web: [199, 168, 240], gen: [232, 210, 154] },
+    light: { ml: [77, 99, 184],   rt: [47, 138, 128],  web: [125, 91, 176],  gen: [165, 131, 47] }
+  };
+  const dotCol = k => DOM_COL[root.getAttribute('data-theme') === 'dark' ? 'dark' : 'light'][DOMAIN[k]] || pal.dot;
+
+  const KEYS = Object.keys(META);
+  const N = CHUNKS.length;
+  const members = {};
+  KEYS.forEach(k => { members[k] = []; });
+  CHUNKS.forEach((c, i) => members[c.project].push(i));
+
+  const centroid = {};
+  KEYS.forEach(k => {
+    const s = [0, 0, 0];
+    members[k].forEach(i => { for (let a = 0; a < 3; a++) s[a] += CHUNKS[i].pos[a]; });
+    centroid[k] = s.map(v => v / members[k].length);
+  });
+  const nearProjects = {};
+  KEYS.forEach(k => {
+    nearProjects[k] = KEYS.filter(o => o !== k)
+      .sort((a, b) => dist(centroid[k], centroid[a]) - dist(centroid[k], centroid[b]))
+      .slice(0, 2);
+  });
+
+  const edges = [];
+  const seenEdge = new Set();
+  const addEdge = (i, j) => {
+    const key = i < j ? i + ':' + j : j + ':' + i;
+    if (!seenEdge.has(key)) { seenEdge.add(key); edges.push([i, j]); }
+  };
+  const mainIdx = {};
+  CHUNKS.forEach((c, i) => { if (c.main) mainIdx[c.project] = i; });
+  // Each detail links to its main point; each main point links to its 2 nearest mains.
+  CHUNKS.forEach((c, i) => {
+    if (!c.main) { addEdge(i, mainIdx[c.project]); return; }
+    CHUNKS.map((o, j) => [dist(c.pos, o.pos), j])
+      .filter(([, j]) => j !== i && CHUNKS[j].main)
+      .sort((a, b) => a[0] - b[0])
+      .slice(0, 2)
+      .forEach(([, j]) => addEdge(i, j));
+  });
+
+  // Per-point animation state.
+  const pts = CHUNKS.map(c => ({
+    from: [gauss() * 0.03, gauss() * 0.03, gauss() * 0.03],
+    delay: rnd() * 0.2,
+    size: c.main ? 1.8 : 0.45 + rnd() * 0.25,
+    acc: 0,
+    dim: 0
+  }));
+
+  // Illustrative win-probability series (31 samples over 30 minutes).
+  const SERIES = (() => {
+    const r = mulberry32(42);
+    const out = [];
+    let p = 0.5;
+    for (let i = 0; i <= 60; i++) {
+      out.push(p);
+      p += (r() - 0.5) * 0.14 + (i > 40 ? 0.012 : -0.002);
+      p = clamp(p, 0.03, 0.97);
+    }
+    return out;
+  })();
+
+  // ---------------------------------------------------------------------
+  // DOM
+  // ---------------------------------------------------------------------
+  const root = document.documentElement;
+  const cv = document.getElementById('cloud');
+  const ctx = cv.getContext('2d');
+  const themeBtn = document.getElementById('themeBtn');
+  const detail = document.getElementById('detail');
+  const backBtn = document.getElementById('backBtn');
+  const dCat = document.getElementById('dCat');
+  const dSub = document.getElementById('dSub');
+  const dTitle = document.getElementById('dTitle');
+  const dStats = document.getElementById('dStats');
+  const dDesc = document.getElementById('dDesc');
+  const dTech = document.getElementById('dTech');
+  const dLinks = document.getElementById('dLinks');
+  const scrubWrap = document.getElementById('scrubWrap');
+  const scCanvas = document.getElementById('scrubCanvas');
+  const sctx = scCanvas.getContext('2d');
+
+  const reduceMq = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let reduce = reduceMq.matches;
+  reduceMq.addEventListener('change', e => { reduce = e.matches; });
+
+  // ---------------------------------------------------------------------
+  // THEME
+  // ---------------------------------------------------------------------
+  const darkMq = window.matchMedia('(prefers-color-scheme: dark)');
+  let dark = false;
+  let pal = PAL.light;
+  function storedTheme() {
+    try { return localStorage.getItem('theme'); } catch (e) { return null; }
+  }
+  function setTheme(isDark, persist) {
+    dark = isDark;
+    pal = dark ? PAL.dark : PAL.light;
+    root.setAttribute('data-theme', dark ? 'dark' : 'light');
+    themeBtn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    if (persist) { try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch (e) {} }
+    if (selected) drawScrub();
+  }
+  themeBtn.addEventListener('click', () => setTheme(!dark, true));
+  darkMq.addEventListener('change', e => { if (!storedTheme()) setTheme(e.matches, false); });
+
+  // ---------------------------------------------------------------------
+  // CANVAS SIZE
+  // ---------------------------------------------------------------------
+  let W = 0, H = 0, DPR = 1;
+  function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth;
+    H = window.innerHeight;
+    cv.width = Math.round(W * DPR);
+    cv.height = Math.round(H * DPR);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+
+  // ---------------------------------------------------------------------
+  // STATE
+  // ---------------------------------------------------------------------
+  const ZOOM = 5;
+  const CAM = 4.2;
+  const INTRO_S = 1.3;
+  const t0 = performance.now();
+  let last = t0;
+  let t = 0;               // seconds, drives drift
+  let angY = 0.6, angX = 0.22;
+  let spin = 1;            // multiplier on rotation speed
+  let zoom = 1;
+  let userZoom = 1;        // wheel zoom
+  let userTilt = 0;        // vertical drag tilt
+  let velY = 0, velX = 0;  // drag inertia (rad/s)
+  let panelT = 0;          // 0 closed, 1 open
+  const focus = [0, 0, 0];
+  let selected = null;     // project key whose detail is open
+  let hovered = null;      // project key under pointer
+  let hoverIdx = -1;       // chunk index under pointer
+  let S = [];              // projected points from the last frame
+  const pointer = { x: -1, y: -1, on: false, touch: false };
+
+  // ---------------------------------------------------------------------
+  // PROJECTION + HIT TEST
+  // ---------------------------------------------------------------------
+  function hitTest(x, y, slop) {
+    let best = -1, bd = Infinity;
+    for (let i = 0; i < S.length; i++) {
+      const s = S[i];
+      const d = Math.hypot(s.x - x, s.y - y);
+      if (d < Math.max(slop, s.rad0 + slop * 0.6) && d < bd) { bd = d; best = i; }
+    }
+    return best;
+  }
+
+  // ---------------------------------------------------------------------
+  // PANEL
+  // ---------------------------------------------------------------------
+  function openProject(k) {
+    selected = k;
+    fillPanel(k);
+    detail.classList.add('open');
+    detail.scrollTop = 0;
+  }
+  function closeProject() {
+    selected = null;
+    detail.classList.remove('open');
+  }
+  function fillPanel(k) {
+    const m = META[k];
+    dCat.textContent = m.cat;
+    dSub.textContent = m.sub || '';
+    dSub.hidden = !m.sub;
+    dTitle.textContent = m.title;
+    dStats.innerHTML = m.stats.map(([v, l]) => `<li><b>${v}</b><span>${l}</span></li>`).join('');
+    dStats.hidden = !m.stats.length;
+    dDesc.textContent = m.desc;
+    dTech.innerHTML = m.tech.map(x => `<li>${x}</li>`).join('');
+    dLinks.innerHTML = m.links.map(([l, h]) => `<a href="${h}" target="_blank" rel="noopener">${l} ↗</a>`).join('');
+    scrubWrap.hidden = !m.scrub;
+    if (m.scrub) {
+      scrubIdx = 30;
+      drawScrub();
+    }
+  }
+  backBtn.addEventListener('click', closeProject);
+  window.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && selected) closeProject();
+  });
+
+  // ---------------------------------------------------------------------
+  // WIN-PROBABILITY SCRUBBER (LeagueVODreview)
+  // ---------------------------------------------------------------------
+  let scrubIdx = 30;
+  let scrubDrag = false;
+  function drawScrub() {
+    const w = scCanvas.clientWidth, h = scCanvas.clientHeight;
+    if (!w || !h) return;
+    scCanvas.width = Math.round(w * DPR);
+    scCanvas.height = Math.round(h * DPR);
+    sctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    sctx.clearRect(0, 0, w, h);
+
+    const top = 26, bot = h - 8;
+    const X = i => (i / (SERIES.length - 1)) * w;
+    const Y = p => top + (1 - p) * (bot - top);
+
+    sctx.setLineDash([2, 3]);
+    sctx.strokeStyle = rgba(pal.line, 0.22);
+    sctx.lineWidth = 1;
+    sctx.beginPath(); sctx.moveTo(0, Y(0.5)); sctx.lineTo(w, Y(0.5)); sctx.stroke();
+    sctx.setLineDash([]);
+
+    sctx.strokeStyle = rgba(pal.line, 0.85);
+    sctx.lineWidth = 1.5;
+    sctx.lineJoin = 'round';
+    sctx.beginPath();
+    SERIES.forEach((p, i) => (i ? sctx.lineTo(X(i), Y(p)) : sctx.moveTo(X(i), Y(p))));
+    sctx.stroke();
+
+    const mx = X(scrubIdx), my = Y(SERIES[scrubIdx]);
+    sctx.lineWidth = 1;
+    sctx.strokeStyle = rgba(pal.line, 0.25);
+    sctx.beginPath(); sctx.moveTo(mx, top - 6); sctx.lineTo(mx, bot); sctx.stroke();
+    sctx.fillStyle = rgba(pal.accent, 1);
+    sctx.beginPath(); sctx.arc(mx, my, 4, 0, Math.PI * 2); sctx.fill();
+
+    sctx.font = '11px ui-monospace, Menlo, Consolas, monospace';
+    sctx.fillStyle = rgba(pal.line, 0.6);
+    sctx.textBaseline = 'top';
+    sctx.textAlign = 'left';
+    sctx.fillText(Math.round(SERIES[scrubIdx] * 100) + '%', 0, 2);
+    sctx.textAlign = 'right';
+    sctx.fillText('min ' + (scrubIdx / 2).toFixed(1), w, 2);
+  }
+  function setScrubFromEvent(e) {
+    const r = scCanvas.getBoundingClientRect();
+    const f = clamp((e.clientX - r.left) / r.width);
+    scrubIdx = Math.round(f * (SERIES.length - 1));
+    drawScrub();
+  }
+  scCanvas.addEventListener('pointerdown', e => {
+    scrubDrag = true;
+    scCanvas.setPointerCapture(e.pointerId);
+    setScrubFromEvent(e);
+  });
+  scCanvas.addEventListener('pointermove', e => { if (scrubDrag) setScrubFromEvent(e); });
+  const endScrubDrag = () => { scrubDrag = false; };
+  scCanvas.addEventListener('pointerup', endScrubDrag);
+  scCanvas.addEventListener('pointercancel', endScrubDrag);
+  scCanvas.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      e.preventDefault();
+      scrubIdx = clamp(scrubIdx + (e.key === 'ArrowRight' ? 1 : -1), 0, SERIES.length - 1);
+      drawScrub();
+    }
+  });
+
+  // ---------------------------------------------------------------------
+  // POINTER ON THE CLOUD (mouse hover, tap = hover + click)
+  // ---------------------------------------------------------------------
+  cv.addEventListener('pointermove', e => {
+    pointer.x = e.clientX; pointer.y = e.clientY;
+    pointer.on = true; pointer.touch = e.pointerType === 'touch';
+  });
+  cv.addEventListener('pointerleave', () => { pointer.on = false; });
+
+  // Drag to rotate (with inertia); a press that barely moves counts as a click.
+  const drag = { on: false, x0: 0, y0: 0, lx: 0, ly: 0, moved: false };
+  cv.addEventListener('pointerdown', e => {
+    cv.setPointerCapture(e.pointerId);
+    drag.on = true; drag.moved = false;
+    drag.x0 = drag.lx = e.clientX; drag.y0 = drag.ly = e.clientY;
+    velY = velX = 0;
+  });
+  cv.addEventListener('pointermove', e => {
+    if (!drag.on) return;
+    if (Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0) > 5) drag.moved = true;
+    if (!drag.moved) return;
+    const dx = e.clientX - drag.lx, dy = e.clientY - drag.ly;
+    drag.lx = e.clientX; drag.ly = e.clientY;
+    angY += dx * 0.006; userTilt = clamp(userTilt + dy * 0.006, -1.2, 1.2);
+    velY = dx * 0.006 * 60; velX = dy * 0.006 * 60;
+    cv.classList.add('grabbing');
+  });
+  const endDrag = e => {
+    if (!drag.on) return;
+    drag.on = false;
+    cv.classList.remove('grabbing');
+    if (drag.moved) return;
+    pointer.x = e.clientX; pointer.y = e.clientY;
+    pointer.touch = e.pointerType === 'touch';
+    const i = hitTest(pointer.x, pointer.y, pointer.touch ? 22 : 10);
+    if (i >= 0) openProject(CHUNKS[i].project);
+    else if (selected) closeProject();
+    if (pointer.touch) pointer.on = false;
+  };
+  cv.addEventListener('pointerup', endDrag);
+  cv.addEventListener('pointercancel', () => { drag.on = false; cv.classList.remove('grabbing'); });
+
+  // ---------------------------------------------------------------------
+  // QUERY (keyword retrieval for now; swap for a real embedding later)
+  // ---------------------------------------------------------------------
+  const STOP = new Set('a an and the of to in on for with by is are i my me at as or it from that this what who how do does'.split(' '));
+  const tok = s => s.toLowerCase().split(/[^a-z0-9+#.]+/).filter(w => w.length > 1 && !STOP.has(w));
+  const DOCS = CHUNKS.map(c => c.main ? null :
+    tok([c.text, META[c.project].title, META[c.project].tech.join(' ')].join(' ')).join(' '));
+  let hits = [];           // [{i, score}]
+  const qPos = [0, 0, 0];  // smoothed query point
+  let qT = 0;              // query visibility ease
+  const qInput = document.getElementById('q');
+  function runQuery() {
+    const qs = tok(qInput.value);
+    if (!qs.length) { hits = []; return; }
+    hits = DOCS.map((d, i) => {
+      if (!d) return { i, score: 0 };
+      const m = qs.filter(w => d.includes(w)).length;
+      return { i, score: m / qs.length };
+    }).filter(h => h.score > 0).sort((a, b) => b.score - a.score).slice(0, 5);
+  }
+  qInput.addEventListener('input', runQuery);
+  qInput.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { qInput.value = ''; runQuery(); qInput.blur(); }
+  });
+  const cosine = (a, b) => {
+    const d = a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+    return d / ((Math.hypot(...a) * Math.hypot(...b)) || 1);
+  };
+
+  // ---------------------------------------------------------------------
+  // HOVER PREVIEW: a live page, a video, or a screenshot per project
+  // ---------------------------------------------------------------------
+  const IMG = '../../img/';
+  const PEEK = {
+    league:      { live: 'https://augustzhang1.github.io/LeagueVODreview/review/NA1_5650873814?p=1', img: 'league.jpg' },
+    minecraft:   { video: 'minecraft.mp4', img: 'minecraft.jpg' },   // add img/minecraft.mp4 to enable
+    arbitrage:   { img: 'odds.jpg' },
+    rag:         { img: 'rag.jpg' },
+    audiobook:   { img: 'audiobook.jpg' },
+    'ark-eagle': { img: 'scheduler.jpg' },
+    arkproject:  { img: 'recipe.jpg' },
+    medihub:     { img: 'medihub.jpg' },
+    snake:       { img: 'snakegame.PNG' },
+    housing:     { img: 'house.jpg' },
+    sinai:       { img: 'sinai.jpg' },
+    senseway:    { img: 'senseway.png' }
+  };
+  const peek = document.getElementById('peek');
+  const peekImg = document.getElementById('peekImg');
+  const peekVid = document.getElementById('peekVid');
+  let peekFrame = null, peekKey = null, vidOk = {};
+  function showPeek(k) {
+    if (k === peekKey) return;
+    peekKey = k;
+    [peekImg, peekVid, peekFrame].forEach(e => e && e.classList.remove('show'));
+    peekVid.pause();
+    if (!k || !PEEK[k]) { peek.classList.remove('on'); return; }
+    const m = PEEK[k];
+    if (m.live) {
+      // Created once and kept, so the live page doesn't reload on every hover.
+      if (!peekFrame) {
+        peekFrame = document.createElement('iframe');
+        peekFrame.src = m.live; peekFrame.tabIndex = -1; peekFrame.loading = 'eager';
+        peek.appendChild(peekFrame);
+      }
+      peekFrame.classList.add('show');
+    } else if (m.video && vidOk[k] !== false) {
+      if (!peekVid.src.endsWith(m.video)) {
+        peekVid.poster = IMG + m.img;
+        peekVid.src = IMG + m.video;
+        peekVid.onerror = () => { vidOk[k] = false; if (peekKey === k) { peekKey = null; showPeek(k); } };
+      }
+      peekVid.classList.add('show');
+      peekVid.play().catch(() => {});
+    } else {
+      peekImg.src = IMG + m.img;
+      peekImg.classList.add('show');
+    }
+    peek.classList.add('on');
+  }
+  function placePeek(x, y) {
+    const w = peek.offsetWidth, h = peek.offsetHeight;
+    let px = x - w - 24, py = y - h / 2;
+    if (px < 16) px = x + 24;
+    if (px + w > W - 16) px = W - w - 16;
+    py = clamp(py, 96, H - h - 80);
+    peek.style.transform = `translate(${Math.round(px)}px, ${Math.round(py)}px)`;
+  }
+
+  // Scroll to zoom.
+  cv.addEventListener('wheel', e => {
+    e.preventDefault();
+    userZoom = clamp(userZoom * Math.exp(-e.deltaY * 0.0015), 0.6, 2.5);
+  }, { passive: false });
+
+  // ---------------------------------------------------------------------
+  // FRAME
+  // ---------------------------------------------------------------------
+  function frame(now) {
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    t += dt;
+    const sm = rate => (reduce ? 1 : 1 - Math.exp(-dt * rate));
+
+    // Smooth state transitions.
+    spin += ((selected ? 0.12 : 1) - spin) * sm(3);
+    zoom += ((selected ? ZOOM : 1) - zoom) * sm(5);
+    panelT += ((selected ? 1 : 0) - panelT) * sm(5);
+    const ft = selected ? centroid[selected] : [0, 0, 0];
+    for (let a = 0; a < 3; a++) focus[a] += (ft[a] - focus[a]) * sm(5);
+    const zt = (zoom - 1) / (ZOOM - 1);
+
+    // Rotation, slow tilt and drift.
+    if (!reduce && !drag.on) angY += dt * 0.07 * spin;
+    if (!drag.on) {
+      angY += velY * dt; userTilt = clamp(userTilt + velX * dt, -1.2, 1.2);
+      const f = Math.exp(-dt * 3); velY *= f; velX *= f;
+    }
+    angX = (reduce ? 0.22 : 0.22 + 0.05 * Math.sin(t * 0.11)) + userTilt;
+    const offX = reduce ? 0 : 0.025 * Math.sin(t * 0.19);
+    const offY = reduce ? 0 : 0.018 * Math.sin(t * 0.13 + 1.1);
+
+    const cA = Math.cos(angY), sA = Math.sin(angY);
+    const cB = Math.cos(angX), sB = Math.sin(angX);
+    const rot = p => {
+      const x1 = cA * p[0] + sA * p[2];
+      const z1 = -sA * p[0] + cA * p[2];
+      return [x1, cB * p[1] - sB * z1, sB * p[1] + cB * z1];
+    };
+    const fR = rot(focus);
+
+    const Sc = Math.min(W, H) * 0.36 * userZoom;
+    const desk = W > 720;
+    const cx = W / 2 - (desk ? panelT * 188 : 0) + offX * Sc;
+    const cy = H / 2 - (desk ? 0 : panelT * H * 0.2) - offY * Sc;
+
+    // Project any world point to the screen.
+    const P = w => {
+      const q = rot(w), k = CAM / (CAM - q[2]);
+      return [cx + (q[0] - fR[0]) * k * Sc * zoom, cy - (q[1] - fR[1]) * k * Sc * zoom];
+    };
+
+    const elapsed = (now - t0) / 1000;
+    S = CHUNKS.map((c, i) => {
+      const p = pts[i];
+      const u = reduce ? 1 : easeOut(clamp((elapsed - p.delay) / INTRO_S));
+      const q = rot([
+        p.from[0] + (c.pos[0] - p.from[0]) * u,
+        p.from[1] + (c.pos[1] - p.from[1]) * u,
+        p.from[2] + (c.pos[2] - p.from[2]) * u
+      ]);
+      const k = CAM / (CAM - q[2]);
+      const d = clamp((q[2] + 1) / 2);
+      return {
+        x: cx + (q[0] - fR[0]) * k * Sc * zoom,
+        y: cy - (q[1] - fR[1]) * k * Sc * zoom,
+        z: q[2],
+        d,
+        rad0: (3.2 + 2.8 * d) * p.size * Math.min(k, 1.3) * (1 + 0.4 * zt)
+      };
+    });
+
+    // Hover from pointer position (mouse only; touch hovers via tap).
+    hoverIdx = pointer.on ? hitTest(pointer.x, pointer.y, pointer.touch ? 22 : 10) : -1;
+    hovered = hoverIdx >= 0 ? CHUNKS[hoverIdx].project : null;
+    cv.classList.toggle('pointer', hoverIdx >= 0);
+    const peekOn = hovered && !selected && !drag.on;
+    showPeek(peekOn ? hovered : null);
+    if (peekOn) { const m = S[mainIdx[hovered]]; placePeek(m.x, m.y); }
+
+    const active = hovered || selected;
+    const hitSet = new Set(hits.map(h => h.i));
+    const querying = !active && hits.length > 0;
+
+    // Query point eases toward the score-weighted mean of its hits.
+    qT += ((querying ? 1 : 0) - qT) * sm(6);
+    if (hits.length) {
+      const tw = hits.reduce((s, h) => s + h.score, 0);
+      const tgt = [0, 1, 2].map(a => hits.reduce((s, h) => s + CHUNKS[h.i].pos[a] * h.score, 0) / tw);
+      for (let a = 0; a < 3; a++) qPos[a] += (tgt[a] - qPos[a]) * sm(6);
+    }
+
+    // Per-point accent and dim eases.
+    CHUNKS.forEach((c, i) => {
+      const p = pts[i];
+      const isA = active ? c.project === active : querying && hitSet.has(i);
+      const isD = (!!active || querying) && !isA;
+      p.acc += ((isA ? 1 : 0) - p.acc) * sm(12);
+      p.dim += ((isD ? 1 : 0) - p.dim) * sm(10);
+    });
+
+    // Draw.
+    ctx.clearRect(0, 0, W, H);
+    const introEdge = reduce ? 1 : easeOut(clamp(elapsed / 1.8));
+
+    ctx.lineWidth = 1;
+    const mono = '10px ui-monospace, "SF Mono", Menlo, Consolas, monospace';
+    const O = P([0, 0, 0]);
+
+    // Axes through the origin.
+    ctx.font = mono; ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
+    [[1, 0, 0, 'x'], [0, 1, 0, 'y'], [0, 0, 1, 'z']].forEach(([ax, ay, az, nm]) => {
+      const a = P([-ax * 0.9, -ay * 0.9, -az * 0.9]), b = P([ax * 0.9, ay * 0.9, az * 0.9]);
+      ctx.strokeStyle = rgba(pal.line, 0.09 * introEdge);
+      ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
+      const l = P([ax, ay, az]);
+      ctx.fillStyle = rgba(pal.line, 0.3 * introEdge);
+      ctx.fillText(nm, l[0], l[1]);
+    });
+
+    // Vectors from the origin for whatever is in focus.
+    const arrowIdx = active ? members[active] : (querying ? hits.map(h => h.i) : []);
+    arrowIdx.forEach(i => {
+      const s = S[i];
+      const dx = s.x - O[0], dy = s.y - O[1], L = Math.hypot(dx, dy);
+      if (L < 8) return;
+      const ux = dx / L, uy = dy / L;
+      const ex = s.x - ux * (s.rad0 + 2), ey = s.y - uy * (s.rad0 + 2);
+      ctx.strokeStyle = rgba(pal.accent, (CHUNKS[i].main ? 0.5 : 0.28) * introEdge);
+      ctx.beginPath();
+      ctx.moveTo(O[0], O[1]); ctx.lineTo(ex, ey);
+      ctx.moveTo(ex, ey); ctx.lineTo(ex - ux * 6 - uy * 3, ey - uy * 6 + ux * 3);
+      ctx.moveTo(ex, ey); ctx.lineTo(ex - ux * 6 + uy * 3, ey - uy * 6 - ux * 3);
+      ctx.stroke();
+    });
+
+    edges.forEach(([i, j]) => {
+      const a = S[i], b = S[j];
+      const pi = CHUNKS[i].project, pj = CHUNKS[j].project;
+      let col = pal.line, al = pal.edge;
+      if (active) {
+        if (pi === active && pj === active) { col = pal.accent; al = 0.6; }
+        else if (pi === active || pj === active) { col = pal.accent; al = 0.4; }
+        else { al = 0.04; }
+      } else if (querying) {
+        al = 0.05;
+      }
+      al *= (0.45 + 0.55 * ((a.d + b.d) / 2)) * introEdge;
+      ctx.strokeStyle = rgba(col, al);
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+    });
+
+    // Centroids of projects, used for neighbour hairlines.
+    const cS = {};
+    KEYS.forEach(k => {
+      let sx = 0, sy = 0;
+      members[k].forEach(i => { sx += S[i].x; sy += S[i].y; });
+      cS[k] = [sx / members[k].length, sy / members[k].length];
+    });
+    ctx.font = mono; ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
+    if (active) {
+      nearProjects[active].forEach(nk => {
+        const a = cS[active], b = cS[nk];
+        ctx.strokeStyle = rgba(pal.accent, 0.4 * introEdge);
+        ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
+        ctx.fillStyle = rgba(pal.accent, 0.85 * introEdge);
+        ctx.fillText(cosine(centroid[active], centroid[nk]).toFixed(2), (a[0] + b[0]) / 2, (a[1] + b[1]) / 2 - 8);
+      });
+    }
+
+    // Query point and its retrieved chunks.
+    if (qT > 0.01 && hits.length) {
+      const q = P(qPos);
+      hits.forEach(h => {
+        const s = S[h.i];
+        ctx.strokeStyle = rgba(pal.accent, 0.5 * qT);
+        ctx.beginPath(); ctx.moveTo(q[0], q[1]); ctx.lineTo(s.x, s.y); ctx.stroke();
+        ctx.fillStyle = rgba(pal.accent, 0.85 * qT);
+        ctx.fillText(cosine(qPos, CHUNKS[h.i].pos).toFixed(2), (q[0] + s.x) / 2, (q[1] + s.y) / 2 - 8);
+      });
+      ctx.strokeStyle = rgba(pal.accent, qT);
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(q[0], q[1], 6, 0, Math.PI * 2); ctx.stroke();
+      ctx.lineWidth = 1;
+    }
+
+    const order = S.map((s, i) => i).sort((a, b) => S[a].z - S[b].z);
+    order.forEach(i => {
+      const s = S[i], p = pts[i];
+      const x = (0.3 + 0.6 * s.d) * (1 - 0.8 * p.dim);
+      const a = x + (0.95 - x) * p.acc;
+      const r = s.rad0 * (1 + 0.25 * p.acc);
+      ctx.fillStyle = rgba(mix(dotCol(CHUNKS[i].project), pal.accent, p.acc), a);
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    if (hoverIdx >= 0) {
+      const s = S[hoverIdx];
+      const label = META[hovered].label;
+      ctx.font = '500 12px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+      ctx.textBaseline = 'alphabetic';
+      ctx.textAlign = 'left';
+      const w = ctx.measureText(label).width;
+      let lx = s.x + 12;
+      if (lx + w > W - 12) lx = s.x - 12 - w;
+      ctx.fillStyle = rgba(pal.line, 0.95);
+      ctx.fillText(label, lx, s.y - 12);
+      // Detail points also show the chunk they hold.
+      const txt = CHUNKS[hoverIdx].text;
+      if (txt) {
+        ctx.font = '12px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+        const words = txt.split(' '), lines = [];
+        let ln = '';
+        words.forEach(wd => {
+          const tryLn = ln ? ln + ' ' + wd : wd;
+          if (ctx.measureText(tryLn).width > 260 && ln) { lines.push(ln); ln = wd; } else ln = tryLn;
+        });
+        lines.push(ln);
+        const tw = Math.max(...lines.map(l => ctx.measureText(l).width));
+        let tx = s.x + 12;
+        if (tx + tw > W - 12) tx = s.x - 12 - tw;
+        ctx.fillStyle = rgba(pal.line, 0.6);
+        lines.slice(0, 4).forEach((l, n) => ctx.fillText(l, tx, s.y + 8 + n * 16));
+      }
+    }
+
+    requestAnimationFrame(frame);
+  }
+
+  // ---------------------------------------------------------------------
+  // INIT
+  // ---------------------------------------------------------------------
+  window.addEventListener('resize', () => {
+    resize();
+    if (selected) drawScrub();
+  });
+  const stored = storedTheme();
+  setTheme(stored ? stored === 'dark' : darkMq.matches, false);
+  resize();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
