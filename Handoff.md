@@ -31,8 +31,8 @@ Each subagent was stopped while iterating. The files below are syntactically val
 | audiobook | **Done and verified (batch 3).** Star book sheds lines through a 28-voice ring into a star waveform with chapter beacons; 24s loop. |
 | ark-eagle | **Done and verified (batch 3).** 7 day-orbits fill with 17 satellites; one drops out, scan auto-launches a replacement; 24s loop. |
 | arkproject | Written (231 lines), not verified. |
-| jobapply | Written (209 lines), not verified. |
-| sinai | Written (243 lines). Was checking the dark-theme system phase. |
+| jobapply | **Done and verified (batch 4).** Boards stream postings into an inbox, duplicates merge, ranked list, AI document + autofill form, unpressed "you submit"; 25s loop. |
+| sinai | **Done and verified (batch 4).** Logo from stars, then sun with 3 site planets on a shared-components ring, update waves and deploy pulses; 24.2s loop. |
 | medihub | **Done and verified (batch 1).** Station with 6 bays; book, specialist match, turn-away, cancel and rebook; 24s loop. |
 | senseway | **Done and verified (batch 1).** Logo from stars, then crosswalk with LiDAR, GPS fixes and a dashboard; 23.2s loop. |
 
