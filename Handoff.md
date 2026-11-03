@@ -23,7 +23,7 @@ Each subagent was stopped while iterating. The files below are syntactically val
 | Key | Status |
 |---|---|
 | housing | **Done and verified.** Scatter, decision-tree splits, then a 16-step staircase on a 23s loop. |
-| league | Written (182 lines), not finished or verified. |
+| league | **Done and verified (batch 1).** Win-probability curve, playhead sweep, swing flares ending on "+18% Baron"; 25s loop. |
 | minecraft | Written (196 lines), was mid visual check of the build. |
 | snake | Written (228 lines), not verified (was waiting on fly-in). |
 | rag | Written (177 lines), not verified. |
@@ -33,8 +33,8 @@ Each subagent was stopped while iterating. The files below are syntactically val
 | arkproject | Written (231 lines), not verified. |
 | jobapply | Written (209 lines), not verified. |
 | sinai | Written (243 lines). Was checking the dark-theme system phase. |
-| medihub | **Not started.** Stub only; the old built-in fallback shows. |
-| senseway | **Not started.** Stub only, with no fallback. |
+| medihub | **Done and verified (batch 1).** Station with 6 bays; book, specialist match, turn-away, cancel and rebook; 24s loop. |
+| senseway | **Done and verified (batch 1).** Logo from stars, then crosswalk with LiDAR, GPS fixes and a dashboard; 23.2s loop. |
 
 The vision for each animation is the table in `DESIGN.md` ("In-galaxy animations"). Rules: build from the galaxy's own stars, keep it calm and elegant, use flat dots in the galaxy colours with one accent, keep text minimal, and edit only your own `anims/<key>.js`.
 
