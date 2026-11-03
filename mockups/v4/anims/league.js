@@ -12,7 +12,7 @@ GALAXY_ANIMS['league'] = function (api) {
   const S0 = 4.2, S1 = 16.2;       // playhead sweeps 0..30 min
   const H1 = 19.5;                 // hold
   const R1 = 23.0;                 // relax back into the spiral
-  const LOOP = 24.5;
+  const LOOP = 25.0;
 
   // Win-probability series, one sample per 15 s (121 points), seeded.
   const EVENTS = [
@@ -33,7 +33,7 @@ GALAXY_ANIMS['league'] = function (api) {
   const wpAt = u => { const f = clamp(u) * (K - 1), i = Math.min(K - 2, Math.floor(f)), r = f - i; return WP[i] + (WP[i + 1] - WP[i]) * r; };
 
   // Star budget per role.
-  const NC = 620, NM = 64, NP = 22, NE = 26;
+  const NC = 620, NM = 72, NP = 26, NE = 26;
   const NT = NC + NM + NP + 1 + NE * EVENTS.length;
 
   // Curve stars spaced evenly by arc length (aspect matches the on-screen box).
@@ -92,7 +92,7 @@ GALAXY_ANIMS['league'] = function (api) {
       const gin = t => smooth((T - G0 - t) / (G1 - G0 - 1.3));
       const gout = t => 1 - smooth((T - H1 - t) / (R1 - H1 - 1.2));
       const form = T < H1 ? smooth((T - G0) / (G1 - G0)) : 1 - smooth((T - H1) / (R1 - H1));
-      spiralDim = 0.86 * form;
+      spiralDim = 0.92 * form;
       const ph = clamp((T - S0) / (S1 - S0));           // playhead 0..1
       const sweeping = T > S0 && T < H1;
 
@@ -102,14 +102,14 @@ GALAXY_ANIMS['league'] = function (api) {
         const u = cu[i], ahead = u > ph;
         tx[o] = px(u); ty[o] = py(wpAt(u)) + cj[i];
         const lit = T < S0 ? 0.5 : ahead ? 0.3 : 0.72;
-        ta[o] = lit * (Math.abs(cj[i]) > 2 ? 0.45 : 1); tr[o] = 1.0 + (ahead ? 0 : 0.25); tc[o] = ahead ? 2 : 3;
+        ta[o] = lit * (Math.abs(cj[i]) > 2 ? 0.45 : 1); tr[o] = (dark ? 1.0 : 1.15) + (ahead ? 0 : 0.3); tc[o] = ahead ? 2 : 3;
       }
       for (let i = 0; i < NM; i++, o++) {
-        tx[o] = px((i + 0.5) / NM); ty[o] = py(0.5); ta[o] = 0.22; tr[o] = 0.8; tc[o] = 1;
+        tx[o] = px((i + 0.5) / NM); ty[o] = py(0.5); ta[o] = 0.3; tr[o] = 1.0; tc[o] = 2;
       }
       const hx = px(ph), hp = wpAt(ph), hy = py(hp);
       for (let i = 0; i < NP; i++, o++) {
-        tx[o] = hx; ty[o] = py(0.04 + 0.92 * i / (NP - 1)); ta[o] = sweeping ? 0.4 : 0.1; tr[o] = 0.8; tc[o] = 1;
+        tx[o] = hx; ty[o] = py(0.04 + 0.92 * i / (NP - 1)); ta[o] = sweeping ? 0.32 : 0.08; tr[o] = 0.9; tc[o] = 2;
       }
       tx[o] = hx; ty[o] = hy; ta[o] = 1; tr[o] = 2.4; tc[o] = 3; o++;
       const flares = [];
@@ -117,14 +117,19 @@ GALAXY_ANIMS['league'] = function (api) {
         const u = e.t / 30, ex = px(u), ey = py(wpAt(u));
         const k = T - (S0 + u * (S1 - S0));            // seconds since the playhead hit it
         const burst = k > 0 ? ease3(k / 0.8) : 0, settle = k > 0.8 ? smooth((k - 0.8) / 1.6) : 0;
-        const rad = 0.8 + 26 * burst - 15 * settle;
-        const flash = k > 0 ? Math.max(0, 1 - k / 1.4) : 0;
+        const big = e.key ? 1.35 : 1, rad = 0.8 + 26 * big * burst - 15 * big * settle;
+        const flash = k > 0 ? Math.max(0, 1 - k / 2.0) : 0;
         for (let i = 0; i < NE; i++, o++) {
           tx[o] = ex + Math.cos(ea[i]) * rad * er[i]; ty[o] = ey + Math.sin(ea[i]) * rad * er[i];
           ta[o] = k > 0 ? 0.45 + 0.55 * flash : 0.12; tr[o] = k > 0 ? 1.1 + flash * 0.9 : 0.8;
           tc[o] = (flash > 0.3 && (e.key || i % 2 === 0)) ? 4 : 3;
         }
-        if (k > 0) flares.push({ e, ex, ey, k, flash });
+        if (k > 0) {
+          // Label sits just beyond the swing's extreme so it never sits on the curve.
+          const a0 = wpAt(u - 0.04), a1 = wpAt(u + 0.04);
+          const up = e.d > 0, ly = up ? py(Math.max(a0, a1)) - 24 : py(Math.min(a0, a1)) + 24;
+          flares.push({ e, ex, ey, ly, up, k, flash });
+        }
       });
 
       // Draw: each star travels from its live spiral position to its target.
@@ -166,14 +171,15 @@ GALAXY_ANIMS['league'] = function (api) {
         ctx.restore();
         flares.forEach(f => {
           const la = fa * smooth((f.k - 0.25) / 0.6);
-          const up = f.e.d > 0, ly = f.ey + (up ? -34 : 34);
-          api.line(ctx, f.ex, f.ey + (up ? -12 : 12), f.ex, ly + (up ? 7 : -7), lc, la * 0.25, 1);
-          api.text(ctx, f.e.label, f.ex, ly, f.flash > 0.2 ? acc : lc, la * 0.9);
+          const up = f.up, ly = f.ly;
+          api.line(ctx, f.ex, f.ey + (up ? -8 : 8), f.ex, ly + (up ? 7 : -7), lc, la * 0.25, 1);
+          // The key swing keeps the accent; the others flash it, then settle to ink.
+          api.text(ctx, f.e.label, f.ex, ly, f.e.key || f.flash > 0.25 ? acc : lc, la * 0.9);
         });
         if (sweeping) {
           const m = Math.floor(ph * 30), s = Math.floor((ph * 30 - m) * 4) * 15;
           api.text(ctx, Math.round(hp * 100) + '%', hx + 22, hy - 12, lc, fa * 0.85);
-          api.text(ctx, m + ':' + (s < 10 ? '0' : '') + s, hx, py(0) + 30, lc, fa * 0.5);
+          api.text(ctx, m + ':' + (s < 10 ? '0' : '') + s, hx, py(0) + 30, lc, fa * 0.5 * (1 - smooth((T - S1) / 0.6)));
         }
       }
     }
