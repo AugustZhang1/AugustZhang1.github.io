@@ -1,13 +1,16 @@
 // In-galaxy animation for 'sinai' (Sinai Foundation, Software Developer).
 // Phase 1: the galaxy's own stars swirl in and form the Sinai Foundation logo as a halftone.
 // Phase 2: the logo collapses into a sun; three planets (the 3 sites) ride a shared
-// component-library ring; deploy pulses run sun -> planet ("deploy 4 min"), and the odd
-// Stripe coin lands on a planet. Then the stars return to the logo, and it loops.
+// component-library ring. A component update sweeps around the ring, then deploy pulses
+// run from the sun to all three planets at once ("deploy 4 min"). Twice, then the stars
+// return to the logo, and it loops (24.2 s after a 4.2 s intro).
 GALAXY_ANIMS['sinai'] = function (api) {
   const { TAU, clamp, mix, ease3, rng } = api;
+  const smooth = x => { const u = clamp(x); return u * u * (3 - 2 * u); };
   const INTRO = 4.2, HOLD = 6, TO_SYS = 2.6, SYS = 13, TO_LOGO = 2.6;
   const P = HOLD + TO_SYS + SYS + TO_LOGO;
-  const SUN_R = 0.12, ORBIT = 0.62, PLANET_R = 0.05;
+  const SUN_R = 0.15, ORBIT = 0.64, PLANET_R = 0.085;
+  const WAVES = [1.4, 7.2], DEPLOYS = [3.2, 9.0], WAVE_D = 1.6, FLY = 1.1;
 
   let T = 0, N = 0, ready = false;
   let LX, LY, LS, LC, DL;        // logo target (units of R), dot size, colour class, stagger
@@ -74,7 +77,7 @@ GALAXY_ANIMS['sinai'] = function (api) {
       SPH[j] = rng() * TAU;
     }
     // System roles: innermost logo stars -> sun, middle band -> planets, outer -> ring.
-    const nSun = Math.floor(N * 0.38), nPl = Math.floor(N * 0.2);
+    const nSun = Math.floor(N * 0.34), nPl = Math.floor(N * 0.27);
     for (let j = 0; j < nSun; j++) {
       KIND[j] = 0; SA[j] = j * 2.39996; SB[j] = SUN_R * Math.sqrt((j + 0.5) / nSun);
     }
@@ -88,7 +91,7 @@ GALAXY_ANIMS['sinai'] = function (api) {
     });
     const ring = []; for (let j = nSun + nPl; j < N; j++) ring.push(j);
     ring.sort((a, b) => ang(a) - ang(b));
-    ring.forEach((j, r) => { KIND[j] = 4; SA[j] = -Math.PI + (r / ring.length) * TAU; SB[j] = 0.012 * (rng() + rng() - 1); });
+    ring.forEach((j, r) => { KIND[j] = 4; SA[j] = -Math.PI + (r / ring.length) * TAU; SB[j] = 0.0065 * ((r % 3) - 1); });   // three clean lanes
     return true;
   }
 
@@ -130,13 +133,13 @@ GALAXY_ANIMS['sinai'] = function (api) {
       const leafCol = mix(col[3], acc, 0.35);
       // Planet flash (deploy arrivals), computed once per frame.
       const sysLocal = cyc - HOLD - TO_SYS;              // seconds into the system phase
-      const flash = [0, 0, 0];
+      let flash = 0, waveE = -1;
       if (cyc >= 0 && sysLocal > 0 && sysLocal < SYS) {
-        for (let d = 0; d < 4; d++) {
-          const t0 = 1.2 + d * 3, arr = t0 + 1.1, k = d % 3;
-          if (sysLocal > arr && sysLocal < arr + 1.4) flash[k] = Math.max(flash[k], 1 - (sysLocal - arr) / 1.4);
-        }
+        DEPLOYS.forEach(t0 => { const u = sysLocal - t0 - FLY; if (u > 0 && u < 1.6) flash = Math.max(flash, 1 - u / 1.6); });
+        WAVES.forEach(t0 => { const u = (sysLocal - t0) / WAVE_D; if (u > 0 && u < 1.25) waveE = u; });
       }
+      const waveHead = -Math.PI / 2 + W_ORB * sysT + TAU * smooth(waveE);
+      const waveFade = waveE < 0 ? 0 : clamp((1.25 - waveE) / 0.3);
       for (let j = 0; j < N; j++) {
         let x, y, r, a, c;
         const lx = cx + LX[j] * R, ly = cy + LY[j] * R;
@@ -175,9 +178,16 @@ GALAXY_ANIMS['sinai'] = function (api) {
           }
           const K = KIND[j];
           let rs, as, cs;
-          if (K === 0) { rs = 1.1; as = 0.55; cs = col[3]; }
-          else if (K === 4) { rs = 0.8; as = 0.42; cs = col[1]; }
-          else { const f = flash[K - 1]; rs = 1.05; as = 0.6 + 0.4 * f; cs = f > 0.05 ? mix(col[2], acc, 0.7 * f) : col[2]; }
+          if (K === 0) { rs = 1.15; as = dark ? 0.6 : 0.7; cs = col[3]; }
+          else if (K === 4) {
+            rs = 0.95; as = dark ? 0.5 : 0.6; cs = dark ? col[2] : col[3];
+            if (waveFade > 0) {
+              let d = waveHead - (SA[j] + W_ORB * sysT); d = ((d % TAU) + TAU) % TAU;
+              const w = waveFade * clamp(1 - d / 1.4);
+              if (w > 0.02) { rs += 0.9 * w; as += (1 - as) * w; cs = mix(cs, acc, w); }
+            }
+          }
+          else { const f = flash; rs = 1.1; as = 0.75 + 0.25 * f; cs = f > 0.05 ? mix(col[3], acc, 0.75 * f) : col[3]; }
           r = rLogo + (rs - rLogo) * m;
           a = 0.95 + (as - 0.95) * m;
           c = m < 0.5 ? cLogo : cs;
@@ -196,46 +206,37 @@ GALAXY_ANIMS['sinai'] = function (api) {
       // Sun glow core
       api.dot(ctx, cx, cy, SUN_R * R * 0.45, col[3], A * 0.12);
       // Labels: the ring and the sites, briefly at the start.
-      const lab = clamp(sysLocal / 1) * clamp((4.5 - sysLocal) / 1);
-      api.text(ctx, 'shared components', cx, cy + ORBIT * TILT * R + 16, col[2], A * 0.55 * lab);
-      ['site 1', 'site 2', 'site 3'].forEach((s, k) => { const p = P2(k); api.text(ctx, s, p[0], p[1] + PLANET_R * R + 12, col[2], A * 0.5 * lab); });
-      // Deploys: sun -> planet k, one every 3 s.
-      for (let d = 0; d < 4; d++) {
-        const t0 = 1.2 + d * 3, k = d % 3, u = sysLocal - t0;
-        if (u < 0 || u > 3) continue;
-        const p = P2(k);
-        if (u < 1.1) {
-          const e = ease3(u / 1.1);
-          const dx = p[0] - cx, dy = p[1] - cy, L = Math.hypot(dx, dy) || 1;
+      const labA = A * (dark ? 0.7 : 0.85) * clamp(sysLocal / 1) * clamp((5.6 - sysLocal) / 1);
+      api.text(ctx, 'shared components', cx, cy + ORBIT * TILT * R + 18, textCol, labA);
+      for (let k = 0; k < 3; k++) {
+        const p = P2(k), dx = p[0] - cx, dy = p[1] - cy, L = Math.hypot(dx, dy) || 1, o = PLANET_R * R + 20;
+        api.text(ctx, 'site ' + (k + 1), p[0] + dx / L * o, p[1] + dy / L * o, textCol, labA);
+      }
+      // Deploys: pulses from the sun to all three planets at once.
+      DEPLOYS.forEach(t0 => {
+        const u = sysLocal - t0;
+        if (u < 0 || u > FLY + 2.4) return;
+        for (let k = 0; k < 3; k++) {
+          const p = P2(k), dx = p[0] - cx, dy = p[1] - cy, L = Math.hypot(dx, dy) || 1;
           const sx = cx + dx / L * SUN_R * R, sy = cy + dy / L * SUN_R * R;
           const ex = p[0] - dx / L * PLANET_R * R, ey = p[1] - dy / L * PLANET_R * R;
-          for (let s = 0; s < 6; s++) {
-            const ee = Math.max(0, e - s * 0.035);
-            api.dot(ctx, sx + (ex - sx) * ee, sy + (ey - sy) * ee, 2.4 - s * 0.3, acc, A * (1 - s * 0.16));
+          if (u < FLY) {
+            const e = ease3(u / FLY), hx = sx + (ex - sx) * e, hy = sy + (ey - sy) * e;
+            api.line(ctx, sx, sy, hx, hy, acc, A * 0.35, 1);
+            for (let s = 0; s < 5; s++) {
+              const ee = Math.max(0, e - s * 0.03);
+              api.dot(ctx, sx + (ex - sx) * ee, sy + (ey - sy) * ee, 3.4 - s * 0.5, acc, A * (1 - s * 0.18));
+            }
+          } else {
+            const q = (u - FLY) / 1.3;
+            if (q < 1) {
+              api.line(ctx, sx, sy, ex, ey, acc, A * 0.35 * (1 - q), 1);
+              api.ring(ctx, p[0], p[1], PLANET_R * R + 4 + 26 * q, acc, A * 0.7 * (1 - q), 1.3);
+            }
           }
-        } else {
-          const q = (u - 1.1) / 1.9;
-          if (q < 0.6) api.ring(ctx, p[0], p[1], PLANET_R * R + 4 + 22 * (q / 0.6), acc, A * 0.6 * (1 - q / 0.6), 1);
-          const la = clamp(q / 0.12) * clamp((1 - q) / 0.3);
-          api.text(ctx, 'deploy 4 min', p[0], p[1] - PLANET_R * R - 14, acc, A * 0.85 * la);
         }
-      }
-      // Stripe coins: arrive from outside onto a planet.
-      [[6.0, 0], [9.3, 1]].forEach(([t0, k]) => {
-        const u = sysLocal - t0;
-        if (u < 0 || u > 2.4) return;
-        const p = P2(k), dx = p[0] - cx, dy = p[1] - cy, L = Math.hypot(dx, dy) || 1;
-        const ox = p[0] + dx / L * R * 0.5 + dy / L * R * 0.2, oy = p[1] + dy / L * R * 0.5 - dx / L * R * 0.2;
-        if (u < 1.3) {
-          const e = ease3(u / 1.3), x = ox + (p[0] - ox) * e, y = oy + (p[1] - oy) * e;
-          const fa = clamp(u / 0.3);
-          api.ring(ctx, x, y, 3.6, col[3], A * 0.9 * fa, 1.2);
-          api.dot(ctx, x, y, 1.3, col[3], A * 0.9 * fa);
-        } else {
-          const q = (u - 1.3) / 1.1;
-          api.ring(ctx, p[0], p[1], PLANET_R * R + 3 + 8 * q, col[3], A * 0.5 * (1 - q), 1);
-          api.text(ctx, 'stripe', p[0], p[1] + PLANET_R * R + 14, col[3], A * 0.7 * clamp((1 - q) / 0.4));
-        }
+        const q = u - FLY, la = clamp(q / 0.3) * clamp((2.4 - q) / 0.5);
+        if (q > 0) api.text(ctx, 'deploy  4 min', cx, cy + SUN_R * R + 20, acc, A * 0.95 * la);
       });
     }
   };
