@@ -5,6 +5,7 @@
 // run from the sun to all three planets at once ("deploy 4 min"). Twice, then the stars
 // return to the logo, and it loops (24.2 s after a 4.2 s intro).
 GALAXY_ANIMS['sinai'] = function (api) {
+  api.lightBoost({ dots: false });   // light theme: dense clusters keep their dot size
   const { TAU, clamp, mix, ease3, rng } = api;
   const smooth = x => { const u = clamp(x); return u * u * (3 - 2 * u); };
   const INTRO = 4.2, HOLD = 6, TO_SYS = 2.6, SYS = 13, TO_LOGO = 2.6;
@@ -23,7 +24,7 @@ GALAXY_ANIMS['sinai'] = function (api) {
   const im = new Image();
   im.onload = () => { own = im; };
   im.onerror = () => { ownFailed = true; };
-  im.src = '../../img/sinai.jpg';
+  im.src = 'img/sinai.jpg';
 
   function sample(cols) {
     const sw = own.naturalWidth, sh = own.naturalHeight;

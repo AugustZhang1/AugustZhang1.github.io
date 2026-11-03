@@ -6,6 +6,7 @@
 // The finished build turns, an accent wave climbs it, then the stars return to the spiral.
 // Three designs take turns, one per loop.
 GALAXY_ANIMS['minecraft'] = function (api) {
+  api.lightBoost();   // light theme: a little more weight (see index.html makeApi)
   const { clamp, ease3, rng } = api;
   const smooth = x => { const u = clamp(x); return u * u * (3 - 2 * u); };
 
@@ -152,7 +153,7 @@ GALAXY_ANIMS['minecraft'] = function (api) {
       const wait = self.spiralDim / 0.9;                                                   // how far the spiral has dimmed
       const step = Math.max(1, Math.floor(pool / P.need));
       const star = i => (P.idx[i] * step) % pool;
-      const sq = clamp(s * 0.1, 1.3, 2.2);                                               // star size on the build
+      const sq = clamp(s * 0.1, 1.3, 2.2) * (dark ? 1 : 1.3);                                               // star size on the build
 
       ctx.save();
       ctx.globalCompositeOperation = dark ? 'lighter' : 'source-over';
@@ -167,7 +168,7 @@ GALAXY_ANIMS['minecraft'] = function (api) {
         proj(f.x, -0.5, f.z);
         const x = gx + (q[0] - gx) * k, y = gy + (q[1] - gy) * k;
         const a = vis * ((1 - k) * 0.4 * wait + k * (0.12 + 0.3 * f.fade));
-        api.dot(ctx, x, y, 0.9, cols[1], a);
+        api.dot(ctx, x, y, dark ? 0.9 : 1.1, cols[1], a);
       }
 
       // block stars

@@ -1,845 +1,2830 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>August Zhang — Computer Engineer</title>
-  <meta name="description" content="August Zhang — computer engineer. Selected work in AI, web, and data." />
-  <link rel="stylesheet" href="style.css" />
-  <script>
-    // Mark JS as available so reveal-on-scroll can hide content (CSS gates the
-    // hide behind html.js — without JS the page stays fully visible).
-    document.documentElement.classList.add('js');
-    // Set theme before first paint to avoid a flash. Stored choice wins,
-    // otherwise follow the OS preference.
-    (function () {
-      try {
-        var saved = localStorage.getItem('theme');
-        var dark = saved ? saved === 'dark'
-          : window.matchMedia('(prefers-color-scheme: dark)').matches;
-        document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-      } catch (e) {
-        document.documentElement.setAttribute('data-theme', 'light');
-      }
-    })();
-  </script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>August Zhang</title>
+<meta name="description" content="August Zhang, computer engineer. Selected work in AI, web and data.">
+<script>
+  (function () {
+    var s = null;
+    try { s = localStorage.getItem('theme'); } catch (e) {}
+    var dark = s ? s === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  })();
+</script>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f5f5f3;
+    --ink: #17181a;
+    --muted: #6e727a;
+    --rule: rgba(23, 24, 26, 0.14);
+    --accent: #e0643a;
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #05060a;
+    --ink: #e9e9e7;
+    --muted: #8f949c;
+    --rule: rgba(233, 233, 231, 0.14);
+    --accent: #ff8a5c;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+
+  #cloud {
+    position: fixed; inset: 0;
+    width: 100%; height: 100%;
+    display: block;
+    touch-action: none;
+  }
+  #cloud { cursor: grab; }
+  #cloud.pointer { cursor: pointer; }
+  #cloud.grabbing { cursor: grabbing; }
+
+  .top {
+    position: fixed; top: 0; left: 0; right: 0;
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 24px;
+    padding: 28px 36px;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .top, .crumbs, .crumb { text-shadow: 0 0 6px var(--bg), 0 0 14px var(--bg); }
+  .top > * { pointer-events: auto; }
+  .ident { display: flex; flex-direction: column; gap: 4px; }
+  .name { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+  .role { margin: 0; font-size: 13px; color: var(--muted); }
+
+  .nav {
+    display: flex; align-items: center; flex-wrap: wrap;
+    gap: 22px;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .nav a { text-decoration: none; opacity: 0.7; transition: opacity .2s ease, color .2s ease; }
+  .nav a:hover, .nav a:focus-visible { opacity: 1; color: var(--accent); outline: none; }
+
+  .theme {
+    width: 28px; height: 28px;
+    padding: 0;
+    border: 1px solid var(--rule);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--ink);
+    display: grid; place-items: center;
+    cursor: pointer;
+  }
+  .theme:focus-visible { outline: 1px solid var(--accent); outline-offset: 2px; }
+  .theme .dot {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+  :root[data-theme="dark"] .theme .dot { background: transparent; border: 1.5px solid currentColor; }
+
+  .detail {
+    position: fixed;
+    right: 36px; top: 112px; bottom: 36px;
+    width: 340px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--rule) transparent;
+    padding-right: 4px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(6px);
+    pointer-events: none;
+    transition: opacity .45s ease, transform .45s ease, visibility 0s linear .45s;
+    z-index: 2;
+  }
+  .detail::-webkit-scrollbar { width: 6px; }
+  .detail::-webkit-scrollbar-track { background: transparent; }
+  .detail::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 3px; }
+  .detail.open { opacity: 1; visibility: visible; transform: none; pointer-events: auto; transition-delay: 0s; }
+
+  .back {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--muted);
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .back:hover, .back:focus-visible { color: var(--accent); outline: none; }
+
+  .d-cat {
+    margin: 26px 0 0;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .d-sub { margin: 6px 0 0; font-size: 13px; color: var(--muted); }
+  .d-title {
+    margin: 12px 0 18px;
+    font-size: 21px; font-weight: 600; line-height: 1.25;
+    letter-spacing: -0.015em;
+  }
+  .d-stats {
+    list-style: none; margin: 0 0 20px; padding: 16px 0;
+    border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 16px;
+  }
+  .d-stats b { display: block; font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .d-stats span { display: block; margin-top: 4px; font-size: 12px; line-height: 1.4; color: var(--muted); }
+  .d-desc { margin: 0 0 20px; font-size: 14px; line-height: 1.65; opacity: 0.88; }
+  .d-tech {
+    list-style: none; margin: 0 0 20px; padding: 0;
+    display: flex; flex-wrap: wrap; gap: 6px 14px;
+    font-size: 12px; color: var(--muted);
+  }
+  .scrub { margin: 0 0 22px; }
+  .scrub-label {
+    margin: 0 0 8px;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted);
+  }
+  #scrubCanvas {
+    display: block; width: 100%; height: 120px;
+    cursor: ew-resize; touch-action: pan-y; outline: none;
+  }
+  #scrubCanvas:focus-visible { outline: 1px solid var(--accent); outline-offset: 4px; }
+  .d-links { margin: 0; font-size: 13px; }
+  .d-links a {
+    display: inline-block; margin: 0 18px 8px 0; padding-bottom: 2px;
+    text-decoration: none; border-bottom: 1px solid var(--rule);
+    transition: color .2s ease, border-color .2s ease;
+  }
+  .d-links a:hover, .d-links a:focus-visible { color: var(--accent); border-color: var(--accent); outline: none; }
+
+  .crumbs {
+    position: fixed; left: 36px; top: 112px;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    z-index: 2;
+  }
+  .crumbs .sep { opacity: 0.5; }
+  .crumb {
+    padding: 0; border: 0; background: none;
+    font: inherit; letter-spacing: inherit; text-transform: inherit;
+    color: inherit; cursor: pointer;
+  }
+  .crumb:hover, .crumb:focus-visible { color: var(--accent); outline: none; }
+  .crumbs .crumb:last-child { color: var(--ink); cursor: default; }
+
+  .query {
+    position: fixed; left: 50%; bottom: 32px;
+    transform: translateX(-50%);
+    width: min(360px, 80vw);
+    z-index: 1;
+    transition: opacity .25s ease, visibility 0s;
+  }
+  .query.hidden {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+    transition: opacity .25s ease, visibility 0s .25s;
+  }
+  .query input {
+    width: 100%;
+    padding: 8px 2px;
+    border: 0; border-bottom: 1px solid var(--rule);
+    border-radius: 0;
+    background: transparent;
+    color: var(--ink);
+    font: 13px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    text-align: center;
+    outline: none;
+    transition: border-color .2s ease;
+  }
+  .query input::placeholder { color: var(--muted); }
+  .query input:focus { border-color: var(--accent); }
+
+  .peek {
+    position: fixed; left: 0; top: 0;
+    width: 280px; aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: var(--bg);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s ease;
+    z-index: 1;
+  }
+  .peek.on { opacity: 1; }
+  .peek > * { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: none; }
+  .peek > .show { display: block; }
+  .peek img.contain { object-fit: contain; padding: 12%; box-sizing: border-box; }
+  .peek iframe {
+    width: 1280px; height: 800px; border: 0;
+    transform: scale(0.21875); transform-origin: 0 0;
+  }
+
+  @media (max-width: 720px) {
+    .top { flex-direction: column; padding: 22px 22px; gap: 14px; }
+    .nav { gap: 16px 18px; }
+    .crumbs { left: 22px; right: 22px; }
+    .detail {
+      left: 0; right: 0; top: auto; bottom: 0;
+      width: auto; max-height: 56vh;
+      padding: 0 24px 28px;
+      background: var(--bg);
+      transform: translateY(100%);
+    }
+    .detail.open { transform: none; }
+    .back { position: sticky; top: 0; z-index: 1; display: block; width: 100%; padding: 16px 0 10px; text-align: left; background: var(--bg); }
+  }
+</style>
 </head>
 <body>
-  <div class="grid-paper" aria-hidden="true"></div>
 
-  <header class="topbar" id="top">
-    <a class="wordmark" href="#top">AUGUST&nbsp;ZHANG</a>
-    <nav class="topnav">
-      <a href="#work">Work</a>
-      <a href="#experience">Experience</a>
-      <a href="#skills">Skills</a>
-      <a href="#contact">Contact</a>
-      <button type="button" id="themeToggle" class="theme-toggle" aria-label="Switch to dark mode" aria-pressed="false">☾</button>
-    </nav>
-  </header>
+<canvas id="cloud" role="img" aria-label="Galaxies of August's work"></canvas>
 
-  <main>
-    <!-- HERO -->
-    <section class="hero reveal" id="home">
-      <div class="hero-text">
-        <p class="eyebrow">Computer Engineer &middot; Portfolio 2026</p>
-        <h1 class="display">
-          Building systems<br />that <em>learn</em>.
-        </h1>
-        <p class="lede">
-          I design and ship software across full-stack web, real-time
-          systems, and AI — from Raspberry Pi mobility hardware and
-          concurrent Go services to CI/CD pipelines and RAG evaluation tooling.
-        </p>
-        <div class="hero-links">
-          <a href="#work" class="link-arrow">View work <span aria-hidden="true">&darr;</span></a>
-          <a href="https://github.com/AugustZhang1" target="_blank" rel="noopener" class="link-arrow">GitHub <span aria-hidden="true">&#8599;</span></a>
-          <a href="mailto:augustzhang878@gmail.com" class="link-arrow">Email <span aria-hidden="true">&#8599;</span></a>
-        </div>
-      </div>
+<header class="top">
+  <div class="ident">
+    <p class="name">August Zhang</p>
+    <p class="role">Computer Engineering @ uOttawa</p>
+  </div>
+  <nav class="nav" aria-label="Links">
+    <a href="AugustZhang_Resume_Final.pdf" target="_blank" rel="noopener">Resume</a>
+    <a href="https://github.com/AugustZhang1" target="_blank" rel="noopener">GitHub</a>
+    <a href="https://www.linkedin.com/in/august-zhang-122918274/" target="_blank" rel="noopener">LinkedIn</a>
+    <a href="mailto:augustzhang878@gmail.com">Email</a>
+    <button type="button" class="theme" id="themeBtn" aria-label="Switch to dark theme"><span class="dot"></span></button>
+  </nav>
+</header>
 
-      <figure class="hero-portrait">
-        <img src="img/me.png" alt="Portrait of August Zhang" />
-        <figcaption>BASED IN CANADA</figcaption>
-      </figure>
-    </section>
+<aside class="detail" id="detail">
+  <button type="button" class="back" id="backBtn">Back</button>
+  <p class="d-cat" id="dCat"></p>
+  <p class="d-sub" id="dSub"></p>
+  <h2 class="d-title" id="dTitle"></h2>
+  <ul class="d-stats" id="dStats"></ul>
+  <p class="d-desc" id="dDesc"></p>
+  <ul class="d-tech" id="dTech"></ul>
+  <div class="scrub" id="scrubWrap" hidden>
+    <p class="scrub-label">Win probability · sample game</p>
+    <canvas id="scrubCanvas" tabindex="0" role="slider" aria-label="Win probability over match time" aria-valuemin="0" aria-valuemax="30" aria-valuenow="15"></canvas>
+  </div>
+  <p class="d-links" id="dLinks"></p>
+</aside>
 
-    <!-- EXPERIENCE -->
-    <section class="experience reveal" id="experience">
-      <div class="section-head">
-        <span class="section-no">01</span>
-        <h2 class="display-sm">Experience</h2>
-      </div>
+<nav class="crumbs" id="crumbs" aria-label="Breadcrumb" hidden></nav>
 
-      <ol class="exp-list">
-        <li class="exp-item">
-          <div class="exp-head">
-            <div class="exp-id">
-              <span class="exp-logo">
-                <img src="img/sinai.jpg" alt="Sinai Foundation logo" loading="lazy" />
-              </span>
-              <div class="exp-role">
-                <h3 class="exp-title">Software Developer Intern</h3>
-                <p class="exp-org">Sinai Foundation &middot; Toronto, ON</p>
-              </div>
-            </div>
-            <p class="exp-dates">May 2026 &mdash; Aug 2026</p>
-          </div>
-          <ul class="exp-points">
-            <li>Cut deployment time by 90% across 3 production websites serving 5,000+ monthly visitors by engineering a GitHub Actions CI/CD pipeline automating builds, Jest tests, and releases.</li>
-            <li>Integrated Stripe payments across all 3 sites — checkout, webhook validation, confirmation, and failure handling — moving the organization's donation pipeline online.</li>
-            <li>Saved ~4 engineering hours/week by configuring Pages CMS with a <code>.pages.yml</code> schema, enabling non-technical staff to publish directly to GitHub and trigger automated deploys.</li>
-            <li>Cut code duplication by 30% across 3 legacy websites by rebuilding UIs in React and consolidating duplicated JavaScript into a shared component library.</li>
-          </ul>
-        </li>
+<div class="peek" id="peek" aria-hidden="true">
+  <img id="peekImg" alt="">
+  <video id="peekVid" muted loop playsinline preload="none"></video>
+</div>
 
-        <li class="exp-item">
-          <div class="exp-head">
-            <div class="exp-id">
-              <span class="exp-logo exp-logo--dark">
-                <img src="img/senseway.png" alt="SenseWay logo" loading="lazy" />
-              </span>
-              <div class="exp-role">
-                <h3 class="exp-title">Software Developer Intern</h3>
-                <p class="exp-org">SenseWay &middot; Ottawa, ON</p>
-              </div>
-            </div>
-            <p class="exp-dates">Sept 2025 &mdash; April 2026</p>
-          </div>
-          <ul class="exp-points">
-            <li>Designed and integrated a hardware/software mobility system combining Raspberry Pi, camera, LiDAR, IMU, GPS, Bluetooth, Android software, backend services, and a web dashboard for real-time crosswalk detection and alerts.</li>
-            <li>Improved system reliability under intermittent connectivity by implementing telemetry validation, error handling, and automatic reconnection across real-time communication interfaces.</li>
-            <li>Improved backend scalability to 10,000+ concurrent WebSocket connections by load-testing services and optimizing PostgreSQL indexes, reducing hot-path query latency by 85%.</li>
-            <li>Built a Vue.js dashboard for real-time GPS, biometric, and alert data, preserving live updates through automatic WebSocket reconnection.</li>
-          </ul>
-        </li>
-      </ol>
-    </section>
+<form class="query" id="queryForm" role="search">
+  <label for="q" hidden>Search my work</label>
+  <input id="q" type="search" placeholder="Search my work" autocomplete="off" spellcheck="false">
+</form>
 
-    <!-- SKILLS / KEYBOARD FILTER -->
-    <section class="skills reveal" id="skills">
-      <div class="section-head">
-        <span class="section-no">02</span>
-        <h2 class="display-sm">Skills &amp; Tools</h2>
-      </div>
-      <p class="skills-hint">
-        Tap keys to filter. Selected keys stay pressed and the list below shows
-        projects built with <em>all</em> of them.
-      </p>
+<script>window.GALAXY_ANIMS = {};</script>
+<script src="anims/league.js"></script>
+<script src="anims/minecraft.js"></script>
+<script src="anims/rag.js"></script>
+<script src="anims/arbitrage.js"></script>
+<script src="anims/audiobook.js"></script>
+<script src="anims/ark-eagle.js"></script>
+<script src="anims/medihub.js"></script>
+<script src="anims/arkproject.js"></script>
+<script src="anims/jobapply.js"></script>
+<script src="anims/sinai.js"></script>
+<script src="anims/senseway.js"></script>
+<script src="anims/reels.js"></script>
+<script src="anims/clerk.js"></script>
+<script src="anims/pet.js"></script>
+<script src="embeddings.js"></script>
+<script>
+(() => {
+  'use strict';
 
-      <div class="keyboard" id="keyboard" role="group" aria-label="Filter projects by skill"></div>
+  // ---------------------------------------------------------------------
+  // HELPERS
+  // ---------------------------------------------------------------------
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  const rnd = mulberry32(7);
+  function gauss() {
+    let u = 0; while (!u) u = rnd();
+    return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * rnd());
+  }
+  const TAU = Math.PI * 2;
+  const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+  const easeOut = t => 1 - Math.pow(1 - t, 3);
+  const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+  const rgba = (c, a) => `rgba(${c[0]},${c[1]},${c[2]},${clamp(a).toFixed(3)})`;
+  const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
+  const unit = v => { const l = Math.hypot(v[0], v[1], v[2]) || 1; return [v[0] / l, v[1] / l, v[2] / l]; };
+  const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
 
-      <div class="kb-status">
-        <span id="kbCount" class="kb-count">Showing all projects</span>
-        <button type="button" id="kbClear" class="kb-clear" hidden>Clear keys</button>
-      </div>
+  // ---------------------------------------------------------------------
+  // PALETTE. Dark is the main theme: stars add up and cores glow. Light
+  // draws the same galaxies as ink, source-over, with no glow.
+  // ---------------------------------------------------------------------
+  const INK = [23, 24, 27];
+  const WHITE = [255, 255, 255];
+  const PAL = {
+    light: { accent: [224, 100, 58], line: [23, 24, 27], dust: [120, 100, 84], dustA: 0.35 },
+    dark:  { accent: [255, 138, 92], line: [226, 228, 232], dust: [110, 80, 64], dustA: 0.3 }
+  };
+  const CORE_PAL = [[255, 238, 204], [255, 224, 176], [255, 244, 222]];
+  const ARM_PAL = [[160, 196, 255], [190, 180, 255], [150, 224, 236], [255, 200, 210], [184, 210, 255]];
+  const BG_COL = [200, 208, 220];
 
-      <ol class="work-list" id="skillResults"></ol>
-      <p class="work-empty" id="skillEmpty" hidden>No project uses every selected skill.</p>
-    </section>
+  const CHUNKS = [
+  { id: "league-01", project: "league", kind: "project", text: "Chess.com-style game review for League of Legends.", terms: ["Chess.com", "League of Legends"] },
+  { id: "league-02", project: "league", kind: "project", text: "A LightGBM model scores your win chance every 15 seconds and grades each fight and objective by how much it swung the game.", terms: ["LightGBM", "15 s", "win chance", "fight"] },
+  { id: "league-03", project: "league", kind: "project", text: "A 24/7 crawler on Google Cloud collected 200K+ high-elo matches at the Riot API rate limit.", terms: ["Google Cloud", "200K+", "Riot API", "24/7"] },
+  { id: "league-04", project: "league", kind: "project", text: "The model is calibrated to within about 1 point on 60K games.", terms: ["60K", "1 point", "calibrated model"] },
+  { id: "minecraft-01", project: "minecraft", kind: "project", text: "In-game AI builder for Minecraft Java servers: an op types !design with a prompt or image link.", terms: ["Minecraft Java", "!design", "prompt", "image link"] },
+  { id: "minecraft-02", project: "minecraft", kind: "project", text: "Claude or Gemini writes OpenSCAD code, and the rendered meshes are voxelized into blocks and placed over RCON in seconds.", terms: ["Claude", "Gemini", "OpenSCAD", "RCON"] },
+  { id: "minecraft-03", project: "minecraft", kind: "project", text: "Builds pixel art and 1.4M-block 3D statues from a single picture, with no mods or plugins.", terms: ["pixel art", "1.4M blocks", "single picture", "no mods", "no plugins"] },
+  { id: "arbitrage-01", project: "arbitrage", kind: "project", text: "Concurrent Go service ingesting live betting lines from 5+ bookmakers in near real time.", terms: ["Go", "5+ bookmakers", "betting lines", "real time"] },
+  { id: "arbitrage-02", project: "arbitrage", kind: "project", text: "Converts odds to implied probabilities and flags arbitrage where combined margins fall below 100%.", terms: ["probabilities", "arbitrage", "100%", "odds"] },
+  { id: "arbitrage-03", project: "arbitrage", kind: "project", text: "A time-series PostgreSQL schema tracks historical line movement for trend analysis and backtesting.", terms: ["PostgreSQL", "time-series", "line movement", "backtesting"] },
+  { id: "rag-01", project: "rag", kind: "project", text: "Zero-cost RAG evaluation platform with pgvector hybrid search and LangFuse tracing.", terms: ["RAG", "pgvector", "LangFuse", "hybrid search"] },
+  { id: "rag-02", project: "rag", kind: "project", text: "LLM-as-judge scoring runs on versioned gold sets, and the eval harness runs in CI on every commit.", terms: ["LLM-as-judge", "gold sets", "CI", "every commit"] },
+  { id: "rag-03", project: "rag", kind: "project", text: "Cut hallucinated answers from 11/33 to 7/33 by tuning chunk size and retrieval-k.", terms: ["11/33 → 7/33", "chunk size", "retrieval-k", "hallucinations"] },
+  { id: "rag-04", project: "rag", kind: "project", text: "Presidio guardrails with Luhn validation keep secrets and PII out of traces.", terms: ["Presidio", "Luhn", "secrets", "PII"] },
+  { id: "audiobook-01", project: "audiobook", kind: "project", text: "Local PDF-to-M4B audiobook converter with chapter detection and 28 Kokoro TTS voices.", terms: ["PDF-to-M4B", "28 voices", "Kokoro TTS", "chapters"] },
+  { id: "audiobook-02", project: "audiobook", kind: "project", text: "No accounts, API keys, or uploads.", terms: ["no accounts", "no API keys", "no uploads"] },
+  { id: "audiobook-03", project: "audiobook", kind: "project", text: "Runs on CPU in the browser at localhost, or on a free Colab T4 GPU.", terms: ["CPU", "browser", "localhost", "Colab T4"] },
+  { id: "audiobook-04", project: "audiobook", kind: "project", text: "Verifies embedded chapters after encoding.", terms: ["embedded chapters", "encoding", "verifies"] },
+  { id: "ark-eagle-01", project: "ark-eagle", kind: "project", text: "Mobile-first volunteer operations system that auto-generates weekly assignments and reminders.", terms: ["mobile-first", "volunteer ops", "weekly assignments", "reminders"] },
+  { id: "ark-eagle-02", project: "ark-eagle", kind: "project", text: "Handles urgent replacements so coordinators only manage exceptions.", terms: ["replacements", "coordinators", "exceptions"] },
+  { id: "ark-eagle-03", project: "ark-eagle", kind: "project", text: "TypeScript modular monolith with a separate worker, PostgreSQL audit history, and Docker Compose deployment.", terms: ["TypeScript", "PostgreSQL", "Docker Compose", "separate worker", "audit history"] },
+  { id: "arkproject-01", project: "arkproject", kind: "project", text: "Canada-first progressive web app that turns what is in your fridge into recipes.", terms: ["Canada-first", "web app", "fridge", "recipes"] },
+  { id: "arkproject-02", project: "arkproject", kind: "project", text: "React, TypeScript and Vite frontend with a Hono API on Cloudflare Workers.", terms: ["React", "TypeScript", "Vite", "Hono", "Cloudflare Workers"] },
+  { id: "arkproject-03", project: "arkproject", kind: "project", text: "Supabase PostgreSQL with Auth.", terms: ["Supabase", "PostgreSQL", "Auth"] },
+  { id: "medihub-01", project: "medihub", kind: "project", text: "Android healthcare appointment app serving 500+ users.", terms: ["Android", "500+ users", "healthcare", "appointments"] },
+  { id: "medihub-02", project: "medihub", kind: "project", text: "Firebase real-time booking, cancellation, and specialist handling.", terms: ["Firebase", "real-time booking", "cancellation", "specialists"] },
+  { id: "sinai-01", project: "sinai", kind: "experience", text: "Cut deployment time by 90% across 3 production websites serving 5,000+ monthly visitors, using a GitHub Actions CI/CD pipeline for builds, Jest tests, and releases.", terms: ["90%", "5,000+", "GitHub Actions", "Jest", "3 websites"] },
+  { id: "sinai-02", project: "sinai", kind: "experience", text: "Integrated Stripe payments across all 3 sites, including checkout, webhook validation, confirmation, and failure handling.", terms: ["Stripe", "3 sites", "checkout", "webhook validation", "failure handling"] },
+  { id: "sinai-03", project: "sinai", kind: "experience", text: "Saved about 4 engineering hours a week by configuring Pages CMS, so non-technical staff can publish directly.", terms: ["4 hours/week", "Pages CMS", "staff", "publish directly"] },
+  { id: "sinai-04", project: "sinai", kind: "experience", text: "Cut code duplication by 30% across 3 legacy websites by rebuilding the UIs in React and sharing one component library.", terms: ["30%", "3 websites", "React", "component library", "code duplication"] },
+  { id: "senseway-01", project: "senseway", kind: "experience", text: "Designed and integrated a Raspberry Pi mobility system with camera, LiDAR, IMU, GPS, Android, backend services, and a web dashboard for real-time crosswalk detection.", terms: ["Raspberry Pi", "LiDAR", "IMU", "GPS", "Android"] },
+  { id: "senseway-02", project: "senseway", kind: "experience", text: "Kept the system reliable under intermittent connectivity with telemetry validation, error handling, and automatic reconnection.", terms: ["connectivity", "telemetry", "error handling", "reconnection"] },
+  { id: "senseway-03", project: "senseway", kind: "experience", text: "Scaled backend services to 10,000+ concurrent WebSocket connections and cut hot-path query latency by 85% through PostgreSQL index tuning.", terms: ["10,000+", "WebSocket", "85%", "PostgreSQL", "index tuning"] },
+  { id: "senseway-04", project: "senseway", kind: "experience", text: "Built a Vue.js dashboard for real-time GPS, biometric, and alert data with live updates.", terms: ["Vue.js", "GPS", "biometric", "alert data", "live updates"] },
+  { id: "jobapply-01", project: "jobapply", kind: "project", text: "Scrapes public job boards and curated feeds into a local store, then ranks and de-duplicates postings.", terms: ["job boards", "curated feeds", "local store", "de-duplicates"] },
+  { id: "jobapply-02", project: "jobapply", kind: "project", text: "A Chrome extension dashboard filters jobs by term, province, source, role, score and freshness, and tracks each application from saved to offer.", terms: ["Chrome", "province", "score", "freshness", "saved to offer"] },
+  { id: "jobapply-03", project: "jobapply", kind: "project", text: "Generates application documents on demand with AI and autofills forms, but never submits an application.", terms: ["AI", "documents", "autofills forms", "never submits"] },
+  { id: "jobapply-04", project: "jobapply", kind: "project", text: "A local Qwen model on llama.cpp maps form fields, with embedding retrieval; it loads on demand and unloads after 15 idle minutes.", terms: ["Qwen", "llama.cpp", "retrieval", "15 min"] },
+  { id: "jobapply-05", project: "jobapply", kind: "project", text: "Zero runtime dependencies: built entirely on Node 24 built-ins.", terms: ["Node 24", "zero dependencies", "built-ins"] },
+  { id: "reels-01", project: "reels", kind: "project", text: "Chrome and Edge extension that turns the video on any page into vertical, swipeable 30-second Reels.", terms: ["Chrome", "Edge", "30-second Reels", "vertical", "swipeable"] },
+  { id: "reels-02", project: "reels", kind: "project", text: "On YouTube each swipe plays a 30-second peek of a recommended video, cut from its Most replayed peak.", terms: ["YouTube", "30-second peek", "recommended video", "Most replayed", "swipe"] },
+  { id: "reels-03", project: "reels", kind: "project", text: "The next peek is picked while you watch and loads straight into YouTube's own player, usually in under a second.", terms: ["next peek", "YouTube player", "under a second", "while you watch"] },
+  { id: "clerk-01", project: "clerk", kind: "project", text: "Calendar Clerk turns pasted email text or selected Gmail messages into editable Google Calendar event drafts.", terms: ["Calendar Clerk", "Gmail", "Google Calendar", "email text", "event drafts"] },
+  { id: "clerk-02", project: "clerk", kind: "project", text: "Groq strict structured output extracts event details and dateparser normalizes dates to your time zone.", terms: ["Groq", "dateparser", "structured output", "event details", "time zone"] },
+  { id: "clerk-03", project: "clerk", kind: "project", text: "No event is created without explicit approval, and the browser never sees API keys or OAuth tokens.", terms: ["explicit approval", "API keys", "OAuth tokens", "browser"] },
+  { id: "pet-01", project: "pet", kind: "project", text: "A draggable, transparent desktop pet Chrome extension that floats on every webpage and remembers its position.", terms: ["Chrome extension", "desktop pet", "draggable", "every webpage", "transparent"] },
+  { id: "pet-02", project: "pet", kind: "project", text: "Unfinished: it lives in the black hole with the other half-built ideas.", terms: ["unfinished", "black hole", "half-built ideas"] }
+  ];
 
-    <!-- DIVIDER -->
-    <div class="rule-label">
-      <span>Selected Work</span>
-      <span class="rule-line" aria-hidden="true"></span>
-      <span>2024 / 2026</span>
-    </div>
+  // Project details (from index.html). Keys match CHUNKS[].project.
+  const META = {
+    league: {
+      label: 'LeagueVODreview', title: 'LeagueVODreview Live Demo', cat: 'AI', scrub: true,
+      desc: 'Chess.com-style game review for League of Legends: a LightGBM model scores your win chance every 15 seconds and grades each fight and objective by how much it swung the game. A 24/7 crawler on Google Cloud collected 200K+ high-elo matches at the Riot API rate limit; the model is calibrated to within about 1 point on 60K games.',
+      stats: [['200K+', 'high-elo matches crawled'], ['15 s', 'per win-chance update'], ['60K', 'games used for calibration']],
+      tech: ['Python', 'FastAPI', 'React', 'Scikit-learn', 'Pandas', 'SQLite', 'GitHub Actions', 'Linux'],
+      links: [['Live review', 'https://augustzhang1.github.io/LeagueVODreview/review/NA1_5650873814?p=1']]
+    },
+    minecraft: {
+      label: 'AI Builder for Minecraft', title: 'AI Builder for Minecraft', cat: 'AI',
+      desc: 'In-game AI builder for Minecraft Java servers: an op types !design with a prompt or image link, Claude or Gemini writes OpenSCAD code, and the rendered meshes are voxelized into blocks and placed over RCON in seconds. Also builds pixel art and 1.4M-block 3D statues from a single picture, with no mods or plugins needed.',
+      stats: [['1.4M', 'blocks in a single statue']],
+      tech: ['Python', 'Docker', 'Linux'],
+      links: [['GitHub', 'https://github.com/AugustZhang1/AI-Builder-Minecraft']]
+    },
+    arbitrage: {
+      label: 'Sports Odds Arbitrage Engine', title: 'Sports Odds Arbitrage Engine', cat: 'Web Dev',
+      desc: 'Concurrent Go service ingesting live betting lines from 5+ bookmakers in near real time, converting odds to implied probabilities and flagging arbitrage where combined margins fall below 100%. A time-series PostgreSQL schema tracks historical line movement for trend analysis and backtesting.',
+      stats: [['5+', 'bookmakers ingested live']],
+      tech: ['Go', 'Vue.js', 'PostgreSQL'],
+      links: [['GitHub', 'https://github.com/AugustZhang1/Sports-arbitage']]
+    },
+    rag: {
+      label: 'RAG Evaluation Toolkit', title: 'RAG Evaluation and Observability Toolkit', cat: 'AI',
+      desc: 'Zero-cost RAG evaluation platform: pgvector hybrid search, LLM-as-judge scoring on versioned gold sets, and LangFuse tracing. Cut hallucinated answers from 11/33 to 7/33 by tuning chunk size and retrieval-k; the eval harness runs in CI on every commit and Presidio guardrails with Luhn validation keep secrets and PII out of traces.',
+      stats: [['11 to 7', 'hallucinated answers out of 33']],
+      tech: ['Python', 'FastAPI', 'PostgreSQL', 'Docker', 'GitHub Actions', 'TypeScript', 'Next.js'],
+      links: []
+    },
+    audiobook: {
+      label: 'AudiobookFree', title: 'AudiobookFree', cat: 'AI',
+      desc: 'Local PDF-to-M4B audiobook converter with chapter detection and 28 Kokoro TTS voices. No accounts, API keys, or uploads. Runs on CPU in the browser at localhost, or on a free Colab T4 GPU, and verifies embedded chapters after encoding.',
+      stats: [['28', 'Kokoro TTS voices']],
+      tech: ['Python', 'PyTorch', 'JavaScript', 'HTML/CSS'],
+      links: [['GitHub', 'https://github.com/AugustZhang1/AudiobookFree']]
+    },
+    'ark-eagle': {
+      label: 'Ark Eagle Volunteer Scheduler', title: 'Ark Eagle Volunteer Scheduler', cat: 'Web Dev',
+      desc: 'Mobile-first volunteer operations system that auto-generates weekly assignments, sends reminders, and handles urgent replacements so coordinators only manage exceptions. TypeScript modular monolith with a separate worker, PostgreSQL audit history, and Docker Compose deployment.',
+      stats: [],
+      tech: ['TypeScript', 'React', 'Next.js', 'Node.js', 'PostgreSQL', 'Docker', 'GitHub Actions', 'Tailwind'],
+      links: []
+    },
+    arkproject: {
+      label: 'ArkProject', title: 'ArkProject Fridge-to-Recipe PWA', cat: 'Web Dev',
+      desc: "Canada-first progressive web app that turns what's in your fridge into recipes. React, TypeScript and Vite frontend, Hono API on Cloudflare Workers, and Supabase PostgreSQL with Auth.",
+      stats: [],
+      tech: ['TypeScript', 'React', 'Node.js', 'PostgreSQL', 'Docker'],
+      links: []
+    },
+    medihub: {
+      label: 'MediHub', title: 'MediHub', cat: 'Data',
+      desc: 'Android healthcare appointment app serving 500+ users, with Firebase real-time booking, cancellation, and specialist handling.',
+      stats: [['500+', 'users']],
+      tech: ['Java'],
+      links: [['GitHub', 'https://github.com/AugustZhang1/MediHub']]
+    },
+    sinai: {
+      label: 'Sinai Foundation', title: 'Software Developer Intern', cat: 'Experience',
+      sub: 'Sinai Foundation, Toronto, ON · May to Aug 2026',
+      desc: 'Cut deploy time 90% across 3 production sites with a GitHub Actions CI/CD pipeline and Jest tests, integrated Stripe donations end to end, rebuilt UIs in a shared React component library, and configured Pages CMS for non-technical publishing.',
+      stats: [['90%', 'faster deploys'], ['3', 'production websites'], ['5,000+', 'monthly visitors'], ['30%', 'less duplicated code']],
+      tech: ['React', 'JavaScript', 'Jest', 'GitHub Actions', 'Stripe'],
+      links: []
+    },
+    senseway: {
+      label: 'SenseWay', title: 'Software Developer Intern', cat: 'Experience',
+      sub: 'SenseWay, Ottawa, ON · Sept 2025 to Apr 2026',
+      desc: 'Integrated a Raspberry Pi and LiDAR/IMU/GPS/camera mobility system with an Android app, Go backend, and Vue.js dashboard; scaled to 10,000+ concurrent WebSocket connections and cut hot-path PostgreSQL latency 85%.',
+      stats: [['10,000+', 'concurrent WebSocket connections'], ['85%', 'lower hot-path query latency']],
+      tech: ['Go', 'PostgreSQL', 'Docker', 'AWS', 'Kotlin', 'Android', 'Vue.js', 'Raspberry Pi'],
+      links: []
+    },
+    jobapply: {
+      label: 'JobApply', title: 'JobApply', cat: 'AI',
+      desc: 'A local job-search and application copilot for Canadian software internships and co-ops. It scrapes public job boards into a local store, ranks and de-duplicates postings, and runs a Chrome extension dashboard with AI document generation and form autofill. It never submits an application, and it has zero runtime dependencies on Node 24.',
+      stats: [],
+      tech: ['Node.js', 'Chrome Extension', 'llama.cpp', 'Qwen3', 'Python'],
+      links: []
+    },
+    reels: {
+      label: 'Video To Reels', title: 'Video To Reels', cat: 'Web Dev',
+      desc: 'A Chrome and Edge extension that turns the video on any page into vertical, swipeable 30-second Reels. On YouTube, each swipe plays a 30-second peek of a recommended video, cut from its "Most replayed" peak; the next peek is chosen while you watch and loads into YouTube\'s own player in under a second. Hold for 2x, press Watch to open the full video.',
+      stats: [['30 s', 'per reel'], ['< 1 s', 'to load the next peek']],
+      tech: ['JavaScript', 'Chrome Extension', 'CSS'],
+      links: []
+    },
+    clerk: {
+      label: 'Calendar Clerk', title: 'Calendar Clerk', cat: 'AI',
+      desc: 'Turns pasted email text or selected Gmail messages into editable Google Calendar event drafts. Groq strict structured output extracts the event details, dateparser normalizes dates to your time zone, and nothing reaches your calendar until you approve it. The browser never receives the API key, client secret, or OAuth tokens.',
+      stats: [],
+      tech: ['Python', 'FastAPI', 'Pydantic', 'Groq', 'Google OAuth', 'React', 'TypeScript', 'Vite', 'Pytest'],
+      links: []
+    },
+    pet: {
+      label: 'Black hole: unfinished projects', title: 'Desktop Pet', cat: 'Unfinished',
+      desc: "A Chrome extension: a draggable, transparent desktop pet that floats on every webpage and remembers where you left it. The plan was to grow it into an AI companion that could chat and help while you browse, but once Grok's companions and other assistants like it launched, there wasn't much left for a rock to do. It works; it just never got the brain it was meant to have.",
+      stats: [],
+      tech: ['JavaScript', 'Chrome Extension', 'CSS'],
+      links: []
+    }
+  };
 
-    <!-- WORK -->
-    <section class="work reveal" id="work">
-      <div class="work-controls">
-        <input type="text" id="searchInput" placeholder="Search projects" aria-label="Search projects" />
-        <label class="control">
-          Category
-          <select id="categorySelect">
-            <option>All Categories</option>
-            <option>AI</option>
-            <option>Web Dev</option>
-            <option>Data</option>
-          </select>
-        </label>
-        <label class="control">
-          Order
-          <select id="sortSelect">
-            <option value="featured">Featured</option>
-            <option value="recent">Recent</option>
-          </select>
-        </label>
-      </div>
+  // ---------------------------------------------------------------------
+  // LAYOUT. Each project is its own galaxy in a void of its own. Centres sit
+  // on a loose shell, each project taking the slot nearest its embedding
+  // direction, so related work lands nearby. Stars are generated once from
+  // the seed; per frame they are only turned and projected.
+  // ---------------------------------------------------------------------
+  const KEYS = Object.keys(META);
+  const NK = KEYS.length;
+  const KINDS = ['tight', 'loose', 'barred', 'tight', 'elliptical', 'loose', 'barred', 'tight', 'elliptical', 'loose', 'barred', 'tight'];
+  const TIGHT = { tight: 4.2, loose: 2.2, barred: 2.8, elliptical: 0 };
 
-      <ol class="work-list" id="projectsGrid"></ol>
-      <p class="work-empty" id="workEmpty" hidden>No projects match that search.</p>
-    </section>
-
-    <!-- CONTACT -->
-    <section class="contact reveal" id="contact">
-      <div class="section-head">
-        <span class="section-no">03</span>
-        <h2 class="display-sm">Let's talk</h2>
-      </div>
-      <a class="contact-email" href="mailto:augustzhang878@gmail.com">augustzhang878@gmail.com</a>
-      <ul class="contact-links">
-        <li><a href="https://github.com/AugustZhang1" target="_blank" rel="noopener">GitHub <span aria-hidden="true">&#8599;</span></a></li>
-        <li><a href="https://www.linkedin.com/in/august-zhang-122918274/" target="_blank" rel="noopener">LinkedIn <span aria-hidden="true">&#8599;</span></a></li>
-        <li><a href="mailto:augustzhang878@gmail.com">Email <span aria-hidden="true">&#8599;</span></a></li>
-      </ul>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-    <span>&copy; 2026 August Zhang</span>
-    <span>Designed &amp; built by hand</span>
-  </footer>
-
-  <script>
-    // Project data
-    // NOTE: `tech` arrays are inferred from each project's description/repo.
-    // Edit them to match each project's real stack — they drive the keyboard filter.
-    const projects = [
-      {
-        id: 12,
-        title: "LeagueVODreview — Live Demo",
-        description: "Chess.com-style game review for League of Legends: a LightGBM model scores your win chance every 15 seconds and grades each fight and objective by how much it swung the game. A 24/7 crawler on Google Cloud collected 200K+ high-elo matches at the Riot API rate limit; the model is calibrated to within about 1 point on 60K games. Click to open a live review, or search your own Riot ID.",
-        image: "img/league.jpg",
-        category: "AI",
-        tech: ["Python", "FastAPI", "React", "Scikit-learn", "Pandas", "SQLite", "GitHub Actions", "Linux"],
-        link: "https://augustzhang1.github.io/LeagueVODreview/review/NA1_5650873814?p=1"
-      },
-      {
-        id: 11,
-        title: "AI Builder for Minecraft",
-        description: "In-game AI builder for Minecraft Java servers: an op types !design with a prompt or image link, Claude or Gemini writes OpenSCAD code, and the rendered meshes are voxelized into blocks, previewed as a hologram, and placed over RCON in seconds. Also builds pixel art and 1.4M-block 3D statues from a single picture — no mods or plugins needed.",
-        image: "img/minecraft.jpg",
-        category: "AI",
-        tech: ["Python", "Docker", "Linux"],
-        link: "https://github.com/AugustZhang1/AI-Builder-Minecraft"
-      },
-      {
-        id: 1,
-        title: "Sports Odds Arbitrage Engine",
-        description: "Concurrent Go service ingesting live betting lines from 5+ bookmakers in near real time, converting odds to implied probabilities and flagging arbitrage where combined margins fall below 100%; a time-series PostgreSQL schema tracks historical line movement for trend analysis and backtesting.",
-        image: "img/odds.jpg",
-        category: "Web Dev",
-        tech: ["Go", "Vue.js", "PostgreSQL"],
-        link: "https://github.com/AugustZhang1/Sports-arbitage"
-      },
-      {
-        id: 7,
-        title: "RAG Evaluation & Observability Toolkit",
-        description: "Zero-cost RAG evaluation platform: pgvector hybrid search, LLM-as-judge scoring on versioned gold sets, and LangFuse tracing. Cut hallucinated answers from 11/33 to 7/33 by tuning chunk size and retrieval-k; the eval harness runs in CI on every commit and Presidio guardrails with Luhn validation keep secrets and PII out of traces.",
-        image: "img/rag.jpg",
-        category: "AI",
-        tech: ["Python", "FastAPI", "PostgreSQL", "Docker", "GitHub Actions", "TypeScript", "Next.js"],
-        link: "https://github.com/AugustZhang1/Rag-Project"
-      },
-      {
-        id: 8,
-        title: "AudiobookFree",
-        description: "Local PDF-to-M4B audiobook converter with chapter detection and 28 Kokoro TTS voices — no accounts, API keys, or uploads. Runs on CPU in the browser at localhost, or on a free Colab T4 GPU; verifies embedded chapters after encoding.",
-        image: "img/audiobook.jpg",
-        category: "AI",
-        tech: ["Python", "PyTorch", "JavaScript", "HTML/CSS"],
-        link: "https://github.com/AugustZhang1/AudiobookFree"
-      },
-      {
-        id: 9,
-        title: "Ark Eagle Volunteer Scheduler",
-        description: "Mobile-first volunteer operations system that auto-generates weekly assignments, sends reminders, and handles urgent replacements so coordinators only manage exceptions. TypeScript modular monolith with a separate worker, PostgreSQL audit history, and Docker Compose deployment.",
-        image: "img/scheduler.jpg",
-        category: "Web Dev",
-        tech: ["TypeScript", "React", "Next.js", "Node.js", "PostgreSQL", "Docker", "GitHub Actions", "Tailwind"],
-        link: "https://github.com/AugustZhang1/Volunteer-Scheduler"
-      },
-      {
-        id: 10,
-        title: "ArkProject — Fridge-to-Recipe PWA",
-        description: "Canada-first progressive web app that turns what's in your fridge into recipes. React + TypeScript + Vite frontend, Hono API on Cloudflare Workers, and Supabase PostgreSQL with Auth.",
-        image: "img/recipe.jpg",
-        category: "Web Dev",
-        tech: ["TypeScript", "React", "Node.js", "PostgreSQL", "Docker"],
-        link: "https://github.com/AugustZhang1/ArkProject"
-      },
-      {
-        id: 2,
-        title: "MediHub",
-        description: "Android healthcare appointment app serving 500+ users, with Firebase real-time booking, cancellation, and specialist handling.",
-        image: "img/medihub.jpg",
-        category: "Data",
-        tech: ["Java"],
-        link: "https://github.com/AugustZhang1/MediHub"
-      },
-      {
-        id: 3,
-        title: "AI Snake Game",
-        description: "AI training framework based on self-reinforcement learning.",
-        image: "img/snakegame.PNG",
-        category: "AI",
-        tech: ["Python", "PyTorch", "NumPy"],
-        link: "https://github.com/AugustZhang1/PythonAI"
-      },
-      {
-        id: 4,
-        title: "Real-Time Chat Platform",
-        description: "Flask + WebSocket chat handling 1,000+ daily interactions, with a row-locked PostgreSQL session store hardening against concurrent-write races and persisting history across reconnects. Deployed on Render.",
-        image: "img/chat.jpg",
-        category: "Web Dev",
-        tech: ["Python", "Flask", "PostgreSQL", "Render"],
-        link: "https://github.com/AugustZhang1"
-      },
-      {
-        id: 5,
-        title: "Housing Price Prediction",
-        description: "Machine learning pipeline predicting prices across 100,000+ houses with a Decision Tree Regressor.",
-        image: "img/house.jpg",
-        category: "AI",
-        tech: ["Python", "Scikit-learn", "Pandas", "NumPy"],
-        link: "https://github.com/AugustZhang1/Housing-Price-Prediction"
-      },
-      {
-        id: 6,
-        title: "E-Hotel Management System",
-        description: "Full-stack hotel platform handling 100+ daily bookings and payments across rooms, guests, and staff.",
-        image: "img/hotel.jpg",
-        category: "Web Dev",
-        tech: ["JavaScript", "React", "Node.js", "Express", "PostgreSQL"],
-        link: "https://github.com/AugustZhang1"
+  // The generator stores normalized, quantized rows so this page stays static.
+  // EMBEDDING_DECODE_BEGIN
+  const EMBED_DATA = window.EMBED;
+  const E_DIM = EMBED_DATA.dim;
+  function decodeRows(encoded, rows, dim) {
+    const raw = atob(encoded), out = [];
+    for (let r = 0; r < rows; r++) {
+      const row = new Float32Array(dim);
+      let n = 0;
+      for (let j = 0; j < dim; j++) {
+        let q = raw.charCodeAt(r * dim + j);
+        if (q > 127) q -= 256;
+        row[j] = q / 127;
+        n += row[j] * row[j];
       }
-    ];
-
-    const searchInput = document.getElementById('searchInput');
-    const categorySelect = document.getElementById('categorySelect');
-    const sortSelect = document.getElementById('sortSelect');
-    const projectsGrid = document.getElementById('projectsGrid');
-    const workEmpty = document.getElementById('workEmpty');
-
-    function pad(n) {
-      return String(n).padStart(2, '0');
+      n = Math.sqrt(n) || 1;
+      for (let j = 0; j < dim; j++) row[j] /= n;
+      out.push(row);
     }
+    return out;
+  }
+  function decodeFloatRows(encoded, rows, dim) {
+    const raw = atob(encoded), bytes = new Uint8Array(raw.length);
+    for (let i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
+    const values = new Float32Array(bytes.buffer), out = [];
+    for (let r = 0; r < rows; r++) out.push(values.slice(r * dim, (r + 1) * dim));
+    return out;
+  }
+  const CHUNK_EMB = decodeRows(EMBED_DATA.chunks, CHUNKS.length, E_DIM);
+  const VOCAB_EMB = decodeRows(EMBED_DATA.vocab, EMBED_DATA.vocabTerms.length, E_DIM);
+  const POS = EMBED_DATA.pos;
+  // Project centroids share the centred, reduced space used by chunks/queries.
+  const PROJECT_EMB_ROWS = decodeFloatRows(EMBED_DATA.centroids, EMBED_DATA.centroidIds.length, E_DIM);
+  const PROJECT_EMB = new Map(EMBED_DATA.centroidIds.map((key, i) => [key, PROJECT_EMB_ROWS[i]]));
+  // EMBEDDING_DECODE_END
 
-    function monogram(title) {
-      return title.split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase();
-    }
+  const count = {}, dirSum = {};
+  CHUNKS.forEach(c => {
+    count[c.project] = (count[c.project] || 0) + 1;
+    const a = dirSum[c.project] || (dirSum[c.project] = [0, 0, 0]);
+    const p = POS[c.id];
+    a[0] += p[0]; a[1] += p[1]; a[2] += p[2];
+  });
 
-    function createProjectCard(project, index) {
-      const num = pad(index + 1);
-      const external = /^https?:/.test(project.link);
-      const linkAttrs = external ? ' target="_blank" rel="noopener"' : '';
-      const logoCls = project.category === 'Experience' ? ' work-thumb--logo' : '';
-      const thumb = project.image
-        ? `<div class="work-thumb${logoCls}" data-mono="${monogram(project.title)}">
-              <img src="${project.image}" alt="${project.title}" loading="lazy"
-                   onerror="this.parentElement.classList.add('no-img'); this.remove();" />
-            </div>`
-        : `<div class="work-thumb no-img${logoCls}" data-mono="${monogram(project.title)}"></div>`;
-      return `
-        <li class="work-item" style="--i:${index}">
-          <a class="work-link" href="${project.link}"${linkAttrs}>
-            <span class="work-no">${num}</span>
-            ${thumb}
-            <div class="work-meta">
-              <h3 class="work-title">${project.title}</h3>
-              <p class="work-cat">${project.category}</p>
-              <p class="work-desc">${project.description}</p>
-            </div>
-            <span class="work-arrow" aria-hidden="true">&rarr;</span>
-          </a>
-        </li>
-      `;
-    }
+  const shell = [];
+  for (let i = 0; i < NK; i++) {
+    const y = 1 - 2 * (i + 0.5) / NK, r = Math.sqrt(1 - y * y), th = i * Math.PI * (3 - Math.sqrt(5));
+    shell.push(unit([Math.cos(th) * r, y, Math.sin(th) * r]));
+  }
+  const taken = new Array(NK).fill(false);
+  const CENTER = {};
+  KEYS.forEach(k => {
+    const d = unit(dirSum[k]);
+    let best = -1, bd = -Infinity;
+    shell.forEach((s, j) => {
+      const dd = s[0] * d[0] + s[1] * d[1] + s[2] * d[2];
+      if (!taken[j] && dd > bd) { bd = dd; best = j; }
+    });
+    taken[best] = true;
+    CENTER[k] = shell[best].map(v => v * (3.6 + 1.4 * rnd()));
+  });
+  CENTER.pet = [4.4, 2.6, -3.2];   // the black hole sits at the edge of the projects
 
-    function displayProjects() {
-      const searchTerm = searchInput.value.toLowerCase().trim();
-      const selectedCategory = categorySelect.value;
-      const order = sortSelect.value;
+  // Galaxies: bulge (bucket 3), arm stars (1, 2), halo (0). Each galaxy
+  // gets a seeded morphology, tilt, spin, palette and star field.
+  const GAL = {};
+  KEYS.forEach((k, idx) => {
+    const hole = k === 'pet';
+    const kind = hole ? 'hole' : KINDS[idx % KINDS.length];
+    const elliptical = kind === 'elliptical';
+    const n = count[k];
+    const R = hole ? 0.32 : 0.14 + 0.03 * n;
+    const arms = elliptical ? 1 : kind === 'tight' ? 2 + Math.floor(rnd() * 3) : 2;
+    const tw = TIGHT[kind];
+    const armAng = (f, a) => a * TAU / arms + tw * Math.log(1 + 3 * f);
 
-      let filtered = projects.filter(project => {
-        const matchesSearch =
-          project.title.toLowerCase().includes(searchTerm) ||
-          project.description.toLowerCase().includes(searchTerm);
-        const matchesCategory =
-          selectedCategory === 'All Categories' || project.category === selectedCategory;
-        return matchesSearch && matchesCategory;
-      });
+    // Random disc orientation (the galaxy's tilt).
+    const uz = rnd() * 2 - 1, ph = rnd() * TAU, sq = Math.sqrt(1 - uz * uz);
+    const N = [sq * Math.cos(ph), sq * Math.sin(ph), uz];
+    const E1 = unit(cross(N, Math.abs(N[1]) < 0.9 ? [0, 1, 0] : [1, 0, 0]));
+    const E2 = cross(N, E1);
 
-      if (order === 'recent') {
-        filtered = [...filtered].reverse();
+    const Ns = 2000 + 500 * Math.min(n, 4);
+    const nBulge = Math.round(Ns * (elliptical ? 0.7 : 0.12));
+    const nHalo = Math.round(Ns * (elliptical ? 0.3 : 0.18));
+    const nArm = elliptical ? 0 : Ns - nBulge - nHalo;
+    const bk = [[], [], [], []];
+    const put = (b, x, y, z) => bk[b].push(x, y, z);
+    if (hole) {
+      // Accretion disc: thin, hottest and densest near the horizon.
+      for (let i = 0; i < Ns; i++) {
+        const f = 0.3 + 0.7 * Math.pow(rnd(), 1.8), th = rnd() * TAU, r = R * f;
+        put(f < 0.4 ? 3 : f < 0.55 ? 2 : f < 0.75 ? 1 : 0, r * Math.cos(th), r * Math.sin(th), gauss() * 0.01 * R);
       }
-
-      projectsGrid.innerHTML = filtered.map(createProjectCard).join('');
-      workEmpty.hidden = filtered.length !== 0;
+    } else for (let i = 0; i < nBulge; i++) {
+      const s = elliptical ? 0.32 : 0.09;
+      put(elliptical && rnd() < 0.4 ? 2 : 3, gauss() * s * R, gauss() * s * R * (elliptical ? 0.8 : 1), gauss() * s * R * 0.6);
+    }
+    if (!hole) for (let i = 0; i < nHalo; i++) put(0, gauss() * 0.45 * R, gauss() * 0.45 * R, gauss() * 0.3 * R);
+    if (!hole) for (let i = 0; i < nArm; i++) {
+      if (kind === 'barred' && rnd() < 0.25) {
+        put(2, (2 * rnd() - 1) * 0.5 * R, gauss() * 0.03 * R, gauss() * 0.01 * R);
+        continue;
+      }
+      const f = 0.1 + 0.9 * Math.pow(rnd(), 0.8);
+      const th = armAng(f, Math.floor(rnd() * arms)) + gauss() * (0.06 + 0.05 * f);
+      const r = R * f * (1 + 0.05 * gauss());
+      put(rnd() < 0.45 ? 2 : 1, r * Math.cos(th), r * Math.sin(th), gauss() * 0.012 * R);
     }
 
-    searchInput.addEventListener('input', displayProjects);
-    categorySelect.addEventListener('change', displayProjects);
-    sortSelect.addEventListener('change', displayProjects);
-    displayProjects();
-
-    // ----- Skill keyboard: multi-select filter (AND across selected keys) -----
-    const SKILLS = [
-      { name: "JavaScript", slug: "javascript" },
-      { name: "TypeScript", slug: "typescript" },
-      { name: "Python", slug: "python" },
-      { name: "Go", slug: "go" },
-      { name: "Java", slug: "openjdk" },
-      { name: "Kotlin", slug: "kotlin" },
-      { name: "C++", slug: "cplusplus" },
-      { name: "Ruby", slug: "ruby" },
-      { name: "React", slug: "react" },
-      { name: "Vue.js", slug: "vuedotjs" },
-      { name: "Next.js", slug: "nextdotjs" },
-      { name: "Node.js", slug: "nodedotjs" },
-      { name: "Express", slug: "express" },
-      { name: "Flask", slug: "flask" },
-      { name: "FastAPI", slug: "fastapi" },
-      { name: "Jest", slug: "jest" },
-      { name: "Android", slug: "android" },
-      { name: "Raspberry Pi", slug: "raspberrypi" },
-      { name: "Stripe", slug: "stripe" },
-      { name: "HTML/CSS", slug: "html5" },
-      { name: "Tailwind", slug: "tailwindcss" },
-      { name: "TensorFlow", slug: "tensorflow" },
-      { name: "PyTorch", slug: "pytorch" },
-      { name: "NumPy", slug: "numpy" },
-      { name: "Pandas", slug: "pandas" },
-      { name: "Scikit-learn", slug: "scikitlearn" },
-      { name: "Git", slug: "git" },
-      { name: "GitHub Actions", slug: "githubactions" },
-      { name: "Docker", slug: "docker" },
-      { name: "Linux", slug: "linux" },
-      { name: "AWS", slug: "amazonwebservices" },
-      { name: "Render", slug: "render" },
-      { name: "MongoDB", slug: "mongodb" },
-      { name: "PostgreSQL", slug: "postgresql" },
-      { name: "SQLite", slug: "sqlite" }
-    ];
-    const ICON_BASE = "https://cdn.jsdelivr.net/npm/simple-icons@13/icons/";
-
-    const keyboard = document.getElementById('keyboard');
-    const skillResults = document.getElementById('skillResults');
-    const skillEmpty = document.getElementById('skillEmpty');
-    const kbCount = document.getElementById('kbCount');
-    const kbClear = document.getElementById('kbClear');
-    const selectedSkills = new Set();
-
-    keyboard.innerHTML = SKILLS.map(s => `
-      <button type="button" class="keycap" data-skill="${s.name}" aria-pressed="false">
-        <span class="key-icon" style="--icon:url('${ICON_BASE}${s.slug}.svg')" aria-hidden="true"></span>
-        <span class="key-label">${s.name}</span>
-      </button>
-    `).join('');
-
-    // Experience entries are filterable by skill too. `tech` mirrors the resume.
-    const experiences = [
-      {
-        title: "Sinai Foundation — Software Developer Intern",
-        description: "Cut deploy time 90% across 3 production sites with a GitHub Actions CI/CD pipeline and Jest tests, integrated Stripe donations end-to-end, rebuilt UIs in a shared React component library, and configured Pages CMS for non-technical publishing.",
-        image: "img/sinai.jpg",
-        category: "Experience",
-        tech: ["React", "JavaScript", "Jest", "GitHub Actions", "Stripe"],
-        link: "#experience"
-      },
-      {
-        title: "SenseWay — Software Developer Intern",
-        description: "Integrated a Raspberry Pi + LiDAR/IMU/GPS/camera mobility system with an Android app, Go backend, and Vue.js dashboard; scaled to 10,000+ concurrent WebSocket connections and cut hot-path PostgreSQL latency 85%.",
-        image: "img/senseway.png",
-        category: "Experience",
-        tech: ["Go", "PostgreSQL", "Docker", "AWS", "Kotlin", "Android", "Vue.js", "Raspberry Pi"],
-        link: "#experience"
-      }
-    ];
-
-    function renderSkillResults() {
-      const picks = [...selectedSkills];
-      const matches = picks.length === 0
-        ? projects
-        : [...projects, ...experiences].filter(p => picks.every(t => p.tech.includes(t)));
-
-      skillResults.innerHTML = matches.map(createProjectCard).join('');
-      skillEmpty.hidden = matches.length !== 0;
-      kbClear.hidden = picks.length === 0;
-      kbCount.textContent = picks.length === 0
-        ? 'Showing all projects'
-        : `${matches.length} result${matches.length === 1 ? '' : 's'} · ${picks.join(' + ')}`;
-    }
-
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    // ----- RGX shader ripple: raw WebGL energy burst, ported from the
-    // reference GLSL. One canvas behind the keys; each click spawns a
-    // localized burst that expands and fades. The render loop only runs
-    // while bursts are alive, so the board costs nothing when idle. -----
-    const MAX_BURSTS = 5;
-    const BURST_LIFE = 1.1; // seconds
-    let gl, glProg, glUni, rgxCanvas, rgxRunning = false;
-    let rgxW = 0, rgxH = 0, rgxDpr = 1;
-    let rgxTint = [1.0, 0.55, 0.38]; // warm in light; set to aurora blue in dark
-    const bursts = []; // { x, y, t0 } — x/y in CSS px relative to the deck
-
-    function compileShader(type, src) {
-      const s = gl.createShader(type);
-      gl.shaderSource(s, src);
-      gl.compileShader(s);
-      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
-        console.warn('RGX shader:', gl.getShaderInfoLog(s));
-        return null;
-      }
-      return s;
-    }
-
-    function initRGXShader() {
-      rgxCanvas = document.createElement('canvas');
-      rgxCanvas.className = 'rgx-canvas';
-      rgxCanvas.setAttribute('aria-hidden', 'true');
-      keyboard.insertBefore(rgxCanvas, keyboard.firstChild);
-
-      gl = rgxCanvas.getContext('webgl', { premultipliedAlpha: false, antialias: true });
-      if (!gl) { rgxCanvas.remove(); return false; }
-
-      const vs = 'attribute vec2 p; void main(){ gl_Position = vec4(p, 0.0, 1.0); }';
-      const fs = `
-        precision highp float;
-        uniform vec2  u_res;
-        uniform int   u_count;
-        uniform vec2  u_origin[${MAX_BURSTS}];
-        uniform float u_age[${MAX_BURSTS}];
-        uniform vec3  u_tint;
-        #define LIFE ${BURST_LIFE.toFixed(2)}
-
-        // Expanding shockwave: a leading edge plus trailing concentric rings
-        // that travel out to the deck diagonal so the wave crosses every key.
-        float ring(vec2 uv, float prog, float maxR) {
-          float lead = prog * maxR * 1.2;    // leading-edge radius (uv units)
-          float L = length(uv);
-          float v = 0.0;
-          for (int i = 0; i < 6; i++) {
-            float r = lead - float(i) * 0.14; // trailing rings behind the edge
-            if (r < 0.0) continue;
-            v += 0.022 / (abs(L - r) + 0.018);
-          }
-          return v;
-        }
-
-        void main() {
-          float m = min(u_res.x, u_res.y);
-          float maxR = length(u_res) / m;     // diagonal reach in uv units
-          vec3 col = vec3(0.0);
-          float a = 0.0;
-          for (int i = 0; i < ${MAX_BURSTS}; i++) {
-            if (i >= u_count) break;
-            float age = u_age[i];
-            if (age < 0.0 || age > LIFE) continue;
-            vec2 uv = (gl_FragCoord.xy - u_origin[i]) / m;
-            float prog = age / LIFE;           // 0 -> 1 across the burst life
-            float fade = 1.0 - prog;
-            fade *= fade;                       // ease-out tail
-            // subtle per-channel offset => chromatic shimmer, tinted warm
-            float r = ring(uv, prog + 0.000, maxR);
-            float g = ring(uv, prog + 0.020, maxR);
-            float b = ring(uv, prog + 0.040, maxR);
-            vec3 line = vec3(r, g, b) * fade * u_tint;
-            col += line;
-            a += (r + g + b) * 0.5 * fade;
-          }
-          gl_FragColor = vec4(clamp(col, 0.0, 1.0), clamp(a, 0.0, 1.0));
-        }
-      `;
-
-      const v = compileShader(gl.VERTEX_SHADER, vs);
-      const f = compileShader(gl.FRAGMENT_SHADER, fs);
-      if (!v || !f) { rgxCanvas.remove(); return false; }
-      glProg = gl.createProgram();
-      gl.attachShader(glProg, v);
-      gl.attachShader(glProg, f);
-      gl.linkProgram(glProg);
-      if (!gl.getProgramParameter(glProg, gl.LINK_STATUS)) {
-        console.warn('RGX link:', gl.getProgramInfoLog(glProg));
-        rgxCanvas.remove();
-        return false;
-      }
-      gl.useProgram(glProg);
-
-      // Single full-screen triangle.
-      const buf = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-      const loc = gl.getAttribLocation(glProg, 'p');
-      gl.enableVertexAttribArray(loc);
-      gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-
-      glUni = {
-        res: gl.getUniformLocation(glProg, 'u_res'),
-        count: gl.getUniformLocation(glProg, 'u_count'),
-        origin: gl.getUniformLocation(glProg, 'u_origin'),
-        age: gl.getUniformLocation(glProg, 'u_age'),
-        tint: gl.getUniformLocation(glProg, 'u_tint'),
-      };
-
-      gl.enable(gl.BLEND);
-      gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-      resizeRGX();
-      return true;
-    }
-
-    function resizeRGX() {
-      if (!gl) return;
-      const r = keyboard.getBoundingClientRect();
-      rgxDpr = Math.min(window.devicePixelRatio || 1, 2);
-      rgxW = Math.round(r.width);
-      rgxH = Math.round(r.height);
-      rgxCanvas.width = Math.round(rgxW * rgxDpr);
-      rgxCanvas.height = Math.round(rgxH * rgxDpr);
-      gl.viewport(0, 0, rgxCanvas.width, rgxCanvas.height);
-    }
-
-    function renderRGX() {
-      const now = performance.now() / 1000;
-      for (let i = bursts.length - 1; i >= 0; i--) {
-        if (now - bursts[i].t0 > BURST_LIFE) bursts.splice(i, 1);
-      }
-
-      gl.clearColor(0, 0, 0, 0);
-      gl.clear(gl.COLOR_BUFFER_BIT);
-
-      const n = Math.min(bursts.length, MAX_BURSTS);
-      const origins = new Float32Array(MAX_BURSTS * 2);
-      const ages = new Float32Array(MAX_BURSTS);
-      for (let i = 0; i < n; i++) {
-        const b = bursts[i];
-        origins[i * 2] = b.x * rgxDpr;
-        origins[i * 2 + 1] = (rgxH - b.y) * rgxDpr; // flip Y for gl_FragCoord
-        ages[i] = now - b.t0;
-      }
-      gl.uniform2f(glUni.res, rgxCanvas.width, rgxCanvas.height);
-      gl.uniform1i(glUni.count, n);
-      gl.uniform2fv(glUni.origin, origins);
-      gl.uniform1fv(glUni.age, ages);
-      gl.uniform3fv(glUni.tint, rgxTint);
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
-
-      if (bursts.length) {
-        requestAnimationFrame(renderRGX);
-      } else {
-        rgxRunning = false;
-        gl.clear(gl.COLOR_BUFFER_BIT);
+    // Dust lanes sit on the inner edge of each arm.
+    const dust = [];
+    if (!elliptical && !hole) {
+      for (let i = 0; i < 140; i++) {
+        const f = 0.25 + 0.7 * rnd();
+        const th = armAng(f, Math.floor(rnd() * arms)) - 0.14;
+        dust.push(R * f * Math.cos(th), R * f * Math.sin(th), gauss() * 0.004 * R);
       }
     }
 
-    function spawnBurst(x, y) {
-      if (!gl) return;
-      bursts.push({ x, y, t0: performance.now() / 1000 });
-      if (bursts.length > MAX_BURSTS) bursts.shift();
-      if (!rgxRunning) {
-        rgxRunning = true;
-        requestAnimationFrame(renderRGX);
-      }
-    }
+    const X = [], bStart = [0];
+    bk.forEach(arr => { for (let i = 0; i < arr.length; i++) X.push(arr[i]); bStart.push(X.length / 3); });
 
-    const rgxReady = !reduceMotion && initRGXShader();
-    if (rgxReady && 'ResizeObserver' in window) {
-      new ResizeObserver(resizeRGX).observe(keyboard);
-    }
-
-    // RGX ripple: a shader burst expands from the click point while an accent
-    // pulse propagates key-to-key, staggered by distance (transform/opacity).
-    function emitRGX(ev) {
-      if (reduceMotion) return;
-      const kb = keyboard.getBoundingClientRect();
-      const ox = ev.clientX - kb.left;
-      const oy = ev.clientY - kb.top;
-
-      spawnBurst(ox, oy);
-
-      const keys = [...keyboard.querySelectorAll('.keycap')];
-      // Read phase: measure distances, then clear any in-flight wave.
-      const waves = keys.map(k => {
-        const r = k.getBoundingClientRect();
-        const cx = r.left - kb.left + r.width / 2;
-        const cy = r.top - kb.top + r.height / 2;
-        return { k, d: Math.hypot(cx - ox, cy - oy) };
-      });
-      keys.forEach(k => k.classList.remove('is-wave'));
-      // Write phase: one rAF so the class removal lands, restarting the anim.
-      requestAnimationFrame(() => {
-        waves.forEach(({ k, d }) => {
-          k.style.setProperty('--wave-delay', Math.min(d * 1.1, 540) + 'ms');
-          k.classList.add('is-wave');
-        });
-      });
-    }
-
-    keyboard.addEventListener('click', e => {
-      const key = e.target.closest('.keycap');
-      if (!key) return;
-      const name = key.dataset.skill;
-      const on = !selectedSkills.has(name);
-      if (on) selectedSkills.add(name); else selectedSkills.delete(name);
-      key.classList.toggle('is-selected', on);
-      key.setAttribute('aria-pressed', String(on));
-      emitRGX(e);
-      renderSkillResults();
+    // Chunks become brighter stars on the arms, in their stored order.
+    const chunkIdx = [];
+    let j = 0;
+    CHUNKS.forEach((c, i) => {
+      if (c.project !== k) return;
+      const f = 0.3 + 0.6 * ((Math.floor(j / arms) + 0.5) / Math.ceil(n / arms));
+      const th = elliptical || hole ? j * 2.4 : armAng(f, j % arms), r = R * (hole ? 0.6 + 0.2 * f : f);
+      c.local = [r * Math.cos(th), r * Math.sin(th), 0.01 * R * gauss()];
+      chunkIdx.push(i);
+      j++;
     });
 
-    kbClear.addEventListener('click', () => {
-      selectedSkills.clear();
-      keyboard.querySelectorAll('.is-selected').forEach(k => {
-        k.classList.remove('is-selected');
-        k.setAttribute('aria-pressed', 'false');
+    // Stars nearest the core first, for plugin animations.
+    const Xf = new Float32Array(X), Nst = Xf.length / 3;
+    const rad2 = q => Xf[3 * q] ** 2 + Xf[3 * q + 1] ** 2 + Xf[3 * q + 2] ** 2;
+    const inner = Int32Array.from(Array.from({ length: Nst }, (_, q) => q)
+      .sort((a, b) => rad2(a) - rad2(b)));
+
+    const core = hole ? [255, 214, 160] : CORE_PAL[Math.floor(rnd() * CORE_PAL.length)];
+    const arm = hole ? [255, 130, 70] : ARM_PAL[Math.floor(rnd() * ARM_PAL.length)];
+    GAL[k] = {
+      key: k, kind, R, N: hole ? [0, 1, 0] : N, E1: hole ? [1, 0, 0] : E1, E2: hole ? [0, 0, -1] : E2, A: [0, 0, 0], B: [0, 0, 0],
+      core: CENTER[k],
+      phase: rnd() * TAU,
+      omega: hole ? 0.5 : (rnd() < 0.5 ? -1 : 1) * (0.05 + 0.06 * rnd()),   // rad/s, own axis
+      hole,
+      delay: rnd(),
+      bcol: [arm, mix(arm, core, 0.35), mix(core, arm, 0.45), core],
+      ccol: mix(core, WHITE, 0.5),
+      X: Xf, bStart, Ns: Nst, inner,
+      D: new Float32Array(dust), nDust: dust.length / 3,
+      chunkIdx,
+      gi: 0, alpha: 0, acc: 0, dim: 0, lit: 0,
+      vis: false, sx: 0, sy: 0, k: 1, px: 0
+    };
+  });
+
+  // Embedding centroid per project (real data), for cosine labels.
+  // SEARCH_COSINE_BEGIN
+  const embCosine = (a, b) => {
+    let d = 0, aa = 0, bb = 0;
+    for (let i = 0; i < a.length; i++) { d += a[i] * b[i]; aa += a[i] * a[i]; bb += b[i] * b[i]; }
+    return d / (Math.sqrt(aa * bb) || 1);
+  };
+  // SEARCH_COSINE_END
+  const EMB = {};
+  KEYS.forEach(k => {
+    EMB[k] = PROJECT_EMB.get(k);
+  });
+
+  const nearProjects = {};
+  KEYS.forEach(k => {
+    nearProjects[k] = KEYS.filter(o => o !== k)
+      .sort((a, b) => embCosine(EMB[k], EMB[b]) - embCosine(EMB[k], EMB[a]))
+      .slice(0, 2);
+  });
+
+  const root = document.documentElement;
+  const cv = document.getElementById('cloud');
+  const ctx = cv.getContext('2d');
+  const themeBtn = document.getElementById('themeBtn');
+  const detail = document.getElementById('detail');
+  const backBtn = document.getElementById('backBtn');
+  const dCat = document.getElementById('dCat');
+  const dSub = document.getElementById('dSub');
+  const dTitle = document.getElementById('dTitle');
+  const dStats = document.getElementById('dStats');
+  const dDesc = document.getElementById('dDesc');
+  const dTech = document.getElementById('dTech');
+  const dLinks = document.getElementById('dLinks');
+  const scrubWrap = document.getElementById('scrubWrap');
+  const scCanvas = document.getElementById('scrubCanvas');
+  const sctx = scCanvas.getContext('2d');
+
+  const reduceMq = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let reduce = reduceMq.matches;
+  reduceMq.addEventListener('change', e => { reduce = e.matches; });
+
+  // ---------------------------------------------------------------------
+  // THEME
+  // ---------------------------------------------------------------------
+  const darkMq = window.matchMedia('(prefers-color-scheme: dark)');
+  let dark = false;
+  let pal = PAL.light;
+  function storedTheme() {
+    try { return localStorage.getItem('theme'); } catch (e) { return null; }
+  }
+  function setTheme(isDark, persist) {
+    dark = isDark;
+    pal = dark ? PAL.dark : PAL.light;
+    root.setAttribute('data-theme', dark ? 'dark' : 'light');
+    themeBtn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+    if (persist) { try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch (e) {} }
+    if (selected) drawScrub();
+  }
+  themeBtn.addEventListener('click', () => setTheme(!dark, true));
+  darkMq.addEventListener('change', e => { if (!storedTheme()) setTheme(e.matches, false); });
+
+  // ---------------------------------------------------------------------
+  // CANVAS SIZE
+  // ---------------------------------------------------------------------
+  let W = 0, H = 0, DPR = 1;
+  function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth;
+    H = window.innerHeight;
+    cv.width = Math.round(W * DPR);
+    cv.height = Math.round(H * DPR);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+
+  // ---------------------------------------------------------------------
+  // ---------------------------------------------------------------------
+  // STATE, CAMERA AND PROJECTION
+  // ---------------------------------------------------------------------
+  const CAM = 7;          // reference camera distance (scale 1 at the focus)
+  const CAM0 = 12;        // overview camera distance
+  let cam = CAM0;         // current camera distance; zooming out dollies back
+  let zoomGoal = 1;       // wheel target for userZoom (eased)
+  const cluster = { on: false, x: 0, y: 0, r: 0 };   // "my projects" ring when zoomed far out
+  const ZIN = 10;         // zoom multiplier when flown into a galaxy
+  const OVER = 0.13;      // overview scale, fraction of min(W, H) per unit
+  const INTRO_S = 2.2;    // galaxy fade-in length, seconds
+  const ZERO = [0, 0, 0];
+  const t0 = performance.now();
+  let last = t0;
+  let t = 0;               // seconds, drives spin
+  let angY = 0.6, angX = 0.22;
+  let spin = 1;            // multiplier on scene rotation speed
+  let zt = 0;              // 0 overview, 1 inside the selected galaxy
+  let userZoom = 1;        // wheel zoom
+  let userTilt = 0;        // vertical drag tilt
+  let velY = 0, velX = 0;  // drag inertia (rad/s)
+  let panelT = 0;          // 0 closed, 1 open
+  let sun = -1;            // chunk index of the solar system open inside `selected`, or -1
+  let zs = 0;              // 0 galaxy level, 1 solar level (eased)
+  let hoverPlanet = -1;    // planet under the pointer at the solar level
+  let sunSX = 0, sunSY = 0;   // sun screen position this frame
+  const sunW = [0, 0, 0];     // sun world position (camera target at the solar level)
+  const focus = [0, 0, 0];
+  let selected = null;     // galaxy (project key) flown into and open
+  let hovered = null;      // galaxy key under the pointer
+  let hoverIdx = -1;       // chunk index under the pointer (inside only)
+  const pointer = { x: -1, y: -1, on: false, touch: false };
+  let cA = 1, sA = 0, cB = 1, sB = 0;   // scene rotation this frame
+  const FR = [0, 0, 0];                  // rotated focus point
+  let CX = 0, CY = 0, SC = 1;            // screen centre and scale
+  const P = [0, 0, 0];                   // projection output: x, y, perspective factor
+
+  function rotPoint(p, out) {
+    const x1 = cA * p[0] + sA * p[2], z1 = -sA * p[0] + cA * p[2];
+    out[0] = x1; out[1] = cB * p[1] - sB * z1; out[2] = sB * p[1] + cB * z1;
+    return out;
+  }
+  function project(wx, wy, wz) {
+    const x1 = cA * wx + sA * wz, z1 = -sA * wx + cA * wz;
+    const y1 = cB * wy - sB * z1, z2 = sB * wy + cB * z1;
+    const dep = cam - (z2 - FR[2]);
+    if (dep < 0.3) return false;
+    const k = CAM / dep;
+    P[0] = CX + (x1 - FR[0]) * k * SC;
+    P[1] = CY - (y1 - FR[1]) * k * SC;
+    P[2] = k;
+    return true;
+  }
+  // Galaxy-local point to screen.
+  function toScreen(g, x, y, z) {
+    return project(
+      g.core[0] + x * g.A[0] + y * g.B[0] + z * g.N[0],
+      g.core[1] + x * g.A[1] + y * g.B[1] + z * g.N[1],
+      g.core[2] + x * g.A[2] + y * g.B[2] + z * g.N[2]
+    );
+  }
+
+  // What is under the pointer: a galaxy in the overview, a chunk when inside.
+  function pick(x, y, rr) {
+    if (selected) {
+      if (zt < 0.5 || sun >= 0) return null;
+      let best = -1, bd = Infinity;
+      GAL[selected].chunkIdx.forEach(i => {
+        const c = CHUNKS[i];
+        if (!c.vis) return;
+        const d = Math.hypot(c.sx - x, c.sy - y);
+        if (d < Math.max(rr, 5) && d < bd) { bd = d; best = i; }
       });
-      renderSkillResults();
+      return best >= 0 ? { k: selected, i: best } : null;
+    }
+    // Search hits first: a matching star flies into its galaxy.
+    let hk = null, hd = Infinity;
+    hits.forEach(h => {
+      const c = CHUNKS[h.i];
+      if (!c.vis) return;
+      const d = Math.hypot(c.sx - x, c.sy - y);
+      if (d < Math.max(rr, 6) && d < hd) { hd = d; hk = c.project; }
     });
-
-    renderSkillResults();
-
-    // Smooth scrolling for in-page navigation
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
-        const href = this.getAttribute('href');
-        if (href === '#') return;
-        const target = document.querySelector(href);
-        if (target) {
-          e.preventDefault();
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      });
+    if (hk) return { k: hk, i: -1 };
+    let bk = null, bd = Infinity;
+    KEYS.forEach(k => {
+      const g = GAL[k];
+      if (!g.vis) return;
+      const d = Math.hypot(g.sx - x, g.sy - y);
+      if (d < Math.max(rr, g.px + 6) && d < bd) { bd = d; bk = k; }
     });
+    return bk ? { k: bk, i: -1 } : null;
+  }
 
-    // Quiet reveal-on-scroll (replaces particle/scroll-listener effects)
-    const reveals = document.querySelectorAll('.reveal');
-    if ('IntersectionObserver' in window) {
-      const io = new IntersectionObserver((entries, obs) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible');
-            obs.unobserve(entry.target);
-          }
-        });
-      }, { threshold: 0.12 });
-      reveals.forEach(el => io.observe(el));
+  // ---------------------------------------------------------------------
+  // POINTER ON THE SKY (hover, drag to orbit, scroll to zoom)
+  // ---------------------------------------------------------------------
+  cv.addEventListener('pointermove', e => {
+    pointer.x = e.clientX; pointer.y = e.clientY;
+    pointer.on = true; pointer.touch = e.pointerType === 'touch';
+  });
+  cv.addEventListener('pointerleave', () => { pointer.on = false; });
+
+  // Drag to rotate (with inertia); a press that barely moves counts as a click.
+  const drag = { on: false, x0: 0, y0: 0, lx: 0, ly: 0, moved: false, grab: null };
+  // The open galaxy's animation, if it has something to grab under (x, y).
+  function grabbable(x, y) {
+    const an = selected && sun < 0 && zt > 0.9 ? ANIMS[selected] : null;
+    const star = pick(x, y, 14);   // chunk stars win over the animation
+    return an && an.hit && !(star && star.i >= 0) && an.hit(x, y) ? an : null;
+  }
+  cv.addEventListener('pointerdown', e => {
+    cv.setPointerCapture(e.pointerId);
+    drag.grab = grabbable(e.clientX, e.clientY);
+    if (drag.grab) { drag.grab.grab(e.clientX, e.clientY); cv.classList.add('grabbing'); }
+    drag.on = true; drag.moved = false;
+    drag.x0 = drag.lx = e.clientX; drag.y0 = drag.ly = e.clientY;
+    velY = velX = 0;
+    if (tour.on) { tour.pointerDown = true; tour.pointerAt = performance.now(); }
+  });
+  cv.addEventListener('pointermove', e => {
+    if (!drag.on) return;
+    if (drag.grab) { drag.grab.drag(e.clientX, e.clientY); return; }
+    if (Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0) > 5) drag.moved = true;
+    if (!drag.moved) return;
+    stopTour();   // orbiting takes the camera back
+    const dx = e.clientX - drag.lx, dy = e.clientY - drag.ly;
+    drag.lx = e.clientX; drag.ly = e.clientY;
+    angY += dx * 0.006; userTilt = clamp(userTilt + dy * 0.006, -1.2, 1.2);
+    velY = dx * 0.006 * 60; velX = dy * 0.006 * 60;
+    cv.classList.add('grabbing');
+  });
+  const endDrag = e => {
+    if (!drag.on) return;
+    drag.on = false;
+    cv.classList.remove('grabbing');
+    if (drag.grab) { drag.grab.release(); drag.grab = null; return; }
+    if (drag.moved) return;
+    if (tour.on) {
+      const heldBoost = tour.boost || (tour.pointerDown && performance.now() - tour.pointerAt >= 180);
+      tour.pointerDown = false;
+      const pip = pipAt(e.clientX, e.clientY);
+      if (pip >= 0) { jumpTour(pip); return; }
+      if (tour.phase === 'dwell' && captionBox.visible && e.clientX >= captionBox.x && e.clientX <= captionBox.x + captionBox.w && e.clientY >= captionBox.y && e.clientY <= captionBox.y + captionBox.h) { openTourStop(); return; }
+      tour.boost = tour.phase === 'flight' && tour.spaceDown && performance.now() - tour.spaceAt >= 180;
+      tour.fast = tour.boost ? 2.5 : ((tour.phase === 'flight' || tour.phase === 'ignite') ? tour.skipRate : 1);
+      if (heldBoost) return;
+      skipTour(); return;
+    }   // during the tour a click moves on
+    pointer.x = e.clientX; pointer.y = e.clientY;
+    pointer.touch = e.pointerType === 'touch';
+    const rr = pointer.touch ? 22 : 10;
+    if (selected && sun >= 0) {
+      // Solar level: a click on empty space steps back to the galaxy.
+      if (hoverPlanet < 0 && !sunHit(pointer.x, pointer.y)) exitSun();
     } else {
-      reveals.forEach(el => el.classList.add('is-visible'));
-    }
-
-    // ===== Aurora background (raw WebGL) + dark-mode theme system =====
-    // A full-screen domain-warped fbm aurora. Renders only in dark mode and
-    // only while the tab is visible. Drawn at reduced resolution (soft glow
-    // hides it) so a 4K screen stays cheap. Reduced-motion => single frame.
-    const root = document.documentElement;
-    const themeToggle = document.getElementById('themeToggle');
-    const AURORA_SCALE = 0.6;
-    let aGL = null, aProg = null, aUni = null, aCanvas = null, aRAF = 0, aT0 = 0;
-    let auroraReady = false, auroraTried = false;
-
-    function initAurora() {
-      aCanvas = document.createElement('canvas');
-      aCanvas.id = 'aurora-canvas';
-      aCanvas.setAttribute('aria-hidden', 'true');
-      document.body.insertBefore(aCanvas, document.body.firstChild);
-      aGL = aCanvas.getContext('webgl', { antialias: false, depth: false, alpha: false });
-      if (!aGL) { aCanvas.remove(); return false; }
-
-      const vs = 'attribute vec2 p; void main(){ gl_Position = vec4(p,0.0,1.0); }';
-      const fs = `
-        precision highp float;
-        uniform vec2 u_res;
-        uniform float u_time;
-        float hash(vec2 p){ p=fract(p*vec2(123.34,345.45)); p+=dot(p,p+34.345); return fract(p.x*p.y); }
-        float noise(vec2 p){
-          vec2 i=floor(p), f=fract(p);
-          float a=hash(i), b=hash(i+vec2(1.0,0.0)), c=hash(i+vec2(0.0,1.0)), d=hash(i+vec2(1.0,1.0));
-          vec2 u=f*f*(3.0-2.0*f);
-          return mix(mix(a,b,u.x),mix(c,d,u.x),u.y);
-        }
-        float fbm(vec2 p){ float s=0.0,a=0.5; for(int i=0;i<5;i++){ s+=a*noise(p); p*=2.0; a*=0.5; } return s; }
-        void main(){
-          vec2 uv = gl_FragCoord.xy/u_res.xy;
-          vec2 p = uv; p.x *= u_res.x/u_res.y;
-          float t = u_time*0.04;
-          vec2 q = vec2(fbm(p*1.5 + t), fbm(p*1.5 - t + 5.0));
-          float n = fbm(p*2.0 + q*1.6 + vec2(0.0, t*1.4));
-          float band = smoothstep(0.2,1.0,n) * (0.5 + 0.7*uv.y);
-          vec3 base   = vec3(0.015,0.025,0.055);
-          vec3 blue   = vec3(0.05,0.35,0.85);
-          vec3 cyan   = vec3(0.10,0.75,0.85);
-          vec3 violet = vec3(0.42,0.24,0.72);
-          vec3 col = base;
-          col += blue   * band * 0.42;
-          col += cyan   * smoothstep(0.55,1.0,n) * 0.30;
-          col += violet * pow(n,3.0) * 0.36;
-          col += vec3(0.9,0.72,0.32) * pow(max(n-0.86,0.0),2.0) * 0.12; // rare gold glint
-          float vig = smoothstep(1.25,0.2,length(uv-0.5));
-          col *= 0.5 + 0.5*vig;
-          gl_FragColor = vec4(col,1.0);
-        }
-      `;
-      const mk = (type, src) => { const s = aGL.createShader(type); aGL.shaderSource(s, src); aGL.compileShader(s);
-        return aGL.getShaderParameter(s, aGL.COMPILE_STATUS) ? s : (console.warn('aurora:', aGL.getShaderInfoLog(s)), null); };
-      const v = mk(aGL.VERTEX_SHADER, vs), f = mk(aGL.FRAGMENT_SHADER, fs);
-      if (!v || !f) { aCanvas.remove(); return false; }
-      aProg = aGL.createProgram(); aGL.attachShader(aProg, v); aGL.attachShader(aProg, f); aGL.linkProgram(aProg);
-      if (!aGL.getProgramParameter(aProg, aGL.LINK_STATUS)) { aCanvas.remove(); return false; }
-      aGL.useProgram(aProg);
-      const buf = aGL.createBuffer(); aGL.bindBuffer(aGL.ARRAY_BUFFER, buf);
-      aGL.bufferData(aGL.ARRAY_BUFFER, new Float32Array([-1,-1,3,-1,-1,3]), aGL.STATIC_DRAW);
-      const loc = aGL.getAttribLocation(aProg, 'p'); aGL.enableVertexAttribArray(loc);
-      aGL.vertexAttribPointer(loc, 2, aGL.FLOAT, false, 0, 0);
-      aUni = { res: aGL.getUniformLocation(aProg, 'u_res'), time: aGL.getUniformLocation(aProg, 'u_time') };
-      resizeAurora();
-      return true;
-    }
-
-    function resizeAurora() {
-      if (!aGL) return;
-      aCanvas.width = Math.max(2, Math.floor(window.innerWidth * AURORA_SCALE));
-      aCanvas.height = Math.max(2, Math.floor(window.innerHeight * AURORA_SCALE));
-      aGL.viewport(0, 0, aCanvas.width, aCanvas.height);
-      if (!aRAF) drawAurora(performance.now()); // refresh a static frame on resize
-    }
-
-    function drawAurora(now) {
-      if (!aGL) return;
-      aGL.uniform2f(aUni.res, aCanvas.width, aCanvas.height);
-      aGL.uniform1f(aUni.time, (now - aT0) / 1000);
-      aGL.drawArrays(aGL.TRIANGLES, 0, 3);
-    }
-
-    function auroraLoop(now) {
-      if (!isDark() || document.hidden) { aRAF = 0; return; }
-      drawAurora(now);
-      aRAF = requestAnimationFrame(auroraLoop);
-    }
-
-    function ensureAurora() {
-      if (!auroraReady) return;
-      if (reduceMotion) { aT0 = aT0 || performance.now(); drawAurora(performance.now()); return; }
-      if (!aRAF) { aT0 = aT0 || performance.now(); aRAF = requestAnimationFrame(auroraLoop); }
-    }
-    function stopAurora() { if (aRAF) { cancelAnimationFrame(aRAF); aRAF = 0; } }
-
-    function isDark() { return root.getAttribute('data-theme') === 'dark'; }
-    function applyTheme(dark) {
-      root.setAttribute('data-theme', dark ? 'dark' : 'light');
-      try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch (e) {}
-      rgxTint = dark ? [0.35, 0.78, 1.0] : [1.0, 0.55, 0.38];
-      if (themeToggle) {
-        themeToggle.setAttribute('aria-pressed', String(dark));
-        themeToggle.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
-        themeToggle.textContent = dark ? '☀' : '☾';
+      const hit = pick(pointer.x, pointer.y, rr);
+      if (hit && hit.i >= 0) enterSun(hit.i);            // chunk star: fly to it, solar level
+      else if (hit && !cluster.on) { if (selected !== hit.k) openProject(hit.k); }
+      else if (cluster.on && Math.hypot(pointer.x - cluster.x, pointer.y - cluster.y) < cluster.r + 20) zoomGoal = 1;
+      else if (selected) {
+        const g = GAL[selected];
+        if (Math.hypot(pointer.x - g.sx, pointer.y - g.sy) > g.px * 1.1) closeProject();
       }
-      if (dark) { if (ensureAuroraInit()) ensureAurora(); } else stopAurora();
+    }
+    if (pointer.touch) pointer.on = false;
+  };
+  function sunHit(x, y) { return Math.hypot(x - sunSX, y - sunSY) < 26; }
+  cv.addEventListener('pointerup', endDrag);
+  cv.addEventListener('pointercancel', () => {
+    if (drag.grab) { drag.grab.release(); drag.grab = null; }
+    drag.on = false; cv.classList.remove('grabbing');
+    tour.pointerDown = false; tour.boost = tour.phase === 'flight' && tour.spaceDown && performance.now() - tour.spaceAt >= 180; tour.fast = tour.boost ? 2.5 : 1;
+  });
+
+  // Scroll to zoom.
+  cv.addEventListener('wheel', e => {
+    e.preventDefault();
+    zoomGoal = clamp(zoomGoal * Math.exp(-e.deltaY * 0.0015), 0.07, 2.5);
+  }, { passive: false });
+
+  // ---------------------------------------------------------------------
+  // SEARCH. Query words select precomputed vocabulary vectors; the browser
+  // only averages and compares them, so this remains a static page.
+  // ---------------------------------------------------------------------
+  // SEARCH_SCORER_BEGIN
+  const STOP = new Set('a an and the of to in on for with by is are i my me at as or it from that this what who how do does'.split(' '));
+  const tok = s => s.toLowerCase().split(/[^a-z0-9+#.]+/)
+    .map(w => w.replace(/^[^a-z0-9]+|[^a-z0-9+#]+$/g, ''))
+    .filter(w => w.length > 1 && !STOP.has(w));
+  const VOCAB = new Map(EMBED_DATA.vocabTerms.map((term, i) => [term, VOCAB_EMB[i]]));
+  const DOCS = CHUNKS.map(c => ({
+    text: new Set(tok([c.text, c.terms.join(' ')].join(' '))),
+    meta: new Set(tok([META[c.project].title, META[c.project].tech.join(' ')].join(' ')))
+  }));
+  const rootWord = w => w.replace(/ies$/, 'y').replace(/(ing|ed)$/, '').replace(/s$/, '');
+  const matches = (words, w) => words.has(w) || (w.length >= 3 && [...words].some(t => rootWord(t) === rootWord(w)));
+  function scoreQuery(value) {
+    const qs = tok(value);
+    const phrase = value.toLowerCase().trim().replace(/\s+/g, ' ');
+    const phraseRow = phrase.includes(' ') ? VOCAB.get(phrase) : null;
+    const qRows = phraseRow ? [phraseRow] : qs.map(w => VOCAB.get(w) || (w.length >= 4
+      ? VOCAB_EMB[VOCAB_EMB.findIndex((_, i) => !EMBED_DATA.vocabTerms[i].includes(' ') && EMBED_DATA.vocabTerms[i].startsWith(w))]
+      : null)).filter(Boolean);
+    if (!qRows.length) return [];
+    const qvec = new Float32Array(E_DIM);
+    qRows.forEach(row => { for (let j = 0; j < E_DIM; j++) qvec[j] += row[j]; });
+    let qn = 0;
+    for (let j = 0; j < E_DIM; j++) qn += qvec[j] * qvec[j];
+    qn = Math.sqrt(qn) || 1;
+    for (let j = 0; j < E_DIM; j++) qvec[j] /= qn;
+    const directScored = DOCS.map(d => ({
+      own: qs.filter(w => matches(d.text, w)).length,
+      meta: qs.filter(w => matches(d.meta, w)).length
+    }));
+    let lexicalWords = new Set(qs);
+    const hasDirect = directScored.some(h => h.own + h.meta > 0);
+    const expanded = !hasDirect;
+    // Related vocabulary phrases enrich the query, provided they share a
+    // word root and have cosine >= 0.5. With no literal corpus match, their
+    // terms also supply lexical evidence (e.g. database -> PostgreSQL).
+    qRows.forEach(row => {
+      const neighbours = VOCAB_EMB.map((candidate, j) => ({ j, score: embCosine(row, candidate) }))
+        .filter(x => x.score < 0.999 && x.score >= 0.5 && tok(EMBED_DATA.vocabTerms[x.j]).some(w => qs.some(q => rootWord(w) === rootWord(q))))
+        .sort((a, b) => b.score - a.score);
+      if (expanded) neighbours.forEach(({ j }) => tok(EMBED_DATA.vocabTerms[j]).forEach(w => lexicalWords.add(w)));
+      neighbours.forEach(({ j }) => {
+        const neighbour = VOCAB_EMB[j];
+        for (let k = 0; k < E_DIM; k++) qvec[k] += neighbour[k];
+      });
+    });
+    qn = Math.sqrt(qvec.reduce((sum, x) => sum + x * x, 0)) || 1;
+    for (let j = 0; j < E_DIM; j++) qvec[j] /= qn;
+    const scored = DOCS.map((d, i) => {
+      const own = [...lexicalWords].filter(w => matches(d.text, w)).length;
+      const meta = [...lexicalWords].filter(w => matches(d.meta, w)).length;
+      // Displayed score is the real cosine of the centred vectors (rounded in UI).
+      const score = embCosine(qvec, CHUNK_EMB[i]);
+      return { i, score, rank: score + own * 0.16 + meta * 0.08, own, meta, keyword: own + meta > 0 };
+    });
+    const keywordRows = scored.filter(h => h.keyword);
+    let candidates;
+    if (!keywordRows.length) {
+      // A semantic-only result must stand clearly on its own; for a vague
+      // query, one strong result is more useful than a page of near-ties.
+      const best = scored.reduce((a, b) => b.score > a.score ? b : a);
+      candidates = best.score >= 0.18 ? [best] : [];
+    } else {
+      const bestKeyword = keywordRows.reduce((a, b) => b.score > a.score ? b : a).score;
+      const floor = Math.max(0.03, bestKeyword * (expanded ? 0.5 : 0.68));
+      // Keyword hits rank first. Semantic-only near-ties are deliberately
+      // omitted once lexical evidence exists, avoiding unrelated projects.
+      // A literal word match (in the text or tech list) always counts; the floor
+      // only trims expanded matches that came from related vocabulary.
+      candidates = scored.filter(h => h.keyword && (!expanded || h.score >= floor));
+    }
+    const counts = new Map();
+    return candidates.sort((a, b) => b.rank - a.rank || b.score - a.score).filter(h => {
+      const k = CHUNKS[h.i].project, n = counts.get(k) || 0;
+      if (n >= 1) return false;   // one stop per project
+      counts.set(k, n + 1);
+      return true;
+    }).slice(0, 8);
+  }
+  // SEARCH_SCORER_END
+  let hits = [];                 // [{i, score}], top 5 chunks
+  let hitSet = new Set();        // chunk indices in hits
+  const hitGal = new Set();      // galaxy keys holding a hit
+  const qWorld = [0, 0, 0];      // smoothed query marker in the void (galaxy space)
+  let qT = 0;                    // query visibility ease
+  const qInput = document.getElementById('q');
+  const queryForm = document.getElementById('queryForm');
+  function runQuery() {
+    hits = scoreQuery(qInput.value);
+    hitSet = new Set(hits.map(h => h.i));
+    hitGal.clear();
+    hits.forEach(h => hitGal.add(CHUNKS[h.i].project));
+  }
+  qInput.addEventListener('input', () => { stopTour(); runQuery(); });
+  // Enter: a rocket tours every hit, weakest first, and lands on the best match.
+  // Reduced motion skips the flight and goes straight to the best match.
+  function submitSearch() {
+    if (selected || !hits.length) return;
+    qInput.blur();
+    if (!reduce) { startTour(); return; }
+    const best = hits.reduce((a, b) => b.score > a.score ? b : a);
+    openProject(CHUNKS[best.i].project);
+    enterSun(best.i);
+  }
+  queryForm.addEventListener('submit', e => { e.preventDefault(); submitSearch(); });
+  qInput.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { stopTour(); qInput.value = ''; runQuery(); qInput.blur(); }
+  });
+
+  // ---------------------------------------------------------------------
+  // SEARCH TOUR. The rocket flies a curved leg to each hit star, dwells there
+  // with a caption, then moves on; the camera follows it. Star positions are
+  // re-read every frame because the galaxies spin.
+  // ---------------------------------------------------------------------
+  const DWELL = 2.2, IGNITE = 0.5, BRAKE = 0.34, LAND = 0.6;
+  const tour = { on: false, landed: false, stops: [], j: 0, fly: true, phase: 'idle', u: 0, e: 0, dur: 2, fast: 1, skipRate: 1, z: 1, cap: -1,
+                 pos: [0, 0, 0], tan: [1, 0, 0], boost: false, thrust: 0, orbitA: 0, orbitR: 0, landA: 0, ignitionDone: false,
+                 pointerDown: false, pointerAt: 0, spaceDown: false, spaceAt: 0 };
+  const LA = [0, 0, 0], LB = [0, 0, 0], LC = [0, 0, 0], LS = [0, 0, 0], ORBIT = [0, 0, 0], LAND_FROM = [0, 0, 0];
+  const trail = Array.from({ length: 160 }, () => ({ w: [0, 0, 0], v: [0, 0, 0], t: 0, s: 1, hx: 1, hy: 0, scale: 1, squash: 1 }));
+  let trailHead = 0, trailCount = 0;
+  let tourZ = 1, tourT = 0;      // tour zoom multiplier and stage blend (eased in frame)
+  let capA = 0, rocketA = 0, rocketAng = 0, rocketRoll = 0, lastRocketAng = 0;
+  const captionBox = { x: 0, y: 0, w: 0, h: 0, visible: false };
+  const pipHits = Array.from({ length: 9 }, () => ({ x: 0, y: 0, j: 0 }));
+  let pipCount = 0, renderRocketX = 0, renderRocketY = 0;
+  const ROCKET_WHITE = [255, 255, 252], ROCKET_EDGE = [255, 251, 244], ROCKET_PAPER = [248, 248, 244], ROCKET_VOID = [8, 10, 14], ROCKET_INK_DARK = [244, 238, 228];
+  // Local-space envelope for the original starfighter. The nose is +x and the
+  // twin engine bells sit at the -x end; keeping this explicit makes the
+  // pointer affordance and the drawing use the same silhouette.
+  const shipHoverHit = (x, y, cx, cy, L, ang, roll) => {
+    const dx = x - cx, dy = y - cy, ca = Math.cos(ang), sa = Math.sin(ang), sc = L / 22;
+    const lx = (dx * ca + dy * sa) / sc + 10.2;
+    const ly = (-dx * sa + dy * ca) / (sc * (1 - Math.abs(roll) * 0.3));
+    return (lx * lx) / (14.5 * 14.5) + (ly * ly) / (11 * 11) < 1;
+  };
+  const SHIP_TOP = [236, 238, 238], SHIP_BOTTOM = [92, 95, 101], SHIP_NACELLE = [54, 57, 63], SHIP_WING = [42, 44, 49], SHIP_WING_EDGE = [142, 146, 151], SHIP_PANEL = [112, 116, 121], SHIP_NACELLE_EDGE = [156, 158, 160], SHIP_BLACK = [0, 0, 0], SHIP_DARK = [35, 39, 45];
+  const shipGradCache = { light: null, dark: null };
+  function shipGradients() {
+    const key = dark ? 'dark' : 'light';
+    if (shipGradCache[key]) return shipGradCache[key];
+    const c = document.createElement('canvas').getContext('2d');
+    const hull = c.createLinearGradient(0, -3.2, 0, 3.2);
+    hull.addColorStop(0, rgba(SHIP_TOP, 0.98)); hull.addColorStop(0.48, rgba(dark ? ROCKET_INK_DARK : INK, 0.98)); hull.addColorStop(1, rgba(SHIP_BOTTOM, 0.9));
+    const invert = c.createLinearGradient(0, -3.2, 0, 3.2);
+    invert.addColorStop(0, rgba(SHIP_BOTTOM, 0.9)); invert.addColorStop(0.52, rgba(dark ? ROCKET_INK_DARK : INK, 0.98)); invert.addColorStop(1, rgba(SHIP_TOP, 0.98));
+    const canopy = c.createLinearGradient(-2.7, -1.25, -7.4, 1.25);
+    canopy.addColorStop(0, rgba(pal.accent, 0.9)); canopy.addColorStop(0.42, rgba(pal.accent, 0.72)); canopy.addColorStop(1, rgba(SHIP_DARK, 0.9));
+    const plume = c.createLinearGradient(0, 0, -1, 0);
+    plume.addColorStop(0, rgba(pal.accent, 0.9)); plume.addColorStop(0.3, rgba(pal.accent, 0.58)); plume.addColorStop(1, rgba(pal.accent, 0));
+    const shadow = c.createRadialGradient(0, 0, 0, 0, 0, 1);
+    shadow.addColorStop(0, rgba(SHIP_BLACK, 0.15)); shadow.addColorStop(1, rgba(SHIP_BLACK, 0));
+    return (shipGradCache[key] = { hull, invert, canopy, plume, shadow });
+  }
+  const easeInOut = x => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+  const starWorld = (h, out) => localToWorld(GAL[CHUNKS[h.i].project], CHUNKS[h.i].local, out);
+  // Zoom so the stop's galaxy spans about 20% of the smaller side (0.0758 = CAM / CAM0 * OVER).
+  const zStop = h => clamp(0.1 / (GAL[CHUNKS[h.i].project].R * 0.0758), 2.5, 6);
+  // Leg j runs from the query marker (j = 0) or the previous stop to stop j, arced
+  // away from the origin so it follows the shell of galaxies instead of cutting across.
+  function legPoints(j) {
+    LA.splice(0, 3, ...LS);
+    starWorld(tour.stops[j], LB);
+    const len = dist(LA, LB);
+    const out = unit([(LA[0] + LB[0]) / 2, (LA[1] + LB[1]) / 2 + 0.01, (LA[2] + LB[2]) / 2]);
+    for (let a = 0; a < 3; a++) LC[a] = (LA[a] + LB[a]) / 2 + out[a] * 0.3 * len;
+    return len;
+  }
+  function startTour() {
+    tour.stops = hits.slice().sort((a, b) => a.score - b.score);   // rising score
+    Object.assign(tour, { on: true, landed: false, j: -1, cap: -1, phase: 'ignite', boost: false, skipRate: 1, pointerDown: false, spaceDown: false, ignitionDone: false, u: 0, e: 0, z: 1, thrust: 0, orbitR: 0, landA: 0 });
+    trailHead = 0; trailCount = 0;
+    tour.pos.splice(0, 3, ...qWorld);
+    LS.splice(0, 3, ...qWorld);
+    nextLeg();
+  }
+  function stopTour() { tour.on = false; tour.boost = false; tour.pointerDown = false; tour.spaceDown = false; tour.skipRate = 1; tour.fast = 1; tour.phase = 'idle'; }
+  function nextLeg() {
+    if (tour.j === tour.stops.length - 1) {
+      LAND_FROM.splice(0, 3, ...tour.pos); tour.phase = 'land'; tour.fly = false; tour.u = 0; tour.landA = 0; tour.cap = tour.j; tour.boost = false; tour.skipRate = 1;
+      return;
+    }
+    tour.j++;
+    LS.splice(0, 3, ...tour.pos);
+    Object.assign(tour, { fly: tour.ignitionDone, phase: tour.ignitionDone ? 'flight' : 'ignite', u: 0, e: 0, fast: 1, skipRate: 1, boost: false, orbitA: 0 });
+    tour.ignitionDone = true;
+    tour.dur = clamp(1.5 + 0.1 * legPoints(tour.j), 1.6, 2.2);
+    for (let a = 0; a < 3; a++) tour.tan[a] = LB[a] - LA[a];
+  }
+  // Click, Space or ArrowRight: leave a stop now, or hurry the current leg.
+  function skipTour() { if (tour.phase === 'flight' || tour.phase === 'ignite') tour.skipRate = 3; else if (tour.phase === 'dwell' || tour.phase === 'brake') nextLeg(); }
+  function openTourStop() {
+    if (!tour.on || tour.j < 0 || !tour.stops[tour.j]) return;
+    const i = tour.stops[tour.j].i; tour.on = false; tour.landed = true; tour.phase = 'idle'; tour.boost = false; tour.pointerDown = false; tour.spaceDown = false; tour.skipRate = 1; tour.fast = 1;
+    openProject(CHUNKS[i].project); enterSun(i);
+  }
+  function jumpTour(index) {
+    if (!tour.on || index < 0 || index >= tour.stops.length) return;
+    const target = tour.stops[index];
+    tour.j = index; tour.cap = -1; tour.phase = 'flight'; tour.fly = true; tour.u = 0; tour.fast = 1; tour.skipRate = 1; tour.boost = false;
+    LS.splice(0, 3, ...tour.pos); starWorld(target, LB);
+    const len = dist(LS, LB); const out = unit([(LS[0] + LB[0]) / 2, (LS[1] + LB[1]) / 2 + 0.01, (LS[2] + LB[2]) / 2]);
+    for (let a = 0; a < 3; a++) { LA[a] = LS[a]; LC[a] = (LS[a] + LB[a]) / 2 + out[a] * 0.3 * len; }
+    tour.dur = clamp(1.5 + 0.1 * len, 1.6, 2.2);
+  }
+  function pipAt(x, y) {
+    let best = -1, bd = 18;
+    for (let i = 0; i < pipCount; i++) { const d = Math.hypot(x - pipHits[i].x, y - pipHits[i].y); if (d <= bd) { bd = d; best = pipHits[i].j; } }
+    return best;
+  }
+  function orbitPosition(h, dt) {
+    starWorld(h, ORBIT);
+    project(ORBIT[0], ORBIT[1], ORBIT[2]);
+    const a = tour.orbitA, targetR = 25 / Math.max(1, P[2] * SC);
+    tour.orbitR += (targetR - tour.orbitR) * (1 - Math.exp(-dt * 7));
+    const rightX = cA, rightZ = sA, upX = sB * sA, upY = cB, upZ = -sB * cA;
+    const ca = Math.cos(a), sa = Math.sin(a);
+    tour.pos[0] = ORBIT[0] + (rightX * ca + upX * sa) * tour.orbitR;
+    tour.pos[1] = ORBIT[1] + upY * sa * tour.orbitR;
+    tour.pos[2] = ORBIT[2] + (rightZ * ca + upZ * sa) * tour.orbitR;
+    tour.tan[0] = (-rightX * sa + upX * ca) * tour.orbitR;
+    tour.tan[1] = upY * ca * tour.orbitR;
+    tour.tan[2] = (-rightZ * sa + upZ * ca) * tour.orbitR;
+  }
+  function updateTour(dt) {
+    if (tour.landed && rocketA > 0.01) starWorld(tour.stops[tour.j], tour.pos);
+    if (!tour.on) return;
+    const h = tour.stops[tour.j];
+    tour.boost = (tour.phase === 'flight' && ((tour.pointerDown && performance.now() - tour.pointerAt > 180) || (tour.spaceDown && performance.now() - tour.spaceAt > 180)));
+    tour.fast = (tour.phase === 'flight' || tour.phase === 'ignite') ? (tour.boost ? 2.5 : tour.skipRate) : 1;
+    tour.u += dt * tour.fast;
+    if (tour.phase === 'ignite') {
+      tour.fly = false; tour.thrust = clamp(tour.u / IGNITE, 0, 1);
+      if (tour.u >= IGNITE) { tour.phase = 'flight'; tour.fly = true; tour.u = 0; tour.fast = 1; }
+    } else if (tour.phase === 'flight') {
+      const len = legPoints(tour.j), e = easeInOut(clamp(tour.u / tour.dur)), f = 1 - e;
+      tour.e = e;
+      for (let a = 0; a < 3; a++) {
+        tour.pos[a] = f * f * LA[a] + 2 * f * e * LC[a] + e * e * LB[a];
+        tour.tan[a] = f * (LC[a] - LA[a]) + e * (LB[a] - LC[a]);
+      }
+      // Zoom from the last stop's framing to the next, pulling back mid-leg.
+      const zA = tour.j ? zStop(tour.stops[tour.j - 1]) : 1, zB = zStop(h);
+      tour.z = (zA + (zB - zA) * e) * (1 - 0.5 * Math.min(1, len / 1.5) * Math.sin(Math.PI * e));
+      tour.thrust = clamp(Math.sin(Math.PI * e) * (tour.boost ? 1.35 : 1), 0, 1.5);
+      if (tour.u >= tour.dur) { tour.pos.splice(0, 3, ...LB); tour.phase = 'brake'; tour.fly = false; tour.u = 0; tour.fast = 1; tour.skipRate = 1; tour.cap = tour.j; tour.thrust = 0.65; }
+    } else if (tour.phase === 'brake') {
+      tour.thrust = Math.max(0, 0.65 * (1 - tour.u / BRAKE));
+      if (tour.u >= BRAKE) { tour.phase = 'dwell'; tour.u = 0; tour.orbitA = 0; tour.orbitR = 0; tour.z = zStop(h); }
+    } else if (tour.phase === 'dwell') {
+      tour.orbitA += dt * 1.15;
+      orbitPosition(h, dt); tour.thrust = 0;
+      if (tour.u >= DWELL) nextLeg();
+    } else if (tour.phase === 'land') {
+      tour.landA = easeInOut(clamp(tour.u / LAND)); tour.thrust = 0; starWorld(h, ORBIT);
+      for (let a = 0; a < 3; a++) { tour.pos[a] = LAND_FROM[a] + (ORBIT[a] - LAND_FROM[a]) * tour.landA; tour.tan[a] = ORBIT[a] - LAND_FROM[a]; }
+      if (tour.u >= LAND) openTourStop();
+    } else {
+      tour.z = zStop(h);
+    }
+    if (tour.phase !== 'dwell') tour.z = tour.phase === 'land' ? zStop(h) : tour.z;
+  }
+  const cosine = embCosine;
+
+  // ---------------------------------------------------------------------
+  // HOVER PEEK: a live page, a video, or a screenshot. Projects that
+  // animate inside their galaxy get no peek card, only the hover label.
+  // ---------------------------------------------------------------------
+  const IMG = 'img/';
+  const PEEK = {
+    league:    { live: 'https://augustzhang1.github.io/LeagueVODreview/review/NA1_5650873814?p=1', img: 'league.jpg' },
+    minecraft: { img: 'minecraft.jpg', video: 'minecraft.mp4' },   // statue timelapse; the jpg is its poster
+    sinai:     { img: 'sinai.jpg', fit: 'contain' },              // logo: contained, never cropped
+    senseway:  { img: 'senseway.png', fit: 'contain' }
+  };
+  const peek = document.getElementById('peek');
+  const peekImg = document.getElementById('peekImg');
+  const peekVid = document.getElementById('peekVid');
+  let peekFrame = null, peekKey = null, vidOk = {};
+  let peekHoverKey = null, peekSide = null;
+  function showPeek(k) {
+    if (k === peekKey) return;
+    peekKey = k;
+    [peekImg, peekVid, peekFrame].forEach(e => e && e.classList.remove('show'));
+    peekVid.pause();
+    if (!k || !PEEK[k]) { peekKey = null; peek.classList.remove('on'); return; }
+    const m = PEEK[k];
+    if (m.live) {
+      // Created once and kept, so the live page doesn't reload on every hover.
+      // The screenshot stands in until the page has loaded and drawn, so there is no black flash.
+      if (!peekFrame) {
+        peekFrame = document.createElement('iframe');
+        peekFrame.src = m.live; peekFrame.tabIndex = -1; peekFrame.loading = 'eager';
+        peekFrame.onload = () => setTimeout(() => {
+          peekFrame.ready = true;
+          if (peekKey === k) { peekFrame.classList.add('show'); peekImg.classList.remove('show'); }
+        }, 1500);
+        peek.appendChild(peekFrame);
+      }
+      if (peekFrame.ready) peekFrame.classList.add('show');
+      else {
+        peekImg.src = IMG + m.img;
+        peekImg.classList.remove('contain');
+        peekImg.classList.add('show');
+      }
+    } else if (m.video && vidOk[k] !== false) {
+      if (!peekVid.src.endsWith(m.video)) {
+        peekVid.poster = IMG + m.img;
+        peekVid.src = IMG + m.video;
+        peekVid.onerror = () => { vidOk[k] = false; if (peekKey === k) { peekKey = null; showPeek(k); } };
+      }
+      peekVid.classList.add('show');
+      peekVid.play().catch(() => {});
+    } else {
+      peekImg.src = IMG + m.img;
+      peekImg.classList.toggle('contain', m.fit === 'contain');
+      peekImg.classList.add('show');
+    }
+    peek.classList.add('on');
+  }
+  function peekCandidate(side, x, y, w, h) {
+    const minX = 16, maxX = Math.max(minX, W - w - 16);
+    const minY = 96, maxY = Math.max(minY, H - h - 80);
+    const fit = (v, lo, hi) => clamp(v, lo, hi);
+    let px, py;
+    // Sides: left/right centred, or shifted up/down ('left-up', 'right-down', ...).
+    const vy = side.endsWith('-up') ? y - h - 12 : side.endsWith('-down') ? y + 12 : y - h / 2;
+    if (side.startsWith('left')) {
+      px = x - w - 24; py = fit(vy, minY, maxY);
+    } else if (side.startsWith('right')) {
+      px = x + 24; py = fit(vy, minY, maxY);
+    } else if (side === 'above') {
+      px = fit(x - w / 2, minX, maxX); py = y - h - 24;
+    } else {
+      px = fit(x - w / 2, minX, maxX); py = y + 24;
+    }
+    px = Math.round(px); py = Math.round(py);
+    return {
+      side, x: px, y: py,
+      inBounds: px >= minX && py >= minY && px + w <= W - 16 && py + h <= H - 80
+    };
+  }
+  function peekSegmentHitsRect(a, b, r) {
+    let lo = 0, hi = 1;
+    const dx = b.x - a.x, dy = b.y - a.y;
+    const clip = (p, q) => {
+      if (Math.abs(p) < 1e-9) return q >= 0;
+      const t = q / p;
+      if (p < 0) { if (t > hi) return false; if (t > lo) lo = t; }
+      else { if (t < lo) return false; if (t < hi) hi = t; }
+      return true;
+    };
+    return clip(-dx, a.x - r.x) && clip(dx, r.x + r.w - a.x) &&
+      clip(-dy, a.y - r.y) && clip(dy, r.y + r.h - a.y);
+  }
+  function peekPointHitsRect(x, y, r) {
+    return x >= r.x - 18 && x <= r.x + r.w + 18 &&
+      y >= r.y - 8 && y <= r.y + r.h + 8;
+  }
+  function placePeek(x, y, key) {
+    const w = peek.offsetWidth || 280, h = peek.offsetHeight || 175;
+    if (peekHoverKey !== key) { peekHoverKey = key; peekSide = null; }
+    const blockers = !GAL[key] || !GAL[key].vis ? [] : (nearProjects[key] || []).reduce((list, nk) => {
+      const n = GAL[nk];
+      if (n && n.vis) list.push({ x: n.sx, y: n.sy });
+      return list;
+    }, []);
+    const overlapCount = c => {
+      const r = { x: c.x, y: c.y, w, h };
+      return blockers.reduce((count, n) => count +
+        (peekSegmentHitsRect({ x, y }, n, r) ||
+          peekPointHitsRect((x + n.x) / 2, (y + n.y) / 2 - 8, r) ? 1 : 0), 0);
+    };
+    let candidate = peekSide && peekCandidate(peekSide, x, y, w, h);
+    if (!candidate || !candidate.inBounds) {
+      peekSide = null;
+      const candidates = ['left', 'right', 'above', 'below', 'left-down', 'right-down', 'left-up', 'right-up']
+        .map(side => peekCandidate(side, x, y, w, h));
+      let best = null, bestCount = Infinity;
+      candidates.forEach(c => {
+        if (!c.inBounds) return;
+        const count = overlapCount(c);
+        if (!best || count < bestCount) { best = c; bestCount = count; }
+      });
+      candidate = best || candidates[0];
+      if (!best) {
+        const maxX = Math.max(16, W - w - 16), maxY = Math.max(96, H - h - 80);
+        candidate.x = clamp(candidate.x, 16, maxX);
+        candidate.y = clamp(candidate.y, 96, maxY);
+      }
+      peekSide = candidate.side;
+    }
+    peek.style.transform = `translate(${Math.round(candidate.x)}px, ${Math.round(candidate.y)}px)`;
+  }
+
+  // ---------------------------------------------------------------------
+  // GUARD: a non-finite value is clamped to 0 once, with a console warning.
+  // ---------------------------------------------------------------------
+  const warned = {};
+  function guard(v, where) {
+    if (Number.isFinite(v)) return v;
+    if (!warned[where]) { warned[where] = true; console.warn('galaxy: non-finite ' + where); }
+    return 0;
+  }
+
+  // ---------------------------------------------------------------------
+  // DEEP FIELD: four parallax starfield layers, nebulae and far-galaxy sprites,
+  // drawn every frame as the scene turns.
+  // ---------------------------------------------------------------------
+  // Star tints: mostly white, some blue-white, a few warm.
+  const STAR_TINT = [[220, 228, 255], [200, 214, 255], [255, 240, 220], [255, 214, 180], [236, 236, 240]];
+  const LAYERS = [
+    { n: 5200, f: 0.12, size: 0.6, a: 0.45 },
+    { n: 2200, f: 0.18, size: 0.75, a: 0.6 },
+    { n: 760, f: 0.35, size: 1.0, a: 0.85 },
+    { n: 140, f: 0.55, size: 1.5, a: 1.0 }
+  ].map(L => {
+    const pts = [];
+    for (let i = 0; i < L.n; i++) {
+      const u = rnd() * 2 - 1, ph = rnd() * TAU, s = Math.sqrt(1 - u * u);
+      pts.push([s * Math.cos(ph), u, s * Math.sin(ph), Math.floor(rnd() * STAR_TINT.length)]);
+    }
+    return Object.assign(L, { pts });
+  });
+  // Faint far galaxies: a bright core plus a tilted disc of dots, some spiral.
+  const DEEP = [];
+  for (let i = 0; i < 1040; i++) {
+    const u = rnd() * 2 - 1, ph = rnd() * TAU, s = Math.sqrt(1 - u * u);
+    const n = 30 + Math.floor(rnd() * 50), dots = new Float32Array(n * 2);
+    const spiral = rnd() < 0.55, off = rnd() * TAU;
+    for (let j = 0; j < n; j++) {
+      if (spiral) {
+        const f = rnd(), th = off + (j % 2) * Math.PI + 3 * Math.log(1 + 3 * f) + gauss() * 0.3;
+        dots[2 * j] = f * Math.cos(th) * 0.8; dots[2 * j + 1] = f * Math.sin(th) * 0.8;
+      } else { dots[2 * j] = gauss() * 0.4; dots[2 * j + 1] = gauss() * 0.4; }
+    }
+    DEEP.push({
+      d: [s * Math.cos(ph), u, s * Math.sin(ph)],
+      size: 0.006 + 0.03 * rnd() * rnd(), ratio: 0.25 + 0.7 * rnd(), tilt: rnd() * Math.PI,
+      a: 0.1 + 0.25 * rnd(), dots, n,
+      col: rnd() < 0.5 ? CORE_PAL[i % 3] : ARM_PAL[i % ARM_PAL.length]
+    });
+  }
+  // Nebulae: large, very faint coloured clouds (dark theme only).
+  const NEB_COL = [[90, 70, 180], [40, 110, 170], [170, 60, 120], [60, 140, 150], [120, 80, 200]];
+  const NEB = [];
+  for (let i = 0; i < 14; i++) {
+    const u = rnd() * 1.4 - 0.7, ph = rnd() * TAU, s = Math.sqrt(1 - u * u);
+    const blobs = [];
+    for (let j = 0; j < 4; j++) blobs.push([gauss() * 0.12, gauss() * 0.06, 0.08 + 0.14 * rnd()]);
+    NEB.push({ d: [s * Math.cos(ph), u, s * Math.sin(ph)], col: NEB_COL[i % NEB_COL.length], a: 0.05 + 0.05 * rnd(), blobs });
+  }
+
+  // Background galaxies in the 3D scene: dim, non-interactive, spread far past the
+  // project galaxies so the overview reads as one large universe. Own RNG so the
+  // project layout stays fixed.
+  const frnd = mulberry32(99);
+  const fgauss = () => { let a = 0; while (!a) a = frnd(); return Math.sqrt(-2 * Math.log(a)) * Math.cos(TAU * frnd()); };
+  const FILL = [];
+  // Cluster centres scattered through a sphere of radius ~70; most galaxies sit in one.
+  const CLUST = [];
+  for (let i = 0; i < 28; i++) {
+    const uz = frnd() * 2 - 1, ph = frnd() * TAU, sq = Math.sqrt(1 - uz * uz), rad = 9 + 60 * Math.pow(frnd(), 0.6);
+    CLUST.push([sq * Math.cos(ph) * rad, uz * rad, sq * Math.sin(ph) * rad, 1.5 + 3 * frnd()]);
+  }
+  for (let i = 0; i < 380; i++) {
+    const uz = frnd() * 2 - 1, ph = frnd() * TAU, sq = Math.sqrt(1 - uz * uz);
+    let rad = 6.5 + 10 * Math.pow(frnd(), 0.7);
+    let cpos = null;
+    if (i >= 90) { const C = CLUST[i % CLUST.length]; cpos = [C[0] + fgauss() * C[3], C[1] + fgauss() * C[3], C[2] + fgauss() * C[3]]; }
+    const nz = frnd() * 2 - 1, np = frnd() * TAU, ns = Math.sqrt(1 - nz * nz);
+    const N = [ns * Math.cos(np), ns * Math.sin(np), nz];
+    const E1 = unit(cross(N, Math.abs(N[1]) < 0.9 ? [0, 1, 0] : [1, 0, 0]));
+    const E2 = cross(N, E1);
+    const R = 0.08 + 0.16 * frnd(), ell = frnd() < 0.3, arms = 2 + Math.floor(frnd() * 2);
+    const n = 160 + Math.floor(frnd() * 200), nb = Math.round(n * (ell ? 1 : 0.25));
+    const pts = new Float32Array(n * 3);
+    for (let j = 0; j < n; j++) {
+      let x, y, z;
+      if (j < nb) { const s = ell ? 0.35 : 0.12; x = fgauss() * s * R; y = fgauss() * s * R * 0.8; z = fgauss() * s * R * 0.5; }
+      else {
+        const f = 0.1 + 0.9 * frnd(), th = (j % arms) * TAU / arms + 3.5 * Math.log(1 + 3 * f) + fgauss() * 0.15;
+        x = R * f * Math.cos(th); y = R * f * Math.sin(th); z = fgauss() * 0.015 * R;
+      }
+      pts[3 * j] = x * E1[0] + y * E2[0] + z * N[0];
+      pts[3 * j + 1] = x * E1[1] + y * E2[1] + z * N[1];
+      pts[3 * j + 2] = x * E1[2] + y * E2[2] + z * N[2];
+    }
+    FILL.push({
+      c: cpos || [sq * Math.cos(ph) * rad, uz * rad, sq * Math.sin(ph) * rad], R, pts, nb, n,
+      core: CORE_PAL[i % 3], arm: ARM_PAL[i % ARM_PAL.length], a: 0.3 + 0.35 * frnd()
+    });
+  }
+  function drawFill(al) {
+    if (al < 0.01) return;
+    ctx.globalCompositeOperation = dark ? 'lighter' : 'source-over';
+    FILL.forEach(F => {
+      if (!project(F.c[0], F.c[1], F.c[2])) return;
+      const k = P[2], sx = P[0], sy = P[1], px = F.R * k * SC;
+      if (k > 2 || px < 0.4) return;
+      if (sx < -px || sx > W + px || sy < -px || sy > H + px) return;
+      // Fade the ones that swing close to the camera, so project galaxies stay the brightest.
+      const a = F.a * al * clamp((2 - k) / 0.8) * clamp(0.5 + 0.5 / k, 0.4, 1);
+      if (dark && px > 1.5) {
+        drawGlow(ctx, sx, sy, px * 0.6, 0.35 * a, F.core);
+      }
+      if (px < 1.5) {
+        ctx.fillStyle = dark ? rgba(F.core, a * 0.9) : rgba(INK, a * 0.35);
+        ctx.fillRect(sx - 0.6, sy - 0.6, 1.2, 1.2);
+        return;
+      }
+      const stride = px < 6 ? 6 : px < 15 ? 2 : 1;
+      for (let part = 0; part < 2; part++) {
+        ctx.fillStyle = dark ? rgba(part ? F.arm : F.core, a * (part ? 0.5 : 0.8)) : rgba(INK, a * 0.35);
+        const j0 = part ? F.nb : 0, j1 = part ? F.n : F.nb;
+        for (let j = j0; j < j1; j += stride) {
+          if (!project(F.c[0] + F.pts[3 * j], F.c[1] + F.pts[3 * j + 1], F.c[2] + F.pts[3 * j + 2])) continue;
+          const s = (part ? 0.8 : 1) * clamp(P[2], 0.6, 1.3);
+          ctx.fillRect(P[0], P[1], s, s);
+        }
+      }
+    });
+    ctx.globalCompositeOperation = 'source-over';
+  }
+  // Soft round glow sprites, one per colour, drawn with drawImage instead of building
+  // a gradient every frame.
+  const GLOW = {};
+  function glow(col) {
+    const key = col.join(',');
+    if (GLOW[key]) return GLOW[key];
+    const c = document.createElement('canvas'); c.width = c.height = 64;
+    const g = c.getContext('2d'), grd = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    grd.addColorStop(0, rgba(col, 1)); grd.addColorStop(0.4, rgba(col, 0.4)); grd.addColorStop(1, rgba(col, 0));
+    g.fillStyle = grd; g.fillRect(0, 0, 64, 64);
+    return (GLOW[key] = c);
+  }
+  function drawGlow(c, x, y, r, a, col) {
+    if (a < 0.003 || r < 0.5) return;
+    c.globalAlpha = Math.min(1, a);
+    c.drawImage(glow(col), x - r, y - r, 2 * r, 2 * r);
+    c.globalAlpha = 1;
+  }
+  // Far galaxies are pre-drawn to small sprites (rebuilt on resize or theme change).
+  let spriteKey = '';
+  function buildDeepSprites(R0, base) {
+    DEEP.forEach(G => {
+      const sz = G.size * R0, ct = Math.cos(G.tilt), st = Math.sin(G.tilt);
+      const half = Math.ceil(sz * 1.4) + 3, side = 2 * half;
+      const c = G.spr || (G.spr = document.createElement('canvas'));
+      c.width = c.height = Math.ceil(side * DPR);
+      const g = c.getContext('2d');
+      g.setTransform(DPR, 0, 0, DPR, 0, 0);
+      if (dark) {
+        const r = Math.max(1.5, sz * 0.35);
+        g.globalAlpha = 0.5 * G.a;
+        g.drawImage(glow(G.col), half - r, half - r, 2 * r, 2 * r);
+        g.globalAlpha = 1;
+      }
+      g.fillStyle = rgba(dark ? G.col : base, G.a * (dark ? 1 : 0.5));
+      for (let j = 0; j < G.n; j++) {
+        const gx = G.dots[2 * j], gy = G.dots[2 * j + 1];
+        g.fillRect(half + sz * (gx * ct - gy * st * G.ratio), half + sz * (gx * st + gy * ct * G.ratio), 1, 1);
+      }
+      G.half = half;
+    });
+  }
+  LAYERS.forEach(L => { L.byTint = STAR_TINT.map((_, ti) => L.pts.filter(p => p[3] === ti)); });
+
+  // Deep field, drawn every frame so it turns smoothly with the scene.
+  function drawDeep() {
+    const R0 = Math.max(W, H) * 0.7;
+    const base = dark ? BG_COL : [22, 28, 42];
+    const key = W + '|' + H + '|' + dark + '|' + DPR;
+    if (key !== spriteKey) { spriteKey = key; buildDeepSprites(R0, base); }
+    const cxD = W / 2, cyD = H / 2, fade = 1 - 0.35 * zt;
+    // Nebulae first, behind everything.
+    if (dark) {
+      const cyN = Math.cos(angY * 0.1), syN = Math.sin(angY * 0.1);
+      const cbN = Math.cos(angX * 0.1), sbN = Math.sin(angX * 0.1);
+      NEB.forEach(nb => {
+        const p = nb.d;
+        const x1 = cyN * p[0] + syN * p[2], z1 = -syN * p[0] + cyN * p[2];
+        const z2 = sbN * p[1] + cbN * z1;
+        if (z2 > 0.3) return;
+        const y1 = cbN * p[1] - sbN * z1;
+        nb.blobs.forEach(b => drawGlow(ctx, cxD + (x1 + b[0]) * R0, cyD - (y1 + b[1]) * R0, b[2] * R0, nb.a * fade, nb.col));
+      });
+    }
+    // Starfield layers: each rotates a little less than the last, for parallax.
+    LAYERS.forEach(L => {
+      if (!dark && L.a < 0.85) return;
+      const cy = Math.cos(angY * L.f), sy = Math.sin(angY * L.f);
+      const cb = Math.cos(angX * L.f), sb = Math.sin(angX * L.f);
+      L.byTint.forEach((pts, ti) => {
+        ctx.fillStyle = rgba(dark ? STAR_TINT[ti] : base, L.a * (dark ? 1 : 0.1) * fade);
+        for (let i = 0; i < pts.length; i++) {
+          const p = pts[i];
+          const x1 = cy * p[0] + sy * p[2], z1 = -sy * p[0] + cy * p[2];
+          const z2 = sb * p[1] + cb * z1;
+          if (z2 >= 0) continue;
+          ctx.fillRect(cxD + x1 * R0, cyD - (cb * p[1] - sb * z1) * R0, L.size, L.size);
+        }
+      });
+    });
+    // Far galaxies.
+    const cyG = Math.cos(angY * 0.25), syG = Math.sin(angY * 0.25);
+    const cbG = Math.cos(angX * 0.25), sbG = Math.sin(angX * 0.25);
+    DEEP.forEach(G => {
+      const p = G.d;
+      const x1 = cyG * p[0] + syG * p[2], z1 = -syG * p[0] + cyG * p[2];
+      const z2 = sbG * p[1] + cbG * z1;
+      if (z2 >= 0) return;
+      const y1 = cbG * p[1] - sbG * z1;
+      const cx = cxD + x1 * R0, cy2 = cyD - y1 * R0, h = G.half;
+      if (cx < -h || cx > W + h || cy2 < -h || cy2 > H + h) return;
+      ctx.globalAlpha = clamp(0.4 - 0.6 * z2, 0.2, 1) * fade * (dark ? 1 : 0.15);
+      ctx.drawImage(G.spr, cx - h, cy2 - h, 2 * h, 2 * h);
+    });
+    ctx.globalAlpha = 1;
+  }
+
+  // ---------------------------------------------------------------------
+  // IMAGE GRIDS. A project's screenshot, logo or title becomes a luminance grid
+  // that plugins can read through api.grid().
+  // ---------------------------------------------------------------------
+  const GCOLS = 60;
+  const GRID = {};   // key -> { cols, rows, lum: Float32Array }
+
+  function storeGrid(key, src, sw, sh, fit) {
+    const ar = sw > 0 && sh > 0 ? sh / sw : 0.625;
+    const cols = GCOLS;
+    const rows = clamp(Math.round(cols * ar), 38, 64);
+    const c = document.createElement('canvas');
+    c.width = cols; c.height = rows;
+    const g = c.getContext('2d');
+    g.imageSmoothingEnabled = true;
+    g.imageSmoothingQuality = 'high';
+    if (fit === 'contain') {
+      // The whole logo, centred with about 12% padding. The padding stays transparent.
+      const s = Math.min(cols * 0.76 / sw, rows * 0.76 / sh), dw = sw * s, dh = sh * s;
+      g.drawImage(src, (cols - dw) / 2, (rows - dh) / 2, dw, dh);
+    } else {
+      g.drawImage(src, 0, 0, cols, rows);
+    }
+    const data = g.getImageData(0, 0, cols, rows).data;
+    const lum = new Float32Array(cols * rows), al = new Float32Array(cols * rows);
+    for (let i = 0; i < lum.length; i++) {
+      lum[i] = (0.2126 * data[i * 4] + 0.7152 * data[i * 4 + 1] + 0.0722 * data[i * 4 + 2]) / 255;
+      al[i] = data[i * 4 + 3] / 255;
+    }
+    GRID[key] = { cols, rows, lum, al };
+  }
+  // Fallback: the project title as text, drawn to a canvas and sampled the same way.
+  function titleGrid(key) {
+    try {
+      const c = document.createElement('canvas');
+      c.width = 600; c.height = 400;
+      const g = c.getContext('2d');
+      g.fillStyle = '#ffffff';
+      g.fillRect(0, 0, 600, 400);
+      g.fillStyle = '#000000';
+      g.font = '600 52px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+      g.textAlign = 'center';
+      g.textBaseline = 'middle';
+      const lines = [];
+      let ln = '';
+      META[key].title.split(' ').forEach(w => {
+        const tryLn = ln ? ln + ' ' + w : w;
+        if (g.measureText(tryLn).width > 500 && ln) { lines.push(ln); ln = w; } else ln = tryLn;
+      });
+      lines.push(ln);
+      const lh = 64, y0 = 200 - (lines.length - 1) * lh / 2;
+      lines.forEach((l, n) => g.fillText(l, 300, y0 + n * lh));
+      storeGrid(key, c, 600, 400);
+    } catch (e) { /* no grid for this project */ }
+  }
+  function loadPortrait(k) {
+    // Only projects with image grids load one for their plugin.
+    if (!PORTRAIT_KEYS.includes(k)) return;
+    const file = PEEK[k].logo || PEEK[k].img;
+    if (!file) { titleGrid(k); return; }
+    const img = new Image();
+    img.onload = () => {
+      try { storeGrid(k, img, img.naturalWidth || img.width, img.naturalHeight || img.height, PEEK[k].fit); }
+      catch (e) { titleGrid(k); return; }   // unreadable (e.g. opened from file://)
+    };
+    img.onerror = () => titleGrid(k);
+    img.src = IMG + file;
+  }
+
+  // ---------------------------------------------------------------------
+  // SOLAR SYSTEM. One sun per chunk, one planet per key term in its text.
+  // ---------------------------------------------------------------------
+  function hash01(s, salt) {
+    let h = 2166136261 ^ salt;
+    for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+    return ((h >>> 0) % 10000) / 10000;
+  }
+  // Planet ellipses around the sun (screen space, camera-facing).
+  function solarCaptionLines(c) {
+    ctx.font = '12px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+    return wrapLines(c.text, 340).slice(0, 4);
+  }
+  function solarPlanets(c, cx, cy, minWH) {
+    const planets = c.terms.map((term, j) => {
+      const h1 = hash01(term, 1), h2 = hash01(term, 2), h3 = hash01(term, 3);
+      const a = minWH * (0.14 + 0.085 * j) * zs;
+      const b = a * (0.45 + 0.4 * h1);
+      const tilt = (h2 - 0.5) * 1.1;
+      const speed = (0.5 / (0.7 + j * 0.5)) * (0.75 + 0.5 * h1) * (reduce ? 0 : 1);
+      const ang = h3 * TAU + speed * t;
+      const lx = a * Math.cos(ang), ly = b * Math.sin(ang);
+      const ct = Math.cos(tilt), st = Math.sin(tilt);
+      return { term, a, b, tilt, r: 2 + 1.5 * h2, x: cx + lx * ct - ly * st, y: cy + lx * st + ly * ct };
+    });
+    const maxB = planets.reduce((m, p) => Math.max(m, p.b), 0);
+    const lines = solarCaptionLines(c);
+    const bottom = W <= 720 ? H * 0.44 : H - 24;
+    const room = bottom - cy - 30 - (lines.length - 1) * 16 - 4;
+    const fit = maxB > 0 ? Math.max(0, Math.min(1, room / maxB)) : 1;
+    return fit < 1 ? planets.map(p => ({ ...p, a: p.a * fit, b: p.b * fit, x: cx + (p.x - cx) * fit, y: cy + (p.y - cy) * fit })) : planets;
+  }
+
+  // ---------------------------------------------------------------------
+  // BREADCRUMB. Universe / galaxy / solar system, each crumb clickable.
+  // ---------------------------------------------------------------------
+  const crumbsEl = document.getElementById('crumbs');
+  let crumbKey = '';
+  const clip = (s, n) => (s.length > n ? s.slice(0, n - 1).trimEnd() + '...' : s);
+  function updateCrumbs() {
+    const key = selected + '|' + sun;
+    if (key === crumbKey) return;
+    crumbKey = key;
+    crumbsEl.innerHTML = '';
+    crumbsEl.hidden = !selected;
+    if (!selected) return;
+    const items = [['Universe', closeProject], [META[selected].label, exitSun]];
+    if (sun >= 0) items.push([clip(CHUNKS[sun].text, 42), null]);
+    items.forEach(([label, fn], i) => {
+      if (i) { const sep = document.createElement('span'); sep.textContent = '/'; sep.className = 'sep'; crumbsEl.appendChild(sep); }
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'crumb'; b.textContent = label;
+      if (fn) b.addEventListener('click', fn);
+      crumbsEl.appendChild(b);
+    });
+  }
+
+  // ---------------------------------------------------------------------
+  // IN-GALAXY ANIMATIONS. Each plugin uses its galaxy's own stars, with flat
+  // dots in the galaxy palette and one accent for key moments.
+  // Time only runs while you are inside. Reduced motion shows a static end state.
+  // ---------------------------------------------------------------------
+  const ANIM_KEYS = ['league', 'minecraft', 'rag', 'arbitrage', 'audiobook', 'ark-eagle', 'medihub', 'arkproject', 'jobapply', 'sinai', 'senseway', 'reels', 'clerk', 'pet'];
+  const PORTRAIT_KEYS = ['minecraft', 'league', 'sinai', 'senseway'];
+  const MONO = '10px ui-monospace, "SF Mono", Menlo, Consolas, monospace';
+  const ease3 = x => { const u = clamp(x); return 1 - Math.pow(1 - u, 3); };
+  // Flat helpers use the supplied colour as given.
+  const dotC = (c, x, y, r, col, a) => { if (a < 0.01) return; c.fillStyle = rgba(col, clamp(a)); c.beginPath(); c.arc(x, y, r, 0, TAU); c.fill(); };
+  const ringC = (c, x, y, r, col, a, lw = 1) => { if (a < 0.01) return; c.strokeStyle = rgba(col, clamp(a)); c.lineWidth = lw; c.beginPath(); c.arc(x, y, r, 0, TAU); c.stroke(); };
+  const arcC = (c, x, y, r, a0, a1, col, a, lw = 1) => { if (a < 0.01 || a1 <= a0) return; c.strokeStyle = rgba(col, clamp(a)); c.lineWidth = lw; c.beginPath(); c.arc(x, y, r, a0, a1); c.stroke(); };
+  const lineC = (c, x0, y0, x1, y1, col, a, lw = 1) => { if (a < 0.01) return; c.strokeStyle = rgba(col, clamp(a)); c.lineWidth = lw; c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke(); };
+  const txtC = (c, s, x, y, col, a) => { if (a < 0.01) return; c.font = MONO; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillStyle = rgba(col, clamp(a)); c.fillText(s, x, y); };
+
+  const ANIMS = {};
+  // API handed to each anims/<key>.js plugin. Screen-space; R is the galaxy radius in px.
+  function makeApi(k, rng) {
+    const g = GAL[k];
+    let sx = new Float32Array(0), sy = new Float32Array(0), sb = new Uint8Array(0), sFrame = -1;
+    const bucketOf = i => { let b = 0; while (b < 3 && i >= g.bStart[b + 1]) b++; return b; };
+    return {
+      key: k, rng, TAU, clamp, mix, rgba, ease3, mono: MONO,
+      meta: META[k],
+      chunks: CHUNKS.filter(c => c.project === k && c.text),
+      dark: () => dark,
+      accent: () => pal.accent,
+      ink: INK,
+      // Galaxy star colours, faint to bright (4 x [r,g,b]), already toned for the theme.
+      colors: () => g.bcol.map(c => (dark ? c : mix(c, INK, 0.55))),
+      // Image grid of the project logo or screenshot, or null: { cols, rows, lum, al }.
+      grid: () => GRID[k] || null,
+      // This frame's screen positions of the galaxy's stars, innermost first (up to max).
+      // Returns { n, x, y, b } where b is the brightness bucket 0..3.
+      stars(max = 1500) {
+        if (sFrame === frameNo && sx.length >= Math.min(max, g.inner.length)) return { n: Math.min(max, g.inner.length), x: sx, y: sy, b: sb };
+        const n = Math.min(max, g.inner.length);
+        if (sx.length < n) { sx = new Float32Array(n); sy = new Float32Array(n); sb = new Uint8Array(n); }
+        for (let j = 0; j < n; j++) {
+          const i = g.inner[j], q = 3 * i;
+          if (toScreen(g, g.X[q], g.X[q + 1], g.X[q + 2])) { sx[j] = P[0]; sy[j] = P[1]; } else { sx[j] = -1e4; sy[j] = -1e4; }
+          sb[j] = bucketOf(i);
+        }
+        sFrame = frameNo;
+        return { n, x: sx, y: sy, b: sb };
+      },
+      // Black hole disc on screen: { rot, ry, flip } (local +y is the near half).
+      hole: () => holeView,
+      dot: dotC, ring: ringC, arc: arcC, line: lineC, text: txtC,
+      // Light theme: ink on paper carries less weight than glow on black, so a plugin can call
+      // api.lightBoost() first to raise alphas, dot sizes and line widths in light only; text gets
+      // darker ink (the accent is kept). Dark passes straight through. { dots: false } skips dots.
+      lightBoost({ dots = true } = {}) {
+        const A = this, D = A.dot, Rg = A.ring, Ln = A.line, Ar = A.arc, Tx = A.text, Rb = A.rgba;
+        const lt = (a, k = 1.4) => Math.min(1, a * k);
+        if (dots) A.dot = (c, x, y, r, col, a) => dark ? D(c, x, y, r, col, a) : D(c, x, y, r * 1.12, col, lt(a));
+        A.ring = (c, x, y, r, col, a, lw = 1) => dark ? Rg(c, x, y, r, col, a, lw) : Rg(c, x, y, r, col, lt(a), lw * 1.15);
+        A.arc = (c, x, y, r, a0, a1, col, a, lw = 1) => dark ? Ar(c, x, y, r, a0, a1, col, a, lw) : Ar(c, x, y, r, a0, a1, col, lt(a), lw * 1.15);
+        A.line = (c, x0, y0, x1, y1, col, a, lw = 1) => dark ? Ln(c, x0, y0, x1, y1, col, a, lw) : Ln(c, x0, y0, x1, y1, col, lt(a), lw * 1.15);
+        A.text = (c, s, x, y, col, a) => {
+          if (dark) return Tx(c, s, x, y, col, a);
+          const ac = pal.accent, isAcc = col[0] === ac[0] && col[1] === ac[1] && col[2] === ac[2];
+          return Tx(c, s, x, y, isAcc ? col : mix(col, INK, 0.45), lt(a, 1.6));
+        };
+        A.rgba = (col, a) => dark ? Rb(col, a) : Rb(col, lt(a));
+      }
+    };
+  }
+
+  // Built on first use. Reduced motion runs the animation forward once, then holds that static end state.
+  function animFor(k) {
+    if (k in ANIMS) return ANIMS[k];
+    const rng = mulberry32(101 + ANIM_KEYS.indexOf(k) * 977);
+    // Each animation is registered by its plugin in anims/<key>.js.
+    const plug = window.GALAXY_ANIMS[k];
+    const an = plug ? plug(makeApi(k, rng)) : null;
+    return an ? (ANIMS[k] = an) : null;
+  }
+
+  // ---------------------------------------------------------------------
+  // LEVELS AND PANEL. Universe > galaxy (selected) > solar system (sun).
+  // Opening a galaxy flies the camera in; closing flies back out.
+  // ---------------------------------------------------------------------
+  function openProject(k) {
+    if (selected !== k) sun = -1;
+    selected = k;
+    queryForm.classList.add('hidden');
+    fillPanel(k);
+    detail.classList.add('open');
+    detail.scrollTop = 0;
+  }
+  function closeProject() {
+    selected = null;
+    queryForm.classList.remove('hidden');
+    sun = -1;
+    detail.classList.remove('open');
+  }
+  function enterSun(i) { if (selected && GAL[selected].chunkIdx.includes(i)) sun = i; }
+  function exitSun() { sun = -1; }
+  // Back and Esc go up one level.
+  function goUp() {
+    if (sun >= 0) exitSun();
+    else if (selected) closeProject();
+  }
+  // Arrow keys at the solar level step between the galaxy's chunk stars.
+  function stepSun(d) {
+    const idx = GAL[selected].chunkIdx;
+    const j = idx.indexOf(sun);
+    sun = idx[(j + d + idx.length) % idx.length];
+  }
+  function fillPanel(k) {
+    const m = META[k];
+    dCat.textContent = m.cat;
+    dSub.textContent = m.sub || '';
+    dSub.hidden = !m.sub;
+    dTitle.textContent = m.title;
+    dStats.innerHTML = m.stats.map(([v, l]) => `<li><b>${v}</b><span>${l}</span></li>`).join('');
+    dStats.hidden = !m.stats.length;
+    dDesc.textContent = m.desc;
+    dTech.innerHTML = m.tech.map(x => `<li>${x}</li>`).join('');
+    dLinks.innerHTML = m.links.map(([l, h]) => `<a href="${h}" target="_blank" rel="noopener">${l} ↗</a>`).join('');
+    scrubWrap.hidden = !m.scrub;
+    if (m.scrub) {
+      scrubIdx = 30;
+      drawScrub();
+    }
+  }
+  backBtn.addEventListener('click', goUp);
+  window.addEventListener('keydown', e => {
+    const typing = e.target === qInput;
+    if (tour.on && e.key === 'Escape') { e.preventDefault(); stopTour(); return; }
+    // The search tour owns the keys: Esc cancels, Space tap skips, hold boosts.
+    if (tour.on && !typing && !e.target.closest('button, a')) {
+      if (/^[1-9]$/.test(e.key)) { e.preventDefault(); jumpTour(+e.key - 1); }
+      else if (e.key === 'Enter' && tour.phase === 'dwell') { e.preventDefault(); openTourStop(); }
+      else if (e.key === 'ArrowRight') { e.preventDefault(); skipTour(); }
+      else if (e.key === ' ') { e.preventDefault(); if (!tour.spaceDown) { tour.spaceDown = true; tour.spaceAt = performance.now(); } }
+      return;
+    }
+    if (e.key === 'Escape') { if (!typing) goUp(); }
+    // A focused button or link keeps Enter; the panel keeps its keys (scrolling, the scrubber).
+    else if (typing || e.target.closest('#detail') || (e.key === 'Enter' && e.target.closest('button, a'))) return;
+    else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+      e.preventDefault();
+      const step = e.key === 'ArrowRight' ? 1 : -1;
+      if (!selected) openProject(step > 0 ? KEYS[0] : KEYS[KEYS.length - 1]);
+      else if (sun >= 0) stepSun(step);
+      else openProject(KEYS[(KEYS.indexOf(selected) + step + KEYS.length) % KEYS.length]);
+    } else if (selected && sun < 0 && (e.key === 'Enter' || e.key === 'ArrowDown')) {
+      e.preventDefault();
+      enterSun(GAL[selected].chunkIdx[0]);
+    } else if (selected && e.key === 'ArrowUp') {
+      e.preventDefault();
+      goUp();
+    }
+  });
+  window.addEventListener('keyup', e => {
+    if (e.key !== ' ') return;
+    const tap = tour.on && tour.spaceDown && performance.now() - tour.spaceAt < 180;
+    tour.spaceDown = false;
+    tour.boost = tour.on && tour.phase === 'flight' && tour.pointerDown && performance.now() - tour.pointerAt >= 180;
+    tour.fast = tour.boost ? 2.5 : ((tour.phase === 'flight' || tour.phase === 'ignite') ? tour.skipRate : 1);
+    if (tap && !tour.pointerDown) skipTour();
+  });
+  window.addEventListener('blur', () => { tour.pointerDown = false; tour.spaceDown = false; tour.boost = false; tour.fast = 1; });
+
+  // Illustrative win-probability series (61 samples over 30 minutes).
+  const SERIES = (() => {
+    const r = mulberry32(42);
+    const out = [];
+    let p = 0.5;
+    for (let i = 0; i <= 60; i++) {
+      out.push(p);
+      p += (r() - 0.5) * 0.14 + (i > 40 ? 0.012 : -0.002);
+      p = clamp(p, 0.03, 0.97);
+    }
+    return out;
+  })();
+
+  // ---------------------------------------------------------------------
+  // WIN-PROBABILITY SCRUBBER (LeagueVODreview)
+  // ---------------------------------------------------------------------
+  let scrubIdx = 30;
+  let scrubDrag = false;
+  function drawScrub() {
+    scCanvas.setAttribute('aria-valuenow', scrubIdx / 2);
+    scCanvas.setAttribute('aria-valuetext', 'minute ' + (scrubIdx / 2).toFixed(1) + ', ' + Math.round(SERIES[scrubIdx] * 100) + '% win probability');
+    const w = scCanvas.clientWidth, h = scCanvas.clientHeight;
+    if (!w || !h) return;
+    scCanvas.width = Math.round(w * DPR);
+    scCanvas.height = Math.round(h * DPR);
+    sctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    sctx.clearRect(0, 0, w, h);
+
+    const top = 26, bot = h - 8;
+    const X = i => (i / (SERIES.length - 1)) * w;
+    const Y = p => top + (1 - p) * (bot - top);
+
+    sctx.setLineDash([2, 3]);
+    sctx.strokeStyle = rgba(pal.line, 0.22);
+    sctx.lineWidth = 1;
+    sctx.beginPath(); sctx.moveTo(0, Y(0.5)); sctx.lineTo(w, Y(0.5)); sctx.stroke();
+    sctx.setLineDash([]);
+
+    sctx.strokeStyle = rgba(pal.line, 0.85);
+    sctx.lineWidth = 1.5;
+    sctx.lineJoin = 'round';
+    sctx.beginPath();
+    SERIES.forEach((p, i) => (i ? sctx.lineTo(X(i), Y(p)) : sctx.moveTo(X(i), Y(p))));
+    sctx.stroke();
+
+    const mx = X(scrubIdx), my = Y(SERIES[scrubIdx]);
+    sctx.lineWidth = 1;
+    sctx.strokeStyle = rgba(pal.line, 0.25);
+    sctx.beginPath(); sctx.moveTo(mx, top - 6); sctx.lineTo(mx, bot); sctx.stroke();
+    sctx.fillStyle = rgba(pal.accent, 1);
+    sctx.beginPath(); sctx.arc(mx, my, 4, 0, Math.PI * 2); sctx.fill();
+
+    sctx.font = '11px ui-monospace, Menlo, Consolas, monospace';
+    sctx.fillStyle = rgba(pal.line, 0.6);
+    sctx.textBaseline = 'top';
+    sctx.textAlign = 'left';
+    sctx.fillText(Math.round(SERIES[scrubIdx] * 100) + '%', 0, 2);
+    sctx.textAlign = 'right';
+    sctx.fillText('min ' + (scrubIdx / 2).toFixed(1), w, 2);
+  }
+  function setScrubFromEvent(e) {
+    const r = scCanvas.getBoundingClientRect();
+    const f = clamp((e.clientX - r.left) / r.width);
+    scrubIdx = Math.round(f * (SERIES.length - 1));
+    drawScrub();
+  }
+  scCanvas.addEventListener('pointerdown', e => {
+    scrubDrag = true;
+    scCanvas.setPointerCapture(e.pointerId);
+    setScrubFromEvent(e);
+  });
+  scCanvas.addEventListener('pointermove', e => { if (scrubDrag) setScrubFromEvent(e); });
+  const endScrubDrag = () => { scrubDrag = false; };
+  scCanvas.addEventListener('pointerup', endScrubDrag);
+  scCanvas.addEventListener('pointercancel', endScrubDrag);
+  scCanvas.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      e.preventDefault();
+      scrubIdx = clamp(scrubIdx + (e.key === 'ArrowRight' ? 1 : -1), 0, SERIES.length - 1);
+      drawScrub();
+    }
+  });
+
+  // ---------------------------------------------------------------------
+  // ---------------------------------------------------------------------
+  // DRAW
+  // ---------------------------------------------------------------------
+  const toneC = c => (dark ? c : mix(c, INK, 0.55));
+  // Screen position of a world point, or null if it is behind the camera.
+  function pr(x, y, z) { return project(x, y, z) ? [P[0], P[1]] : null; }
+  // Galaxy-local point to world.
+  function localToWorld(g, loc, out) {
+    for (let a = 0; a < 3; a++) out[a] = g.core[a] + loc[0] * g.A[a] + loc[1] * g.B[a] + loc[2] * g.N[a];
+    return out;
+  }
+  function wrapLines(txt, maxW) {
+    const words = txt.split(' '), lines = [];
+    let ln = '';
+    words.forEach(wd => {
+      const tryLn = ln ? ln + ' ' + wd : wd;
+      if (ctx.measureText(tryLn).width > maxW && ln) { lines.push(ln); ln = wd; } else ln = tryLn;
+    });
+    lines.push(ln);
+    return lines;
+  }
+
+  // Thin axes through the scene origin. Hidden once you are inside a galaxy.
+  function drawAxes(al) {
+    if (al < 0.005) return;
+    ctx.font = '10px ui-monospace, "SF Mono", Menlo, Consolas, monospace';
+    ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
+    [[1, 0, 0, 'x'], [0, 1, 0, 'y'], [0, 0, 1, 'z']].forEach(([ax, ay, az, nm]) => {
+      const a = pr(-ax * 3.2, -ay * 3.2, -az * 3.2), b = pr(ax * 3.2, ay * 3.2, az * 3.2);
+      const l = pr(ax * 3.0, ay * 3.0, az * 3.0);
+      if (!a || !b || !l) return;
+      ctx.strokeStyle = rgba(pal.line, 0.07 * al);
+      ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
+      ctx.fillStyle = rgba(pal.line, 0.25 * al);
+      ctx.fillText(nm, l[0], l[1]);
+    });
+  }
+
+  // Arrow from o to e, with a small head at e.
+  function arrow(o, e, col, al) {
+    const dx = e[0] - o[0], dy = e[1] - o[1], L = Math.hypot(dx, dy);
+    if (L < 8) return;
+    const ux = dx / L, uy = dy / L;
+    ctx.strokeStyle = rgba(col, al);
+    ctx.beginPath();
+    ctx.moveTo(o[0], o[1]); ctx.lineTo(e[0], e[1]);
+    ctx.moveTo(e[0], e[1]); ctx.lineTo(e[0] - ux * 6 - uy * 3, e[1] - uy * 6 + ux * 3);
+    ctx.moveTo(e[0], e[1]); ctx.lineTo(e[0] - ux * 6 + uy * 3, e[1] - uy * 6 - ux * 3);
+    ctx.stroke();
+  }
+
+  // BLACK HOLE, in the style of the film render: a thin white-gold disc, seen near
+  // edge-on, crosses in front of the shadow, and light from the disc's far side is bent
+  // into a thick bright halo over the top and a thinner one under the bottom. The disc
+  // lies in the hole's 3D plane, so rotating the scene changes the view (edge-on to
+  // face-on); the halo fades as the view opens up. Brightness is even on both sides, as
+  // in the film (no Doppler beaming).
+  const HOLE_HOT = [255, 244, 226], HOLE_GOLD = [255, 206, 140], HOLE_WARM = [255, 160, 80];
+  const holeView = { rot: 0, ry: 0.13, flip: 1 };   // shared with anims/pet.js
+  const holeN = [0, 0, 0];
+  const HOLE_P = (() => {
+    const r = mulberry32(5), out = [];
+    for (let i = 0; i < 320; i++) out.push([Math.pow(r(), 1.3), r() * TAU, 0.4 + 0.6 * r()]);
+    return out;
+  })();
+  function holeGrad(r0, r1, stops) {
+    const gr = ctx.createRadialGradient(0, 0, r0, 0, 0, r1);
+    stops.forEach(([o, c, a]) => gr.addColorStop(o, rgba(c, a)));
+    return gr;
+  }
+  function annulus(r0, r1) {
+    ctx.beginPath(); ctx.arc(0, 0, r1, 0, TAU); ctx.arc(0, 0, r0, 0, TAU, true);
+  }
+  function drawHole(g, ga) {
+    const rs = g.px * 0.2;   // shadow radius
+    if (rs < 1.2) {
+      ringC(ctx, g.sx, g.sy, Math.max(1.5, rs * 2), HOLE_GOLD, 0.9 * ga, 1);
+      return;
+    }
+    // Disc orientation on screen from its normal in camera space.
+    const Nc = rotPoint(g.N, holeN);
+    let M = [Nc[1], -Nc[0], 0];
+    const ML = Math.hypot(M[0], M[1]);
+    M = ML < 1e-3 ? [1, 0, 0] : [M[0] / ML, M[1] / ML, 0];
+    const m = cross(Nc, M);
+    const rot = Math.atan2(-M[1], M[0]);
+    const ry = Math.max(0.03, Math.abs(Nc[2]));
+    const sg = Math.sign(-Math.sin(rot) * m[0] - Math.cos(rot) * m[1]) || 1;
+    const flip = sg * m[2] > 0 ? 1 : -1;   // local +y is then the near half
+    Object.assign(holeView, { rot, ry, flip });
+    const lens = clamp(1 - 0.85 * ry);
+    const glowOp = dark ? 'lighter' : 'source-over';
+
+    ctx.save();
+    ctx.translate(g.sx, g.sy);
+    ctx.rotate(rot);
+    ctx.scale(1, flip);
+    ctx.globalCompositeOperation = glowOp;
+    drawGlow(ctx, 0, 0, rs * 7, 0.22 * ga, HOLE_WARM);
+    drawGlow(ctx, 0, 0, rs * 3, 0.3 * ga, HOLE_GOLD);
+
+    const DISC0 = 1.3, DISC1 = 4.6;
+    const spin = reduce ? 0 : t * 0.8;
+    // One half of the disc (near = local y > 0): a smooth radial gradient squashed to the
+    // viewing angle, plus streaming clumps of gas for texture and motion.
+    const disc = near => {
+      ctx.save();
+      ctx.beginPath(); ctx.rect(-rs * 6, near ? 0 : -rs * 6, rs * 12, rs * 6); ctx.clip();
+      ctx.scale(1, ry);
+      ctx.globalAlpha = ga;
+      ctx.fillStyle = holeGrad(rs * DISC0, rs * DISC1, [
+        [0, HOLE_HOT, 0], [0.015, HOLE_HOT, 1], [0.12, HOLE_HOT, 0.85],
+        [0.35, HOLE_GOLD, 0.45], [0.7, HOLE_WARM, 0.14], [1, HOLE_WARM, 0]
+      ]);
+      annulus(rs * DISC0, rs * DISC1); ctx.fill();
+      ctx.restore();
+      ctx.fillStyle = rgba(HOLE_HOT, 1);
+      HOLE_P.forEach(([u, ph, b]) => {
+        const an = ((ph + spin / Math.pow(0.3 + u, 1.5)) % TAU + TAU) % TAU;
+        if ((an < Math.PI) !== near) return;
+        const r = rs * (DISC0 + (DISC1 - DISC0) * 0.8 * u);
+        ctx.globalAlpha = ga * 0.55 * b * (1 - u);
+        ctx.fillRect(Math.cos(an) * r - 1.2, Math.sin(an) * r * ry - 0.5, 2.4, 1);
+      });
+    };
+
+    disc(false);   // far half, behind the shadow
+    // Lensed image of the far disc: a thick bright halo over the top, thinner underneath.
+    if (lens > 0.01) {
+      ctx.save();
+      ctx.globalAlpha = ga * lens;
+      ctx.beginPath(); ctx.rect(-rs * 6, -rs * 6, rs * 12, rs * 6 + rs * 0.02); ctx.clip();
+      ctx.fillStyle = holeGrad(rs * 1.02, rs * 2.5, [
+        [0, HOLE_HOT, 1], [0.08, HOLE_HOT, 0.9], [0.3, HOLE_GOLD, 0.5], [0.65, HOLE_WARM, 0.15], [1, HOLE_WARM, 0]
+      ]);
+      annulus(rs * 1.02, rs * 2.5); ctx.fill();
+      ctx.restore();
+      ctx.save();
+      ctx.globalAlpha = ga * lens * 0.8;
+      ctx.beginPath(); ctx.rect(-rs * 6, 0, rs * 12, rs * 6); ctx.clip();
+      ctx.fillStyle = holeGrad(rs * 1.02, rs * 1.5, [
+        [0, HOLE_HOT, 1], [0.2, HOLE_GOLD, 0.55], [1, HOLE_WARM, 0]
+      ]);
+      annulus(rs * 1.02, rs * 1.5); ctx.fill();
+      ctx.restore();
+    }
+    // Shadow, then the thin photon ring at its edge.
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = rgba([0, 0, 0], clamp(ga * 1.3));
+    ctx.beginPath(); ctx.arc(0, 0, rs, 0, TAU); ctx.fill();
+    ctx.globalCompositeOperation = glowOp;
+    ctx.globalAlpha = ga;
+    ctx.strokeStyle = rgba(HOLE_HOT, 0.95);
+    ctx.lineWidth = Math.max(1, rs * 0.03);
+    ctx.beginPath(); ctx.arc(0, 0, rs * 1.015, 0, TAU); ctx.stroke();
+    disc(true);    // near half, in front of the shadow
+    ctx.restore();
+  }
+
+  function drawGalaxy(g) {
+    if (!g.vis) return;
+    const ga = guard(g.alpha, 'galaxy alpha');
+    if (ga < 0.01) return;
+    const tint = c => toneC(mix(c, pal.accent, g.acc * 0.35));
+    const bcol = g.bcol.map(tint);
+    const BA = [0.28, 0.5, 0.75, 0.92];
+    const BS = [0.9, 1.0, 1.35, 1.8];
+    // Level of detail: fewer stars when the galaxy is small on screen.
+    const target = clamp(g.px * g.px * 0.5, 120, g.Ns);
+    const stride = Math.max(1, Math.round(g.Ns / target));
+    const dStride = Math.max(1, Math.round(g.nDust / Math.max(20, target * 0.25)));
+    ctx.globalCompositeOperation = dark ? 'lighter' : 'source-over';
+
+    // Beacon: when the galaxy is small on screen (zoomed far out), a glow of fixed
+    // size keeps it findable among the background galaxies.
+    if (g.px < 10 && !selected) {
+      const bA = ga * clamp(1 - g.px / 10) * (dark ? 0.9 : 0.5);
+      drawGlow(ctx, g.sx, g.sy, 11, bA, dark ? bcol[3] : pal.accent);
+      ctx.fillStyle = rgba(dark ? WHITE : pal.accent, bA);
+      ctx.beginPath(); ctx.arc(g.sx, g.sy, 1.6, 0, TAU); ctx.fill();
+    }
+    // Soft core glow (dark theme only).
+    if (dark && g.px > 3 && !g.hole) {
+      const rad = g.px * 0.5;
+      // Wide halo so project galaxies outshine the background ones.
+      const hr = g.px * 1.3 * (1 - 0.8 * zt);
+      if (hr > 2) {
+        const hg = ctx.createRadialGradient(g.sx, g.sy, 0, g.sx, g.sy, hr);
+        hg.addColorStop(0, rgba(bcol[2], 0.22 * ga));
+        hg.addColorStop(1, rgba(bcol[2], 0));
+        ctx.fillStyle = hg;
+        ctx.beginPath(); ctx.arc(g.sx, g.sy, hr, 0, TAU); ctx.fill();
+      }
+      const grd = ctx.createRadialGradient(g.sx, g.sy, 0, g.sx, g.sy, rad);
+      grd.addColorStop(0, rgba(bcol[3], 0.5 * ga));
+      grd.addColorStop(0.35, rgba(bcol[3], 0.14 * ga));
+      grd.addColorStop(1, rgba(bcol[3], 0));
+      ctx.fillStyle = grd;
+      ctx.beginPath(); ctx.arc(g.sx, g.sy, rad, 0, TAU); ctx.fill();
+    }
+    const anD = g.key === selected && ANIMS[g.key] ? clamp(ANIMS[g.key].spiralDim || 0) : 0;
+    const spir = ga * (1 - anD);
+
+    // Dust lanes, one batched fill.
+    ctx.fillStyle = rgba(pal.dust, pal.dustA * spir);
+    for (let i = 0; i < g.nDust; i += dStride) {
+      if (!toScreen(g, g.D[3 * i], g.D[3 * i + 1], g.D[3 * i + 2])) continue;
+      ctx.fillRect(P[0], P[1], 1.2, 1.2);
     }
 
-    // Create the WebGL context only the first time dark mode is needed.
-    function ensureAuroraInit() {
-      if (!auroraTried) { auroraTried = true; auroraReady = initAurora(); }
-      return auroraReady;
+    // At the solar level the 4x zoom would blow the hole up over the panel, so it fades out.
+    const holeA = g.key === selected ? ga * (1 - zs) : ga;
+    if (g.hole && holeA > 0.01) drawHole(g, holeA);
+
+    // Arm, bulge and halo stars, one fill per brightness bucket.
+    const X = g.X;
+    if (!g.hole) for (let b = 0; b < 4; b++) {
+      ctx.fillStyle = rgba(bcol[b], BA[b] * spir * (dark ? 1 : 0.9));
+      const s1 = g.bStart[b + 1];
+      for (let i = g.bStart[b]; i < s1; i += stride) {
+        const q = 3 * i;
+        if (!toScreen(g, X[q], X[q + 1], X[q + 2])) continue;
+        const sx = P[0], sy = P[1];
+        if (sx < -2 || sx > W + 2 || sy < -2 || sy > H + 2) continue;
+        const s = BS[b] * clamp(P[2], 0.7, 1.4);
+        ctx.fillRect(sx, sy, s, s);
+      }
     }
 
-    window.addEventListener('resize', resizeAurora);
-    document.addEventListener('visibilitychange', () => { if (isDark()) ensureAurora(); });
-    if (themeToggle) themeToggle.addEventListener('click', () => applyTheme(!isDark()));
-    applyTheme(isDark()); // sync with the pre-paint theme set in <head>
-  </script>
-  <script data-goatcounter="https://august.goatcounter.com/count"
-          async src="//gc.zgo.at/count.js"></script>
+    if (g.key !== selected || sun >= 0) drawChunks(g);
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  // Inside, chunk stars sit above the animation. Hover and search hits take the accent.
+  function drawChunks(g) {
+    if (!g.vis || g.alpha < 0.01) return;
+    const ga = guard(g.alpha, 'chunk alpha');
+    const inside = g.key === selected && sun < 0 ? zt : 0;
+    const col = toneC(mix(g.ccol, pal.accent, g.acc * 0.35));
+    const cFill = rgba(col, 0.95 * ga);
+    ctx.globalCompositeOperation = dark ? 'lighter' : 'source-over';
+    g.chunkIdx.forEach(i => {
+      if (i === sun) return;   // the sun is drawn over its own star
+      const c = CHUNKS[i];
+      if (!toScreen(g, c.local[0], c.local[1], c.local[2])) return;
+      const hot = hoverIdx === i;
+      const hitStar = !hot && qT > 0.01 && hitSet.has(i);
+      if (inside > 0) {
+        const breath = reduce ? 0 : Math.sin(t * TAU / 3.6 + i * 2.4);
+        ctx.lineWidth = 0.75;
+        ctx.strokeStyle = rgba(hot || hitStar ? pal.accent : col, (0.3 + 0.05 * breath) * ga * inside);
+        ctx.beginPath(); ctx.arc(P[0], P[1], 6.5 + 0.5 * breath, 0, TAU); ctx.stroke();
+      }
+      ctx.fillStyle = hot || hitStar ? rgba(pal.accent, ga) : cFill;
+      const r = ((hot ? 2.6 : hitStar ? 2.2 : 1.5) + 0.9 * inside) * clamp(P[2], 0.7, 1.4);
+      ctx.beginPath(); ctx.arc(P[0], P[1], r, 0, TAU); ctx.fill();
+    });
+    ctx.lineWidth = 1;
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  // The solar system of the open chunk: a sun, orbits, planets and a caption.
+  function drawSolar(g, c, planets, hovP) {
+    const k = zs;
+    const sx = sunSX, sy = sunSY;
+    const Rs = Math.min(W, H) * 0.022;
+    const sunC = toneC(g.bcol[3]);
+    const pc = toneC(g.ccol);
+    ctx.globalCompositeOperation = dark ? 'lighter' : 'source-over';
+    ctx.lineWidth = 1;
+    let maxB = 0;
+    planets.forEach(p => {
+      maxB = Math.max(maxB, p.b);
+      ctx.strokeStyle = rgba(pal.line, 0.1 * k);
+      ctx.beginPath(); ctx.ellipse(sx, sy, p.a, p.b, p.tilt, 0, TAU); ctx.stroke();
+    });
+    if (dark) {
+      const grd = ctx.createRadialGradient(sx, sy, 0, sx, sy, Rs * 6);
+      grd.addColorStop(0, rgba(sunC, 0.45 * k));
+      grd.addColorStop(0.25, rgba(sunC, 0.12 * k));
+      grd.addColorStop(1, rgba(sunC, 0));
+      ctx.fillStyle = grd;
+      ctx.beginPath(); ctx.arc(sx, sy, Rs * 6, 0, TAU); ctx.fill();
+    }
+    ctx.fillStyle = rgba(sunC, k);
+    ctx.beginPath(); ctx.arc(sx, sy, Rs, 0, TAU); ctx.fill();
+    planets.forEach((p, j) => {
+      const hot = j === hovP;
+      ctx.fillStyle = hot ? rgba(pal.accent, k) : rgba(pc, 0.9 * k);
+      ctx.beginPath(); ctx.arc(p.x, p.y, hot ? p.r * 1.6 : p.r, 0, TAU); ctx.fill();
+    });
+    ctx.globalCompositeOperation = 'source-over';
+
+    ctx.textBaseline = 'alphabetic';
+    if (hovP >= 0) {
+      const p = planets[hovP];
+      ctx.font = '500 12px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillStyle = rgba(pal.accent, k);
+      ctx.fillText(p.term, p.x + 10, p.y - 8);
+    }
+    // Caption: the chunk text, small, below the orbits.
+    ctx.font = '12px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = rgba(pal.line, 0.7 * k);
+    wrapLines(c.text, 340).slice(0, 4).forEach((l, n) => ctx.fillText(l, sx, sy + maxB + 30 + n * 16));
+  }
+
+  // ---------------------------------------------------------------------
+  // SEARCH TOUR DRAWING: exhaust trail, the lit stop and its caption, the rocket.
+  // ---------------------------------------------------------------------
+  const TRAIL_LIFE = 3.5;   // seconds an exhaust puff lingers
+  const sstep = x => { x = clamp(x); return x * x * (3 - 2 * x); };
+  function drawTour(sm, dt) {
+    if (rocketA < 0.01 && capA < 0.01 && !trailCount && !tour.on) return;
+    captionBox.visible = false;
+    const L = W > 720 ? 28 : 18;   // enlarged starfighter length, px
+    const hasRp = project(tour.pos[0], tour.pos[1], tour.pos[2]);
+    const rpx = hasRp ? P[0] : -1e4, rpy = hasRp ? P[1] : -1e4;
+    const flying = tour.on && (tour.phase === 'flight' || tour.phase === 'ignite');
+    const orienting = tour.on && (flying || tour.phase === 'dwell' || tour.phase === 'brake' || tour.phase === 'land');
+    // Nose along the screen-space velocity, smoothed so turns at a stop swing round.
+    if (hasRp && orienting) {
+      const hasAp = project(tour.pos[0] + tour.tan[0] * 0.02, tour.pos[1] + tour.tan[1] * 0.02, tour.pos[2] + tour.tan[2] * 0.02);
+      const apx = hasAp ? P[0] : rpx, apy = hasAp ? P[1] : rpy;
+      if (hasAp && Math.hypot(apx - rpx, apy - rpy) > 0.01) {
+        let d = Math.atan2(apy - rpy, apx - rpx) - rocketAng;
+        d = Math.atan2(Math.sin(d), Math.cos(d));
+        rocketAng += d * sm(8);
+      }
+    }
+    let turn = Math.atan2(Math.sin(rocketAng - lastRocketAng), Math.cos(rocketAng - lastRocketAng));
+    const angularVelocity = dt > 0 ? turn / dt : 0;
+    rocketRoll += (clamp(angularVelocity * 0.035, -0.32, 0.32) - rocketRoll) * sm(7); lastRocketAng = rocketAng;
+    // Near a star the nose parks just outside its ring instead of covering it.
+    const off = tour.phase === 'ignite' ? 0 : 13 * (flying ? Math.max(sstep((tour.e - 0.75) / 0.25), 1 - sstep(tour.e / 0.2)) : 1);
+    const ux = Math.cos(rocketAng), uy = Math.sin(rocketAng);
+
+    // Exhaust puffs drift backward, grow and fade. Keep the pool bounded.
+    if (hasRp && flying && trailCount < 160 && off < 2) {
+      const last = trailCount ? trail[(trailHead + trailCount - 1) % 160] : null;
+      const hasLast = last && project(last.w[0], last.w[1], last.w[2]);
+      if (!hasLast || Math.hypot(P[0] - rpx, P[1] - rpy) > 4) {
+        const d = trail[(trailHead + trailCount) % 160];
+        if (trailCount === 160) trailHead = (trailHead + 1) % 160; else trailCount++;
+        d.w[0] = tour.pos[0]; d.w[1] = tour.pos[1]; d.w[2] = tour.pos[2]; d.v[0] = -tour.tan[0]; d.v[1] = -tour.tan[1]; d.v[2] = -tour.tan[2]; d.t = t; d.s = 0.7 + (Math.sin(t * 17) * 0.5 + 0.5) * 0.7; d.hx = ux; d.hy = uy; d.scale = L / 22; d.squash = 1 - Math.abs(rocketRoll) * 0.3;
+      }
+    }
+    const fadeAll = tour.landed ? rocketA : 1;
+    while (trailCount && t - trail[trailHead].t > TRAIL_LIFE) { trailHead = (trailHead + 1) % 160; trailCount--; }
+    for (let tn = 0; tn < trailCount; tn++) {
+      const d = trail[(trailHead + tn) % 160], drift = Math.min(0.08, (t - d.t) * 0.008);
+      const hasP = project(d.w[0] + d.v[0] * drift, d.w[1] + d.v[1] * drift, d.w[2] + d.v[2] * drift);
+      if (!hasP) continue;
+      const life = 1 - (t - d.t) / TRAIL_LIFE;
+      ctx.fillStyle = rgba(pal.accent, 0.42 * Math.pow(life, 1.5) * fadeAll);
+      const sideOff = 3.45 * d.scale, rearOff = 21.15 * d.scale, radius = (0.7 + 1.8 * (1 - life)) * d.s;
+      for (let ps = -1; ps <= 1; ps += 2) {
+        const px = P[0] - d.hx * rearOff - d.hy * sideOff * ps * d.squash, py = P[1] - d.hy * rearOff + d.hx * sideOff * ps * d.squash;
+        ctx.beginPath(); ctx.arc(px, py, radius, 0, TAU); ctx.fill();
+      }
+    }
+
+    // The stop: its star lit in the accent inside a soft ring, and the caption.
+    const h = tour.cap >= 0 ? tour.stops[tour.cap] : null;
+    const c = h && CHUNKS[h.i];
+    if (c && c.vis && capA > 0.01) {
+      ctx.lineWidth = 1.25;
+      ctx.strokeStyle = rgba(pal.accent, 0.9 * capA);
+      ctx.beginPath(); ctx.arc(c.sx, c.sy, 9, 0, TAU); ctx.stroke();
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = rgba(pal.accent, 0.3 * capA);
+      ctx.beginPath(); ctx.arc(c.sx, c.sy, 16, 0, TAU); ctx.stroke();
+      ctx.fillStyle = rgba(pal.accent, capA);
+      ctx.beginPath(); ctx.arc(c.sx, c.sy, 3, 0, TAU); ctx.fill();
+      if (tour.phase === 'land') { ctx.strokeStyle = rgba(pal.accent, 0.5 * (1 - tour.landA)); ctx.lineWidth = 1.4; ctx.beginPath(); ctx.arc(c.sx, c.sy, 10 + 24 * tour.landA, 0, TAU); ctx.stroke(); }
+      drawTourCaption(h, c);
+    }
+
+    // Progress pips and a quiet interaction hint.
+    if (tour.on && tour.stops.length) {
+      const gap = W > 720 ? 16 : Math.min(38, (W - 48) / Math.max(1, tour.stops.length - 1)), total = (tour.stops.length - 1) * gap, py = H - (W > 720 ? 88 : 82), px = W / 2 - total / 2;
+      pipCount = Math.min(tour.stops.length, pipHits.length);
+      for (let n = 0; n < pipCount; n++) { const x = px + n * gap, hit = pipHits[n]; hit.x = x; hit.y = py; hit.j = n; ctx.fillStyle = rgba(n === tour.j ? pal.accent : pal.line, n === tour.j ? 0.95 : 0.35); ctx.beginPath(); ctx.arc(x, py, n === tour.j ? 3.2 : 2, 0, TAU); ctx.fill(); }
+    } else pipCount = 0;
+    // The rocket: an original angular starfighter in a compact 22-unit local
+    // space. It has no borrowed franchise silhouette: a needle nose, split
+    // swept wings, a dorsal canopy and two independent rear nacelles.
+    if (hasRp && rocketA > 0.01) {
+      ctx.save();
+      const shake = tour.phase === 'ignite' ? Math.sin(t * 70) * 1.4 * (1 - clamp(tour.u / IGNITE)) : 0;
+      renderRocketX = rpx - ux * off; renderRocketY = rpy - uy * off + shake;
+      ctx.translate(renderRocketX, renderRocketY);
+      ctx.rotate(rocketAng);
+      ctx.scale(1, 1 - Math.abs(rocketRoll) * 0.3);
+      ctx.scale(L / 22, L / 22);   // drawn 22 units long, nose at the origin
+      const styles = shipGradients();
+      ctx.globalAlpha = rocketA;
+      // A soft shadow under the craft gives the tiny silhouette depth in both themes.
+      ctx.save(); ctx.translate(-9, 3.4); ctx.scale(12, 4); ctx.fillStyle = styles.shadow; ctx.beginPath(); ctx.arc(0, 0, 1, 0, TAU); ctx.fill(); ctx.restore();
+      // Rear nacelle bodies and swept wings are kept behind the fuselage.
+      ctx.fillStyle = rgba(SHIP_WING, 0.9);
+      for (let sd = -1; sd <= 1; sd += 2) {
+        ctx.beginPath(); ctx.moveTo(-6, 2.0 * sd); ctx.lineTo(-12, 4.4 * sd); ctx.lineTo(-20, 7.3 * sd); ctx.lineTo(-18, 2.3 * sd); ctx.lineTo(-10, 1.25 * sd); ctx.closePath(); ctx.fill();
+        ctx.strokeStyle = rgba(SHIP_WING_EDGE, 0.52); ctx.lineWidth = 0.28;
+        ctx.beginPath(); ctx.moveTo(-8.2, 2.15 * sd); ctx.lineTo(-17.7, 5.75 * sd); ctx.stroke();
+        ctx.strokeStyle = rgba(pal.accent, 0.72); ctx.lineWidth = 0.42;
+        ctx.beginPath(); ctx.moveTo(-10.0, 2.4 * sd); ctx.lineTo(-17.0, 5.15 * sd); ctx.stroke();
+      }
+      // Main two-tone faceted fuselage; the lit side changes with bank.
+      ctx.fillStyle = styles.hull;
+      ctx.beginPath(); ctx.moveTo(1.3, 0); ctx.lineTo(-3.2, -2.4); ctx.lineTo(-11, -2.45); ctx.lineTo(-20.5, -1.55); ctx.lineTo(-21.3, 0); ctx.lineTo(-20.5, 1.55); ctx.lineTo(-11, 2.45); ctx.lineTo(-3.2, 2.4); ctx.closePath(); ctx.fill();
+      if (rocketRoll < -0.01) { ctx.globalAlpha = rocketA * clamp(-rocketRoll / 0.32); ctx.fillStyle = styles.invert; ctx.beginPath(); ctx.moveTo(1.3, 0); ctx.lineTo(-3.2, -2.4); ctx.lineTo(-11, -2.45); ctx.lineTo(-20.5, -1.55); ctx.lineTo(-21.3, 0); ctx.lineTo(-20.5, 1.55); ctx.lineTo(-11, 2.45); ctx.lineTo(-3.2, 2.4); ctx.closePath(); ctx.fill(); ctx.globalAlpha = rocketA; }
+      // Facet seam and a directional rim on the nose-facing edge.
+      ctx.strokeStyle = rgba(ROCKET_EDGE, 0.62); ctx.lineWidth = 0.45;
+      ctx.beginPath(); ctx.moveTo(1.3, 0); ctx.lineTo(-3.2, -2.4); ctx.lineTo(-11, -2.45); ctx.stroke();
+      ctx.strokeStyle = rgba(ROCKET_WHITE, 0.7); ctx.lineWidth = 0.32;
+      ctx.beginPath(); ctx.moveTo(1.2, 0); ctx.lineTo(-1.8, -0.25); ctx.stroke();
+      // Recessed panel lines and small vents/greebles.
+      ctx.strokeStyle = rgba(SHIP_PANEL, 0.72); ctx.lineWidth = 0.3;
+      ctx.beginPath(); ctx.moveTo(-5.2, -2.05); ctx.lineTo(-13.5, -1.8); ctx.lineTo(-18.3, -1.15); ctx.moveTo(-5.2, 2.05); ctx.lineTo(-13.5, 1.8); ctx.lineTo(-18.3, 1.15); ctx.stroke();
+      for (let sd = -1; sd <= 1; sd += 2) {
+        ctx.beginPath(); ctx.moveTo(-14.6, 1.45 * sd); ctx.lineTo(-17.4, 1.25 * sd); ctx.moveTo(-15.0, 1.8 * sd); ctx.lineTo(-17.8, 1.55 * sd); ctx.stroke();
+      }
+      // Forward canopy, tinted only with the site's accent and a tiny specular glint.
+      ctx.fillStyle = styles.canopy; ctx.beginPath(); ctx.moveTo(-2.2, -1.05); ctx.lineTo(-4.3, -1.75); ctx.lineTo(-8.0, -1.15); ctx.lineTo(-6.4, 0.05); ctx.lineTo(-2.2, 0.55); ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = rgba(ROCKET_WHITE, 0.76); ctx.lineWidth = 0.35; ctx.beginPath(); ctx.moveTo(-3.8, -1.25); ctx.lineTo(-5.1, -1.35); ctx.stroke();
+      // Twin engine nacelles and glowing nozzles at the rear.
+      const thrust = tour.thrust;
+      for (let sd = -1; sd <= 1; sd += 2) {
+        const ey = 3.45 * sd;
+        ctx.fillStyle = rgba(SHIP_NACELLE, 0.96); ctx.beginPath(); ctx.moveTo(-15.2, ey - 1.0 * sd); ctx.lineTo(-21.1, ey - 0.82 * sd); ctx.lineTo(-21.8, ey + 0.82 * sd); ctx.lineTo(-15.2, ey + 1.0 * sd); ctx.closePath(); ctx.fill();
+        ctx.strokeStyle = rgba(SHIP_NACELLE_EDGE, 0.42); ctx.lineWidth = 0.3; ctx.stroke();
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.shadowColor = rgba(pal.accent, 0.42); ctx.shadowBlur = 4;
+        ctx.fillStyle = rgba(pal.accent, 0.4 + thrust * 0.6); ctx.beginPath(); ctx.arc(-21.15, ey, 0.76 + thrust * 0.28, 0, TAU); ctx.fill();
+        ctx.shadowBlur = 0; ctx.globalCompositeOperation = 'source-over';
+      }
+      if (tour.phase === 'brake' && tour.u < BRAKE) {
+        const pulse = 1 - tour.u / BRAKE;
+        ctx.strokeStyle = rgba(pal.accent, 0.45 * pulse); ctx.lineWidth = 0.8;
+        for (let sd = -1; sd <= 1; sd += 2) { ctx.beginPath(); ctx.arc(-21.15, 3.45 * sd, 1.3 + 3.4 * (1 - pulse), 0, TAU); ctx.stroke(); }
+      }
+      if (thrust > 0.02) {
+        const flick = 0.86 + 0.14 * Math.sin(t * 34); const len = 4.6 + 9.5 * thrust * flick;
+        ctx.globalCompositeOperation = 'lighter';
+        for (let sd = -1; sd <= 1; sd += 2) {
+          const ey = 3.45 * sd;
+          ctx.shadowColor = rgba(pal.accent, 0.36); ctx.shadowBlur = 7;
+          ctx.save(); ctx.translate(-21.2, ey); ctx.scale(len, 1);
+          ctx.fillStyle = styles.plume;
+          ctx.beginPath(); ctx.moveTo(0, -0.65); ctx.quadraticCurveTo(-0.48, -0.8 - thrust / Math.max(1, len), -1, 0); ctx.quadraticCurveTo(-0.48, 0.8 + thrust / Math.max(1, len), 0, 0.65); ctx.fill();
+          ctx.shadowBlur = 0;
+          // A narrow source-over core keeps the light theme's exhaust visible.
+          ctx.globalCompositeOperation = 'source-over'; ctx.fillStyle = styles.plume;
+          ctx.beginPath(); ctx.moveTo(0, -0.34); ctx.quadraticCurveTo(-0.4, -0.24, -1, 0); ctx.quadraticCurveTo(-0.4, 0.24, 0, 0.34); ctx.closePath(); ctx.fill();
+          ctx.restore();
+        }
+        ctx.globalCompositeOperation = 'source-over';
+      }
+      ctx.restore();
+      if (pointer.on && tour.on && shipHoverHit(pointer.x, pointer.y, renderRocketX, renderRocketY, L, rocketAng, rocketRoll)) { ctx.font = '10px ui-monospace, monospace'; ctx.fillStyle = rgba(pal.line, 0.7); ctx.fillText('space: skip · hold: boost · esc: stop', clamp(renderRocketX - 96, 12, W - 210), clamp(renderRocketY + 24, 90, H - 42)); }
+    }
+  }
+  // Caption beside the stop: project name, the chunk text (3 lines at most),
+  // then its cosine score and the stop count in small mono.
+  function drawTourCaption(h, c) {
+    const desk = W > 720;
+    const sans = '12px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+    const maxW = desk ? 260 : Math.min(260, W - 40);
+    ctx.font = sans;
+    let lines = wrapLines(c.text, maxW);
+    if (lines.length > 3) lines = [lines[0], lines[1], lines[2].replace(/\W*\s+\S*$/, '') + '…'];
+    const label = META[c.project].label;
+    ctx.font = '500 ' + sans;
+    const bw = Math.max(ctx.measureText(label).width, ...lines.map(l => { ctx.font = sans; return ctx.measureText(l).width; }));
+    const bh = 16 + lines.length * 16 + 18;
+    let x, y;   // top-left of the block
+    const g = GAL[c.project], gr = g.px * 0.9;   // keep clear of the galaxy's body
+    if (desk) {
+      // Beside the galaxy at the star's height, never under the panel's column.
+      const right = W - 400 - 16;
+      x = Math.max(c.sx, g.sx + gr) + 24;
+      if (x + bw > right) x = Math.min(c.sx, g.sx - gr) - 24 - bw;
+      x = clamp(x, 24, right - bw);
+      y = clamp(c.sy - 18, 120, H - 110 - bh);
+    } else {
+      // Phones: centred below the galaxy, inside the upper stage.
+      x = clamp(c.sx - bw / 2, 20, W - 20 - bw);
+      y = clamp(Math.max(c.sy, g.sy + gr) + 22, 150, H * 0.62 - bh);
+    }
+    const a = capA;
+    captionBox.x = x; captionBox.y = y - 4; captionBox.w = bw; captionBox.h = bh + 8; captionBox.visible = true;
+    ctx.save();
+    ctx.shadowColor = dark ? 'rgba(6,7,10,0.9)' : 'rgba(250,250,248,0.95)';
+    ctx.shadowBlur = 6;
+    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+    ctx.font = '500 ' + sans;
+    ctx.fillStyle = rgba(pal.line, 0.95 * a);
+    ctx.fillText(label, x, y + 12);
+    ctx.font = sans;
+    ctx.fillStyle = rgba(pal.line, 0.65 * a);
+    lines.forEach((l, n) => ctx.fillText(l, x, y + 32 + n * 16));
+    ctx.font = '10px ui-monospace, "SF Mono", Menlo, Consolas, monospace';
+    const my = y + 32 + lines.length * 16 + 4;
+    const sc = h.score.toFixed(2);
+    ctx.fillStyle = rgba(pal.accent, 0.95 * a);
+    ctx.fillText(sc, x, my);
+    ctx.fillStyle = rgba(pal.line, 0.5 * a);
+    ctx.fillText((tour.cap + 1) + ' / ' + tour.stops.length, x + ctx.measureText(sc).width + 14, my);
+    ctx.restore();
+  }
+
+  // ---------------------------------------------------------------------
+  // FRAME
+  // ---------------------------------------------------------------------
+  // Test mode: ?open=<key> flies straight into a galaxy; ?dtmax=0.7 lets time advance
+  // properly when the browser throttles frames (automated, unfocused windows).
+  const QS = new URLSearchParams(location.search);
+  const DTMAX = +QS.get('dtmax') || 0.05;
+  let frameNo = 0, fillDim = 0;
+  function frame(now) {
+    frameNo++;
+    const dt = Math.min(DTMAX, (now - last) / 1000);
+    last = now;
+    t += dt;
+    const elapsed = (now - t0) / 1000;
+    const sm = rate => (reduce ? 1 : 1 - Math.exp(-dt * rate));
+
+    // Transitions: fly in/out to a galaxy, then to its solar system; panel; spin.
+    spin += ((selected ? 0.12 : 1) - spin) * sm(3);
+    zt += ((selected ? 1 : 0) - zt) * sm(3.5);
+    zs += ((sun >= 0 ? 1 : 0) - zs) * sm(4);
+    panelT += ((selected ? 1 : 0) - panelT) * sm(5);
+
+    // Scene rotation: slow spin, drag inertia, slight tilt sway.
+    if (!reduce && !drag.on) angY += dt * 0.07 * spin;
+    if (!drag.on) {
+      angY += velY * dt; userTilt = clamp(userTilt + velX * dt, -1.2, 1.2);
+      const f = Math.exp(-dt * 3); velY *= f; velX *= f;
+    }
+    angX = (reduce ? 0.22 : 0.22 + 0.05 * Math.sin(t * 0.11)) + userTilt;
+    const offX = reduce ? 0 : 0.02 * Math.sin(t * 0.19);
+    const offY = reduce ? 0 : 0.015 * Math.sin(t * 0.13 + 1.1);
+    cA = Math.cos(angY); sA = Math.sin(angY);
+    cB = Math.cos(angX); sB = Math.sin(angX);
+
+    // Each galaxy's spin basis and fade-in.
+    KEYS.forEach(k => {
+      const g = GAL[k];
+      const sp = g.phase + (reduce ? 0 : g.omega * t);
+      const cs = Math.cos(sp), sn = Math.sin(sp);
+      for (let a = 0; a < 3; a++) {
+        g.A[a] = cs * g.E1[a] + sn * g.E2[a];
+        g.B[a] = cs * g.E2[a] - sn * g.E1[a];
+      }
+      g.gi = reduce ? 1 : easeOut(clamp((elapsed - g.delay) / INTRO_S));
+    });
+    updateTour(dt);
+
+    // Search tour eases: zoom (held while a landed galaxy is open), stage, caption, rocket.
+    if (tour.on || !selected) tourZ += ((tour.on ? tour.z : 1) - tourZ) * sm(2.5);
+    tourT += ((tour.on ? 1 : 0) - tourT) * sm(3);
+    capA += ((tour.on && (tour.phase === 'dwell' || tour.phase === 'brake' || tour.phase === 'land') ? 1 : 0) - capA) * sm(tour.on && (tour.phase === 'dwell' || tour.phase === 'brake' || tour.phase === 'land') ? 5 : 8);
+    rocketA += ((tour.on ? 1 : 0) - rocketA) * sm(tour.on ? 5 : 2.5);
+
+    // Camera target: the sun if one is open, else the selected galaxy's core, else the origin.
+    // During the search tour it follows the rocket.
+    let ft = tour.on ? tour.pos : ZERO;
+    if (selected) {
+      const g = GAL[selected];
+      ft = sun >= 0 ? localToWorld(g, CHUNKS[sun].local, sunW) : g.core;
+    }
+    for (let a = 0; a < 3; a++) focus[a] += (ft[a] - focus[a]) * sm(sun >= 0 || tour.on ? 4 : 3.5);
+    rotPoint(focus, FR);
+
+    // Home: the centre of the free area left of the panel (desktop), or the upper part (mobile).
+    // The camera focus lands exactly here, so the galaxy sits centred.
+    const desk = W > 720;
+    const homeY = desk ? (96 + H) / 2 : (96 + H * 0.44) / 2;
+    // Zoom so a flown-into galaxy fills about 72% of the smaller side, but never past the
+    // header or the bottom edge (the room above and below the core).
+    const room = Math.min(homeY - 96, H - homeY) - 16;
+    const zCap = selected ? room / (GAL[selected].R * OVER * Math.min(W, H)) : Infinity;
+    const zTarget = selected ? Math.max(3, Math.min(clamp(0.36 / (GAL[selected].R * OVER), 6, 22), zCap)) : 1;
+    userZoom = Math.exp(Math.log(userZoom) + (Math.log(zoomGoal) - Math.log(userZoom)) * sm(6));
+    const camOut = CAM0 / Math.min(1, userZoom);
+    cam = camOut + (CAM - camOut) * zt;
+    // The tour zoom hands over to the fly-in zoom on landing (whichever is closer wins).
+    SC = Math.min(W, H) * OVER * Math.max(1, userZoom) * Math.max(1 + (zTarget - 1) * zt, tourZ) * (1 + 3 * zs);
+    const sway = (1 - zt) / tourZ;   // no drift once inside a galaxy or on the tour
+    const homeX = desk ? (W - 400) / 2 : W / 2;
+    // The tour already frames its stops where the panel will leave room.
+    const stage = Math.max(panelT, tourT);
+    CX = W / 2 + (homeX - W / 2) * stage + offX * SC * sway;
+    CY = H / 2 + (homeY - H / 2) * stage - offY * SC * sway;
+
+    // Galaxy screen centres and on-screen test.
+    KEYS.forEach(k => {
+      const g = GAL[k];
+      const ok = project(g.core[0], g.core[1], g.core[2]);
+      if (ok) { g.sx = P[0]; g.sy = P[1]; g.k = P[2]; g.px = g.R * P[2] * SC; }
+      g.vis = ok && g.k < 4 && g.px > 0.02 && g.gi > 0.01 &&
+        Math.abs(g.sx - W / 2) < W / 2 + g.px && Math.abs(g.sy - H / 2) < H / 2 + g.px;
+    });
+
+    // Every chunk star's screen position (hover, search hits, arrows).
+    CHUNKS.forEach(c => {
+      const g = GAL[c.project];
+      c.vis = g.gi > 0.01 && toScreen(g, c.local[0], c.local[1], c.local[2]);
+      if (c.vis) { c.sx = P[0]; c.sy = P[1]; }
+    });
+
+    // Solar system: planets for the open chunk.
+    let planets = [];
+    hoverPlanet = -1;
+    if (selected && sun >= 0 && zs > 0.01) {
+      const sp = pr(sunW[0], sunW[1], sunW[2]);
+      if (sp) {
+        sunSX = sp[0]; sunSY = sp[1];
+        planets = solarPlanets(CHUNKS[sun], sunSX, sunSY, Math.min(W, H));
+        if (pointer.on) {
+          planets.forEach((p, j) => {
+            if (hoverPlanet < 0 && Math.hypot(p.x - pointer.x, p.y - pointer.y) < p.r + 7) hoverPlanet = j;
+          });
+        }
+      }
+    }
+
+    // Hover: galaxy, search hit or chunk; a planet when at the solar level.
+    const hit = pointer.on && hoverPlanet < 0 && !tour.on ? pick(pointer.x, pointer.y, pointer.touch ? 22 : 10) : null;
+    hovered = hit ? hit.k : (hoverPlanet >= 0 ? selected : null);
+    hoverIdx = hit ? hit.i : -1;
+    const tourControlHover = tour.on && pointer.on && (pipAt(pointer.x, pointer.y) >= 0 || (captionBox.visible && pointer.x >= captionBox.x && pointer.x <= captionBox.x + captionBox.w && pointer.y >= captionBox.y && pointer.y <= captionBox.y + captionBox.h));
+    cv.classList.toggle('pointer', !!hit || hoverPlanet >= 0 || tourControlHover || (pointer.on && !!grabbable(pointer.x, pointer.y)));
+    // A hover peek beside a galaxy in the overview only.
+    const peekOn = hovered && !selected && !drag.on && W > 720;   // no room on phones
+    showPeek(peekOn ? hovered : null);
+    if (peekOn && PEEK[hovered]) placePeek(GAL[hovered].sx, GAL[hovered].sy, hovered);
+    else { peekHoverKey = null; peekSide = null; }
+
+    const active = hovered || selected;
+    const querying = !active && hits.length > 0;
+    fillDim += ((!selected && (active || querying) ? 1 : 0) - fillDim) * sm(10);
+
+    // Query marker eases toward the score-weighted centre of its hit galaxies.
+    qT += ((querying ? 1 : 0) - qT) * sm(6);
+    if (hits.length) {
+      const tw = hits.reduce((s, h) => s + h.score, 0);
+      const tgtW = [0, 0, 0];
+      hits.forEach(h => {
+        const c = CHUNKS[h.i], w = h.score / tw, core = GAL[c.project].core;
+        for (let a = 0; a < 3; a++) tgtW[a] += core[a] * w;
+      });
+      if (!tour.on) for (let a = 0; a < 3; a++) qWorld[a] += (tgtW[a] - qWorld[a]) * sm(6);
+    }
+
+    // Per-galaxy eases; guard() catches any non-finite value.
+    KEYS.forEach(k => {
+      const g = GAL[k];
+      const hitK = querying && hitGal.has(k);
+      const dimT = k === selected && sun >= 0 ? 0.5
+        : (active && active !== k) || (querying && !hitK) ? 1 : 0;
+      g.acc += ((active === k ? 1 : 0) - g.acc) * sm(12);
+      g.dim += (dimT - g.dim) * sm(10);
+      g.lit += ((hitK ? 1 : 0) - g.lit) * sm(6);
+      // Inside a galaxy the other project galaxies fade out (the deep field stays).
+      const others = k === selected ? 1 : 1 - 0.97 * zt;
+      g.alpha = guard(g.gi * (1 - 0.6 * g.dim) * (1 + 0.5 * g.lit) * others, 'galaxy alpha');
+    });
+    updateCrumbs();
+
+    // Draw: deep field, axes, arrows, galaxies, solar system, hover lines, query, labels.
+    ctx.clearRect(0, 0, W, H);
+    drawDeep();
+    // Axes and origin arrows belong to the universe level: hidden inside a galaxy.
+    drawAxes(selected ? 0 : 0.09 * (1 - zt));
+    if (dark) drawFill((1 - 0.9 * zt) * (selected ? 1 : 1 - 0.6 * fillDim));
+
+    const O = pr(0, 0, 0);
+    ctx.lineWidth = 1;
+    if (O && active && !selected) {
+      const g = GAL[active];
+      if (g.vis) {
+        const dx = g.sx - O[0], dy = g.sy - O[1], L = Math.hypot(dx, dy) || 1;
+        const end = [g.sx - dx / L * (g.px + 2), g.sy - dy / L * (g.px + 2)];
+        arrow(O, end, pal.accent, 0.5 * g.gi);
+      }
+    }
+    if (O && qT > 0.01 && sun < 0) {
+      hits.forEach(h => {
+        const c = CHUNKS[h.i];
+        if (c.vis) arrow(O, [c.sx, c.sy], pal.accent, 0.28 * qT * (1 - 0.7 * tourT));
+      });
+    }
+
+    KEYS.filter(k => GAL[k].vis)
+      .sort((a, b) => GAL[a].k - GAL[b].k)
+      .forEach(k => drawGalaxy(GAL[k]));
+
+    // In-galaxy animation. Time runs only inside.
+    if (selected && ANIM_KEYS.includes(selected) && zt > 0.02) {
+      const an = animFor(selected);
+      if (an) {
+        const R = GAL[selected].R * SC;
+        if (!reduce) an.update(dt * (zt > 0.9 ? 1 : 0));
+        else if (!an.warm) {
+          // Reduced motion: an invisible draw gives the plugin its layout, then it runs
+          // forward once and holds that static end state.
+          an.draw(ctx, CX, CY, R, 0);
+          for (let i = 0; i < 300; i++) an.update(0.04);
+          an.warm = true;
+        }
+        an.draw(ctx, CX, CY, R, zt * (1 - zs));
+      }
+    }
+
+    if (selected && sun < 0) drawChunks(GAL[selected]);
+
+    if (planets.length) drawSolar(GAL[selected], CHUNKS[sun], planets, hoverPlanet);
+
+    // Zoomed far out: when the projects bunch together, one ring marks them all
+    // (click it to fly back); once they spread apart, each gets its name.
+    const nameA = (1 - zt) * clamp((0.5 - userZoom) / 0.2);
+    cluster.on = false;
+    if (nameA > 0.01) {
+      const vk = KEYS.filter(k => GAL[k].vis && k !== 'pet');
+      const bh = GAL.pet;
+      if (bh.vis) {
+        ctx.font = '10px ui-monospace, "SF Mono", Menlo, Consolas, monospace';
+        ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
+        ctx.fillStyle = rgba(pal.line, 0.6 * nameA * bh.alpha);
+        ctx.fillText('black hole?', bh.sx + 12, bh.sy);
+      }
+      if (vk.length) {
+        let mx = 0, my = 0;
+        vk.forEach(k => { mx += GAL[k].sx; my += GAL[k].sy; });
+        mx /= vk.length; my /= vk.length;
+        const spread = Math.max(...vk.map(k => Math.hypot(GAL[k].sx - mx, GAL[k].sy - my)));
+        const packA = clamp((140 - spread) / 50);   // 1 when packed tight
+        ctx.font = '10px ui-monospace, "SF Mono", Menlo, Consolas, monospace';
+        ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
+        if (packA < 1) vk.forEach(k => {
+          const g = GAL[k];
+          if (k === hovered) return;
+          ctx.fillStyle = rgba(pal.line, 0.6 * nameA * (1 - packA) * g.alpha);
+          ctx.fillText(META[k].label, g.sx + 10, g.sy);
+        });
+        if (packA > 0) {
+          const r = spread + 18, a = nameA * packA;
+          Object.assign(cluster, { on: true, x: mx, y: my, r });
+          ctx.strokeStyle = rgba(pal.accent, 0.55 * a);
+          ctx.lineWidth = 1;
+          ctx.setLineDash([3, 4]);
+          ctx.beginPath(); ctx.arc(mx, my, r, 0, TAU); ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.textAlign = 'center';
+          ctx.fillStyle = rgba(pal.accent, 0.9 * a);
+          ctx.fillText('MY PROJECTS', mx, my - r - 12);
+          ctx.fillStyle = rgba(pal.line, 0.45 * a);
+          ctx.fillText('click to fly in', mx, my + r + 12);
+        }
+      }
+    }
+
+    const mono = '10px ui-monospace, "SF Mono", Menlo, Consolas, monospace';
+    ctx.font = mono; ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
+
+    // Hover: faint lines to the 2 nearest galaxies, each with a cosine.
+    if (hovered && !selected) {
+      const g = GAL[hovered];
+      if (g.vis) {
+        nearProjects[hovered].forEach(nk => {
+          const n2 = GAL[nk];
+          if (!n2.vis) return;
+          ctx.strokeStyle = rgba(pal.accent, 0.35 * g.gi);
+          ctx.beginPath(); ctx.moveTo(g.sx, g.sy); ctx.lineTo(n2.sx, n2.sy); ctx.stroke();
+          ctx.fillStyle = rgba(pal.accent, 0.85 * g.gi);
+          ctx.fillText(cosine(EMB[hovered], EMB[nk]).toFixed(2), (g.sx + n2.sx) / 2, (g.sy + n2.sy) / 2 - 8);
+        });
+      }
+    }
+
+    // Query marker in the void, with lines and retrieval scores to its hit stars.
+    if (qT > 0.01 && hits.length && sun < 0) {
+      const q = pr(qWorld[0], qWorld[1], qWorld[2]);
+      // When the hits sit in one galaxy the marker lands on top of it; push it to the side
+      // (across the line from the origin) so the lines and scores can be read.
+      const vh = hits.filter(h => CHUNKS[h.i].vis);
+      if (q && O && vh.length) {
+        const cx = vh.reduce((s, h) => s + CHUNKS[h.i].sx, 0) / vh.length;
+        const cy = vh.reduce((s, h) => s + CHUNKS[h.i].sy, 0) / vh.length;
+        // On the tour the marker returns to its true place: the rocket's launch point.
+        const push = 110 * clamp(1 - Math.hypot(q[0] - cx, q[1] - cy) / 110) * (tour.on ? 0 : 1 - tourT);
+        const ox = cx - O[0], oy = cy - O[1], ol = Math.hypot(ox, oy) || 1;
+        q[0] -= oy / ol * push; q[1] += ox / ol * push;
+      }
+      if (q) {
+        const labels = [];
+        hits.forEach(h => {
+          const c = CHUNKS[h.i];
+          if (!c.vis) return;
+          ctx.strokeStyle = rgba(pal.accent, 0.5 * qT * (1 - 0.6 * tourT));
+          ctx.beginPath(); ctx.moveTo(q[0], q[1]); ctx.lineTo(c.sx, c.sy); ctx.stroke();
+          ctx.fillStyle = rgba(pal.accent, 0.85 * qT * (1 - tourT));   // the stop caption shows the score
+          const x = (q[0] + c.sx) / 2;
+          let y = (q[1] + c.sy) / 2 - 8;
+          while (labels.some(p => Math.abs(p.x - x) < 32 && Math.abs(p.y - y) < 14)) y += 14;
+          labels.push({ x, y });
+          ctx.fillText(h.score.toFixed(2), x, y);
+        });
+        ctx.strokeStyle = rgba(pal.accent, qT);
+        ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.arc(q[0], q[1], 6, 0, TAU); ctx.stroke();
+        ctx.lineWidth = 1;
+      }
+    }
+
+    drawTour(sm, dt);
+
+    // Hover label at the galaxy and galaxy levels: project name, plus the chunk text over a chunk.
+    if (hovered && sun < 0) {
+      const inside = hoverIdx >= 0;
+      const ax = inside ? CHUNKS[hoverIdx].sx : GAL[hovered].sx;
+      const ay = inside ? CHUNKS[hoverIdx].sy : GAL[hovered].sy;
+      ctx.font = '500 12px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+      ctx.textBaseline = 'alphabetic';
+      ctx.textAlign = 'left';
+      const label = META[hovered].label;
+      const w = ctx.measureText(label).width;
+      // The name goes left when the peek card sits to the right, so the card never hides it.
+      const peekRight = !inside && peekKey === hovered && peekSide && peekSide.startsWith('right');
+      let lx = ax + 12;
+      if (lx + w > W - 12 || peekRight) lx = Math.max(12, ax - 12 - w);
+      ctx.fillStyle = rgba(pal.line, 0.95);
+      ctx.fillText(label, lx, ay - 12);
+      const txt = inside ? CHUNKS[hoverIdx].text : '';
+      if (txt) {
+        ctx.font = '12px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+        const lines = wrapLines(txt, 260);
+        const tw = Math.max(...lines.map(l => ctx.measureText(l).width));
+        let tx = ax + 12;
+        if (tx + tw > W - 12) tx = ax - 12 - tw;
+        ctx.fillStyle = rgba(pal.line, 0.6);
+        lines.slice(0, 4).forEach((l, n) => ctx.fillText(l, tx, ay + 8 + n * 16));
+      }
+    }
+
+    requestAnimationFrame(frame);
+  }
+
+  // ---------------------------------------------------------------------
+  // INIT
+  // ---------------------------------------------------------------------
+  window.addEventListener('resize', () => {
+    resize();
+    if (selected) drawScrub();
+  });
+  KEYS.forEach(loadPortrait);
+  if (QS.get('open') && META[QS.get('open')]) setTimeout(() => openProject(QS.get('open')), 100);
+  window.__galaxy = {
+    open: openProject, close: closeProject, enterSun,
+    tour: q => { qInput.value = q; stopTour(); runQuery(); submitSearch(); },
+    tourState: () => {
+      const h = tour.j >= 0 ? tour.stops[tour.j] : null, hasRp = project(tour.pos[0], tour.pos[1], tour.pos[2]);
+      const phase = tour.phase === 'ignite' ? 'ignition' : tour.phase === 'land' ? 'landing' : tour.phase;
+      return { on: tour.on, j: tour.j, fly: tour.fly, phase, u: tour.u, dur: tour.dur, e: tour.e, fast: tour.fast, boost: tour.boost, thrust: tour.thrust,
+        stops: tour.stops.map(x => ({ i: x.i, score: x.score, project: CHUNKS[x.i].project })), selected, sun, pos: tour.pos.slice(),
+        rocket: hasRp ? { x: renderRocketX, y: renderRocketY, angle: rocketAng, roll: rocketRoll, L: W > 720 ? 28 : 18 } : null,
+        star: h && CHUNKS[h.i] ? { x: CHUNKS[h.i].sx, y: CHUNKS[h.i].sy } : null, caption: captionBox.visible ? { x: captionBox.x, y: captionBox.y, w: captionBox.w, h: captionBox.h, visible: true } : null, pips: Array.from({ length: pipCount }, (_, n) => ({ x: pipHits[n].x, y: pipHits[n].y, j: pipHits[n].j })), exhaustCount: trailCount };
+    }
+  };
+  const stored = storedTheme();
+  setTheme(stored ? stored === 'dark' : darkMq.matches, false);
+  resize();
+  requestAnimationFrame(frame);
+})();
+</script>
+<script data-goatcounter="https://august.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>

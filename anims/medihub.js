@@ -6,6 +6,7 @@
 // specialist ship (a cross) docks where it matches; one ship cancels, backs
 // out and rebooks into another bay. Then the ships leave and the stars return.
 GALAXY_ANIMS['medihub'] = function (api) {
+  api.lightBoost();   // light theme: a little more weight (see index.html makeApi)
   const { rng, clamp, TAU } = api;
   const smooth = x => { const u = clamp(x); return u * u * (3 - 2 * u); };
 
@@ -147,6 +148,7 @@ GALAXY_ANIMS['medihub'] = function (api) {
         a *= alpha * tone;
         if (a < 0.01 || !isFinite(x) || !isFinite(y)) return;
         ctx.fillStyle = api.rgba(rgb, Math.min(1, a));
+        if (!dark) r *= 1.25;                               // light: larger squares so the icons read
         ctx.fillRect(x - r / 2, y - r / 2, r, r);
       };
 

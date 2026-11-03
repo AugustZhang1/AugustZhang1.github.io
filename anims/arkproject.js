@@ -7,6 +7,7 @@
 // back into the spiral. Each loop cooks the next recipe; the two before it are the
 // planets already in orbit.
 GALAXY_ANIMS['arkproject'] = function (api) {
+  api.lightBoost({ dots: false });   // light theme: dense clusters keep their dot size
   const { TAU, clamp, rng } = api;
   const sm = x => { const u = clamp(x); return u * u * (3 - 2 * u); };
   const win = (a, b, t) => sm((t - a) / (b - a));

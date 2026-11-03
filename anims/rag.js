@@ -5,6 +5,7 @@
 // then a judge pass ticks each row and strikes one hallucination in the accent.
 // Finally every borrowed star drifts back into the spiral and the loop repeats.
 GALAXY_ANIMS['rag'] = function (api) {
+  api.lightBoost();   // light theme: a little more weight (see index.html makeApi)
   const { rng, TAU, clamp } = api;
   const smooth = x => { const u = clamp(x); return u * u * (3 - 2 * u); };
   const K = 5, RANGE = 0.62;               // matches, beam range (R units)

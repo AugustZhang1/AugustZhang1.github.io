@@ -4,6 +4,7 @@
 // at each big swing a knot of stars flares with a small label. Then it all relaxes
 // back into the spiral and the loop repeats. Curve data is illustrative (seeded).
 GALAXY_ANIMS['league'] = function (api) {
+  api.lightBoost();   // light theme: a little more weight (see index.html makeApi)
   const { rng, TAU, clamp, rgba, ease3 } = api;
   const smooth = x => { const u = clamp(x); return u * u * (3 - 2 * u); };
 
@@ -147,7 +148,7 @@ GALAXY_ANIMS['league'] = function (api) {
         const c = tc[i] === 4 ? acc : col[tc[i] === 3 ? 3 : tc[i]];
         // Fade in with travel so the hand-off from the spiral is seamless.
         const a = A * Math.min(1, e * 2.5) * (0.5 + 0.5 * e) * (ta[i] * e + 0.6 * (1 - e));
-        const r = 0.8 + (tr[i] - 0.8) * e;
+        const r = (0.8 + (tr[i] - 0.8) * e) * (dark ? 1 : 1.15);
         ctx.fillStyle = rgba(c, a);
         ctx.fillRect(x - r * 0.6, y - r * 0.6, r * 1.2, r * 1.2);
         if (dark && e > 0.95 && ta[i] > 0.7 && i < NC) {   // soft glow on the played curve

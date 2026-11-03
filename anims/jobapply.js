@@ -5,6 +5,7 @@
 // an AI-written document page and a form whose fields fill themselves, and it all stops
 // at an unpressed "you submit" button. Then every star flies home and the spiral returns.
 GALAXY_ANIMS['jobapply'] = function (api) {
+  api.lightBoost();   // light theme: a little more weight (see index.html makeApi)
   const { rng, clamp, mix, TAU } = api;
   const L = 25;                                   // loop length, seconds
   const sm = x => { x = clamp(x); return x * x * (3 - 2 * x); };

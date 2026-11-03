@@ -42,6 +42,15 @@ GALAXY_ANIMS['snake'] = function (api) {
   // Normalised star position (relative to core, in units of R).
   function sp(S, i) { return [(S.x[i] - view.cx) / view.R, (S.y[i] - view.cy) / view.R]; }
   const used = i => food.some(f => f.i === i) || segs.some(s => s.src === i);
+  // Point on the body path at distance D behind the head. The head leads trail[0] by acc,
+  // so interpolating here keeps segments gliding instead of hopping between samples.
+  function at(D) {
+    if (!trail.length) return [hx, hy];
+    if (D <= acc) { const f = acc > 0 ? D / acc : 0; return [lerp(hx, trail[0][0], f), lerp(hy, trail[0][1], f)]; }
+    const q = (D - acc) / STEP, i = Math.floor(q), f = q - i;
+    if (i >= trail.length - 1) return trail[trail.length - 1].slice();
+    return [lerp(trail[i][0], trail[i + 1][0], f), lerp(trail[i][1], trail[i + 1][1], f)];
+  }
 
   function pickFood(S) {
     for (let tries = 0; tries < 80; tries++) {
@@ -92,7 +101,7 @@ GALAXY_ANIMS['snake'] = function (api) {
   }
 
   function die(big) {
-    deathAt = segs.map((s, k) => trail[Math.min(trail.length - 1, k * SUB)].slice());
+    deathAt = segs.map((s, k) => at(k * SP));
     if (big) flashes.push({ x: hx, y: hy, t: 0, big: 1 });
     if (gi > 0 && segs.length > best) bestFlash = 1;
     best = Math.max(best, segs.length);
@@ -250,7 +259,7 @@ GALAXY_ANIMS['snake'] = function (api) {
         const P = [];
         for (let k = 0; k < n; k++) {
           const s = segs[k];
-          let p = trail[Math.min(trail.length - 1, k * SUB)];
+          let p = at(k * SP);
           if (phase === 'die' && deathAt && deathAt[k]) p = deathAt[k];
           let x = p[0], y = p[1];
           const home = S.x[s.src] < -1e3 ? [x, y] : sp(S, s.src);

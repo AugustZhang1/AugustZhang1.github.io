@@ -4,6 +4,7 @@
 // a sound wave: each dot of text becomes a mirrored bar of stars. Chapter headings pass as accent
 // beacons. When the book is read, every borrowed star drifts back into the spiral and the loop repeats.
 GALAXY_ANIMS['audiobook'] = function (api) {
+  api.lightBoost();   // light theme: a little more weight (see index.html makeApi)
   const { TAU, clamp, mix } = api;
   const smooth = x => { const u = clamp(x); return u * u * (3 - 2 * u); };
 

@@ -7,6 +7,7 @@
 // from the bankroll at the core to the two best books and return larger as locked profit.
 // The line corrects, the gap closes, and the stars drift back into the spiral.
 GALAXY_ANIMS['arbitrage'] = function (api) {
+  api.lightBoost();   // light theme: a little more weight (see index.html makeApi)
   const { TAU, clamp, rng } = api;
   const smooth = x => { const u = clamp(x); return u * u * (3 - 2 * u); };
   const LOOP = 24;
@@ -198,7 +199,7 @@ GALAXY_ANIMS['arbitrage'] = function (api) {
 
       // Labels: each book's two prices, the gauge reading, the locked profit.
       ctx.globalCompositeOperation = 'source-over';
-      const ink = col[3], soft = col[2];
+      const ink = col[3], soft = dark ? col[2] : col[3];
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       const txt = (s, x, y, c, a, f) => { if (a < 0.01) return; ctx.font = f; ctx.fillStyle = api.rgba(c, clamp(a)); ctx.fillText(s, x, y); };
       const tv = alpha * vis;

@@ -1,6 +1,6 @@
 # Site redesign: direction
 
-Working notes; expect changes. The live prototype is `mockups/v4/galaxy.html`.
+Working notes; expect changes. The live site is `index.html`; the previous site is kept at `old.html`.
 
 ## Concept
 August's work as a **universe**, styled like a RAG vector store a recruiter can explore.
@@ -24,15 +24,13 @@ August's work as a **universe**, styled like a RAG vector store a recruiter can 
 3. **Solar system (click a chunk star).** The star becomes a sun showing the chunk text, with 2 to 5 planets, one per key term (tech or metric). Back or Esc goes up a level; arrow keys step between stars or galaxies.
 
 ## In-galaxy animations
-Each animation is **made of that galaxy's own stars**, which leave the spiral and form the idea. They are never flat overlays drawn on top. The mood is calm and elegant, with one accent for key moments. Each lives in `mockups/v4/anims/<project>.js` (API in `anims/README.md`).
+Each animation is **made of that galaxy's own stars**, which leave the spiral and form the idea. They are never flat overlays drawn on top. The mood is calm and elegant, with one accent for key moments. Each lives in `anims/<project>.js` (API in `anims/README.md`).
 
 | Project | Animation |
 |---|---|
 | LeagueVODreview | Stars form a win-probability curve; a playhead travels it and big swings flare with labels like "+18% Baron". |
 | AI Builder for Minecraft | Stars snap onto a voxel grid and build a small structure block by block, then rotate it. |
-| AI Snake Game | A snake of stars slithers through the arms eating stars; each generation respawns smarter. |
 | RAG Toolkit | A query sweeps the galaxy like radar, finds 5 planets with moons, ranks them with scores, and a judge strikes out a hallucination. |
-| Housing Price Prediction | Stars become houses in a size/price scatter; decision-tree splits partition it into a stepped prediction. |
 | Sports Odds Arbitrage | Bookmaker stations beam odds into a ring gauge; when the implied probability dips under 100%, the gap lights and stakes return as profit. |
 | AudiobookFree | A star book sheds text lines that pass a ring of 28 voices and become a sound wave, with chapter beacons. |
 | Ark Eagle Scheduler | 7 day-orbits fill with volunteer satellites; one drops out and a replacement auto-launches to fill the slot. |
@@ -41,6 +39,9 @@ Each animation is **made of that galaxy's own stars**, which leave the spiral an
 | JobApply | Postings stream in, duplicates merge, a ranking pass orders them, and documents and forms fill, stopping at an unpressed "you submit". |
 | Sinai Foundation | Stars form the logo, then it becomes a sun with 3 site planets, a shared component ring and deploy pulses. |
 | SenseWay | Stars form the logo, then a starlit crosswalk with LiDAR and GPS sensing, data streaming to a dashboard. |
+| Video To Reels | Stars pour into a tall phone frame and fill its screen as a dot-matrix picture; a swipe sends the reel up, and a star "most replayed" curve lifts its peak, which becomes the next 30 s reel. |
+| Calendar Clerk | An email made of star lines drifts into an extraction ring; the date and title stars split out and land on a star calendar grid as a draft event, which lights only once an approval star is pressed. |
+| Desktop Pet (black hole) | A small rock made of disc stars orbits the black hole and slowly spirals in; you can grab and fling it, and it always falls back. |
 
 ## Other prototypes (for comparison)
 - `mockups/v4/map.html`: the minimal vector point cloud (navy and coral, points coloured by domain).
@@ -53,7 +54,8 @@ Each animation is **made of that galaxy's own stars**, which leave the spiral an
 
 ## Content decisions
 - Remove the Real-Time Chat and E-Hotel projects (their repos are private).
-- Include JobApply, with no GitHub link, since its repo is private.
+- Private repos get no GitHub link (JobApply, RAG, Ark Eagle, ArkProject, Video To Reels, Calendar Clerk, Desktop Pet).
+- Trimmed Housing Price Prediction and AI Snake Game (weakest projects); their plugin files stay in `anims/` unused.
 - Education: Computer Engineering, University of Ottawa, Dec 2027.
 - Resume: AugustZhang_Resume_Final.pdf (from Desktop/Job; not in the repo yet, so the Resume link 404s until it's added).
 - Keep the GoatCounter script.

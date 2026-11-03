@@ -6,6 +6,7 @@
 // scans the arms (accent), picks a replacement, which auto-launches and docks with an accent
 // pulse. The week holds, then everything relaxes back into the spiral and the loop repeats.
 GALAXY_ANIMS['ark-eagle'] = function (api) {
+  api.lightBoost();   // light theme: a little more weight (see index.html makeApi)
   const { TAU, clamp, rng } = api;
   const smooth = x => { const u = clamp(x); return u * u * (3 - 2 * u); };
   const DAYS = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
@@ -213,7 +214,8 @@ GALAXY_ANIMS['ark-eagle'] = function (api) {
         if (f < 0.02) continue;
         const lx = labX[d], ly = labY[d];
         const hot = d === cd ? smooth((T - TC) / 0.5) * (1 - smooth((T - TDOCK - 1.6) / 0.8)) : 0;
-        const cl = hot > 0.01 ? api.mix(col[2], acc, hot) : col[2];
+        const tx = dk ? col[2] : col[3];                          // light: darker ink for text
+        const cl = hot > 0.01 ? api.mix(tx, acc, hot) : tx;
         c.fillStyle = api.rgba(cl, clamp(A * vis * f * (0.55 + 0.4 * hot)));
         c.fillText(DAYS[d], lx, ly + 0.5);
       }
@@ -230,7 +232,7 @@ GALAXY_ANIMS['ark-eagle'] = function (api) {
         const k = smooth((T - TC - 1.4) / 0.6);
         api.ring(c, ex, ey, 7 * sz, col[2], A * vis * k * (0.4 + 0.25 * Math.sin(T * 4)), 1);
       }
-      lab('dropped out', col[2], TC + 0.3, TSCAN + 0.3);
+      lab('dropped out', dk ? col[2] : col[3], TC + 0.3, TSCAN + 0.3);
       const rs = rep >= 0 ? sats[rep] : null;
       if (rs && T > TSCAN && T < TREPL + 0.4) {
         const g0 = rs.stars[0], gx = S.x[g0], gy = S.y[g0];
@@ -255,7 +257,7 @@ GALAXY_ANIMS['ark-eagle'] = function (api) {
         const [wx, wy] = P(RINGS - 1, Math.PI / 2);
         const short = T > TC + 0.3 && T < TDOCK;
         c.textAlign = 'center';
-        c.fillStyle = api.rgba(short ? acc : col[2], clamp(A * vis * cf * (short ? 0.85 : 0.6)));
+        c.fillStyle = api.rgba(short ? acc : dk ? col[2] : col[3], clamp(A * vis * cf * (short ? 0.85 : 0.6)));
         c.fillText(filled + ' / ' + NSLOT + ' shifts filled', wx, wy + 30 * sz);
       }
       c.restore();

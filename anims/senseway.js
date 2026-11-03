@@ -5,6 +5,7 @@
 // star dashboard (GPS track, LiDAR trace) that flags "crosswalk detected". Then the stars
 // fold back into the logo, and it loops.
 GALAXY_ANIMS['senseway'] = function (api) {
+  api.lightBoost();   // light theme: a little more weight (see index.html makeApi)
   const { TAU, clamp, mix, ease3, rng } = api;
   const smooth = x => { const u = clamp(x); return u * u * (3 - 2 * u); };
   const INTRO = 4.2, HOLD = 4.6, TO_S = 2.6, SCENE = 13.4, TO_L = 2.6;
@@ -34,7 +35,7 @@ GALAXY_ANIMS['senseway'] = function (api) {
   const im = new Image();
   im.onload = () => { own = im; };
   im.onerror = () => { ownFailed = true; };
-  im.src = '../../img/senseway.png';
+  im.src = 'img/senseway.png';
 
   function sample(cols) {
     const c = document.createElement('canvas');
@@ -322,6 +323,7 @@ GALAXY_ANIMS['senseway'] = function (api) {
           api.dot(ctx, x, y, r, c, a * alpha);
           continue;
         }
+        if (!dark && R0 !== 3) rs += 0.25;                // light: slightly larger dots so the dashboard reads
         const tx = cx + qx * R, ty = cy + qy * R;
         if (m <= 0) { x = lgx; y = lgy; }
         else if (m >= 1) { x = tx; y = ty; }
@@ -344,7 +346,7 @@ GALAXY_ANIMS['senseway'] = function (api) {
         api.text(ctx, 'GPS', cx + SATS[1][0] * R, cy + (SATS[1][1] + 0.07) * R, tc, ovA * 0.55);
         api.text(ctx, 'LiDAR', lx, ly - (LIDAR_R + 0.06) * R, tc, ovA * 0.5 * lOn * clamp((5 - s) / 1));
         ctx.save(); ctx.font = api.mono; ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
-        ctx.fillStyle = api.rgba(tc, clamp(ovA * 0.55));
+        ctx.fillStyle = api.rgba(tc, clamp(ovA * (dark ? 0.55 : 0.8)));
         ctx.fillText('GPS track', cx + (DB_X0 + 0.05) * R, cy + (TR_Y - 0.08) * R);
         ctx.fillText('LiDAR m', cx + (DB_X0 + 0.05) * R, cy + (SP_Y0 - SP_H - 0.07) * R);
         ctx.fillText('dashboard', cx + DB_X0 * R, cy + (DB_Y0 - 0.06) * R);
@@ -356,7 +358,7 @@ GALAXY_ANIMS['senseway'] = function (api) {
           ctx.fillText('crosswalk detected', cx + (DB_X0 + 0.11) * R, sy);
         } else {
           api.dot(ctx, cx + (DB_X0 + 0.07) * R, sy, 2.2, tc, ovA * 0.35);
-          ctx.fillStyle = api.rgba(tc, clamp(ovA * 0.4));
+          ctx.fillStyle = api.rgba(tc, clamp(ovA * (dark ? 0.4 : 0.6)));
           ctx.fillText('scanning', cx + (DB_X0 + 0.11) * R, sy);
         }
         ctx.restore();
