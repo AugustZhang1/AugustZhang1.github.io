@@ -24,9 +24,9 @@ Each subagent was stopped while iterating. The files below are syntactically val
 |---|---|
 | housing | **Done and verified.** Scatter, decision-tree splits, then a 16-step staircase on a 23s loop. |
 | league | **Done and verified (batch 1).** Win-probability curve, playhead sweep, swing flares ending on "+18% Baron"; 25s loop. |
-| minecraft | Written (196 lines), was mid visual check of the build. |
-| snake | Written (228 lines), not verified (was waiting on fly-in). |
-| rag | Written (177 lines), not verified. |
+| minecraft | **Done and verified (batch 2).** Stars build shaded voxel cottage / oak tree / castle tower with `!design` counter, quarter turn, dissolve; 20s loop. |
+| snake | **Done and verified (batch 2).** Star snake over a dimmed field, 3 generations (crash, self-bite, long accent finish) with gen/length/best label; ~22s loop. |
+| rag | **Done and verified (batch 2).** Radar sweep from a query star, 5 planets with moons, ranked top-5, judge strikes a hallucination; 22.5s loop. |
 | arbitrage | Written (228 lines). It may have hit browser caching; hard-reload or add a `?v=` cache buster. |
 | audiobook | Written (226 lines), not verified. |
 | ark-eagle | Written (254 lines), not verified. |
