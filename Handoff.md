@@ -27,9 +27,9 @@ Each subagent was stopped while iterating. The files below are syntactically val
 | minecraft | **Done and verified (batch 2).** Stars build shaded voxel cottage / oak tree / castle tower with `!design` counter, quarter turn, dissolve; 20s loop. |
 | snake | **Done and verified (batch 2).** Star snake over a dimmed field, 3 generations (crash, self-bite, long accent finish) with gen/length/best label; ~22s loop. |
 | rag | **Done and verified (batch 2).** Radar sweep from a query star, 5 planets with moons, ranked top-5, judge strikes a hallucination; 22.5s loop. |
-| arbitrage | Written (228 lines). It may have hit browser caching; hard-reload or add a `?v=` cache buster. |
-| audiobook | Written (226 lines), not verified. |
-| ark-eagle | Written (254 lines), not verified. |
+| arbitrage | **Done and verified (batch 3).** 4 bookmaker stations beam odds into a ring gauge; stale line drops under 100%, gap lights, stakes return as "+2.6% locked"; 24s loop. |
+| audiobook | **Done and verified (batch 3).** Star book sheds lines through a 28-voice ring into a star waveform with chapter beacons; 24s loop. |
+| ark-eagle | **Done and verified (batch 3).** 7 day-orbits fill with 17 satellites; one drops out, scan auto-launches a replacement; 24s loop. |
 | arkproject | Written (231 lines), not verified. |
 | jobapply | Written (209 lines), not verified. |
 | sinai | Written (243 lines). Was checking the dark-theme system phase. |
