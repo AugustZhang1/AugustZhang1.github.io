@@ -1,141 +1,161 @@
 // In-galaxy animation for 'minecraft' (AI Builder). See anims/README.md for the API.
-// The galaxy's own stars leave the spiral, snap onto a voxel grid and assemble a small
-// build block by block, bottom layer up (each block a 2x2x2 cluster of stars). The build
-// turns slowly, holds, then dissolves back into the spiral. Three designs rotate.
+// The galaxy's own stars leave the spiral and snap onto a voxel grid: first a faint floor
+// lattice, then a small build placed block by block, bottom layer up. Each block is drawn
+// as the stars on its outer faces (a 2x2 patch per face), shaded by face direction, with
+// faces turned away from the viewer fading out, so the build reads as solid voxels.
+// The finished build turns, an accent wave climbs it, then the stars return to the spiral.
+// Three designs take turns, one per loop.
 GALAXY_ANIMS['minecraft'] = function (api) {
-  const { TAU, clamp, ease3, rng } = api;
+  const { clamp, ease3, rng } = api;
+  const smooth = x => { const u = clamp(x); return u * u * (3 - 2 * u); };
 
-  // ---- designs: lists of [x, y, z] voxels (y up), centred later ----
+  // ---- designs: integer voxels [x, y, z], y up ----
   function tower() {
     const v = [];
-    for (let x = 0; x < 7; x++) for (let z = 0; z < 7; z++) v.push([x, 0, z]);       // plinth
-    for (let y = 1; y <= 7; y++)
-      for (let x = 1; x < 6; x++) for (let z = 1; z < 6; z++) {
-        const edge = x === 1 || x === 5 || z === 1 || z === 5;
-        if (!edge) continue;
-        if (z === 5 && x === 3 && y <= 2) continue;                                    // door
-        if ((y === 4 || y === 5) && x === 3 && (z === 1 || z === 5)) continue;          // windows
-        if ((y === 4 || y === 5) && z === 3 && (x === 1 || x === 5)) continue;
-        v.push([x, y, z]);
-      }
-    for (let x = 1; x < 6; x++) for (let z = 1; z < 6; z++) {                           // battlements
+    for (let x = 0; x < 7; x++) for (let z = 0; z < 7; z++) v.push([x, 0, z]);          // plinth
+    for (let y = 1; y <= 6; y++) for (let x = 1; x < 6; x++) for (let z = 1; z < 6; z++) {
+      if (z === 5 && x === 3 && y <= 2) continue;                                         // door
+      if (y === 4 && x === 3 && z === 1) continue;                                        // windows
+      if (y === 4 && z === 3 && (x === 1 || x === 5)) continue;
+      v.push([x, y, z]);
+    }
+    for (let x = 1; x < 6; x++) for (let z = 1; z < 6; z++) {                              // battlements
       const edge = x === 1 || x === 5 || z === 1 || z === 5;
-      if (edge && (x + z) % 2 === 0) v.push([x, 8, z]);
+      if (edge && (x + z) % 2 === 0) v.push([x, 7, z]);
     }
     return { name: 'castle tower', v };
   }
   function tree() {
     const v = [];
-    for (let y = 0; y < 6; y++) v.push([0, y, 0]);
-    for (let y = 3; y <= 8; y++)
-      for (let x = -3; x <= 3; x++) for (let z = -3; z <= 3; z++) {
-        if (x === 0 && z === 0 && y < 6) continue;
-        const d = Math.hypot(x, (y - 5.6) * 1.15, z);
-        if (d > 3.1) continue;
-        if (d > 2.2 && ((x * 7 + y * 3 + z * 5) & 3) === 0) continue;                  // ragged edge
-        v.push([x, y, z]);
-      }
+    for (let y = 0; y < 5; y++) v.push([0, y, 0]);                                        // trunk
+    for (let y = 3; y <= 7; y++) for (let x = -3; x <= 3; x++) for (let z = -3; z <= 3; z++) {
+      if (x === 0 && z === 0 && y < 5) continue;
+      const d = Math.hypot(x, (y - 5) * 1.25, z);
+      if (d > 3.05) continue;
+      if (d > 2.3 && ((x * 7 + y * 3 + z * 5) & 3) === 0) continue;                       // ragged edge
+      v.push([x, y, z]);
+    }
     return { name: 'oak tree', v };
   }
-  function statue() {
-    const v = [], box = (x0, x1, y0, y1, z0, z1) => {
-      for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) for (let z = z0; z <= z1; z++) v.push([x, y, z]);
-    };
-    box(0, 4, 0, 0, -1, 2);      // pedestal
-    box(1, 1, 1, 4, 0, 1);       // left leg
-    box(3, 3, 1, 4, 0, 1);       // right leg
-    box(1, 3, 5, 8, 0, 1);       // torso
-    box(0, 0, 5, 8, 0, 1);       // arms
-    box(4, 4, 5, 8, 0, 1);
-    box(1, 3, 9, 11, -0.5, 1.5); // head (3x3x3, centred on the torso)
-    return { name: 'voxel statue', v: v.map(p => [p[0], p[1], Math.round(p[2] * 2) / 2]) };
+  function house() {
+    const v = [];
+    for (let x = 0; x < 7; x++) for (let z = 0; z < 5; z++) for (let y = 0; y < 3; y++) {
+      if (z === 4 && x === 3 && y <= 1) continue;                                         // door
+      if (y === 1 && (x === 1 || x === 5) && (z === 0 || z === 4)) continue;               // windows
+      v.push([x, y, z]);
+    }
+    for (let y = 3; y <= 5; y++) {                                                         // pitched roof
+      const h = y - 3;
+      for (let x = -1; x <= 7; x++) for (let z = h - 1; z <= 5 - h; z++) v.push([x, y, z]);
+    }
+    v.push([5, 6, 2], [5, 7, 2]);                                                          // chimney
+    return { name: 'cottage', v };
   }
-  const DESIGNS = [tower(), tree(), statue()];
+  const DESIGNS = [house(), tree(), tower()];
 
-  // ---- star budget: up to 8 stars per block (corners of a small cube) ----
-  const MAXS = 1600;
-  const sub = [];
-  for (let i = 0; i < 8; i++) sub.push([(i & 1) ? 0.17 : -0.17, (i & 2) ? 0.17 : -0.17, (i & 4) ? 0.17 : -0.17]);
+  // Six face directions; bottom faces are never seen from above, so they are skipped.
+  const DIRS = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, 0, 1], [0, 0, -1]];
+  const L = [-0.55, 0.75, -0.35];                                                          // light, upper left
+  const LN = Math.hypot(L[0], L[1], L[2]);
 
-  // Ordered so blocks go bottom layer up, sweeping around each layer like a print head.
   function prepare(d) {
+    const key = (x, y, z) => x + ',' + y + ',' + z;
+    const has = new Set(d.v.map(p => key(p[0], p[1], p[2])));
     let mx = 0, mz = 0;
     d.v.forEach(p => { mx += p[0]; mz += p[2]; });
     mx /= d.v.length; mz /= d.v.length;
-    const blocks = d.v.map(p => ({ x: p[0] - mx, y: p[1], z: p[2] - mz }));
-    blocks.forEach(b => { b.o = b.y * 100 + (Math.atan2(b.z, b.x) + Math.PI) * 3 + Math.hypot(b.x, b.z) * 0.01; });
-    blocks.sort((a, b) => a.o - b.o);
     let top = 0, ext = 0;
-    blocks.forEach(b => { top = Math.max(top, b.y); ext = Math.max(ext, Math.abs(b.x), Math.abs(b.z)); });
+    const blocks = d.v.map(p => {
+      const b = { x: p[0] - mx, y: p[1], z: p[2] - mz, faces: [] };
+      DIRS.forEach((n, fi) => { if (!has.has(key(p[0] + n[0], p[1] + n[1], p[2] + n[2]))) b.faces.push(fi); });
+      top = Math.max(top, b.y); ext = Math.max(ext, Math.hypot(b.x, b.z));
+      return b;
+    }).filter(b => b.faces.length);                                                        // hidden blocks need no stars
+    // Bottom layer up, sweeping round each layer like a print head.
+    blocks.forEach(b => { b.o = b.y * 100 + (Math.atan2(b.z, b.x) + Math.PI) * 3; });
+    blocks.sort((a, b) => a.o - b.o);
     d.blocks = blocks; d.top = top; d.ext = ext;
   }
   DESIGNS.forEach(prepare);
 
   // ---- timeline (seconds) ----
-  const T_GRID = 1.6, T_BUILD = 9, T_HOLD = 5, T_OUT = 2.6, T_REST = 1.2, FLY = 1.1;
-  const LOOP = T_GRID + T_BUILD + T_HOLD + T_OUT + T_REST;
+  const T_GRID = 1.8, T_BUILD = 9, FLY = 1.1, T_HOLD = 5.4, T_OUT = 2.6, T_REST = 1.2;
+  const T_DONE = T_GRID + T_BUILD + FLY;                                                  // last block lands
+  const T_BACK = T_GRID + T_BUILD + T_HOLD;                                               // dissolve starts
+  const LOOP = T_BACK + T_OUT + T_REST;                                                   // 20.0 s
+  const MAXS = 2600, FS = 0.31;                                                          // 3x3 stars per face, FS apart
 
-  let t = 0, di = 0, yaw = 0.6;
-  let P = null;            // per-design plan
+  let t = 0, di = 0, yaw = 0.35, P = null;
   function plan() {
-    const d = DESIGNS[di];
-    const nb = d.blocks.length;
-    const per = Math.max(1, Math.min(8, Math.floor((MAXS - 140) / nb)));
-    const pts = [];        // { bx, by, bz, block, k }
+    const d = DESIGNS[di], nb = d.blocks.length;
+    const pts = [];
     d.blocks.forEach((b, i) => {
-      for (let k = 0; k < per; k++) {
-        const s = per === 8 ? sub[k] : sub[[0, 7, 3, 4, 1, 6, 2, 5][k]];
-        pts.push({ x: b.x + s[0], y: b.y + s[1], z: b.z + s[2], blk: i, at: T_GRID + (i / nb) * T_BUILD + rng() * 0.12 });
-      }
+      const at = T_GRID + (i / nb) * T_BUILD;
+      b.faces.forEach(fi => {
+        const n = DIRS[fi];
+        // two in-face axes
+        const u = n[0] ? [0, 1, 0] : [1, 0, 0], w = n[2] ? [0, 1, 0] : [0, 0, 1];
+        const lit = Math.max(0, (n[0] * L[0] + n[1] * L[1] + n[2] * L[2]) / LN);
+        for (let a = -1; a <= 1; a++) for (let c = -1; c <= 1; c++) {
+          pts.push({
+            x: b.x + n[0] * 0.5 + (u[0] * a + w[0] * c) * FS,
+            y: b.y + n[1] * 0.5 + (u[1] * a + w[1] * c) * FS,
+            z: b.z + n[2] * 0.5 + (u[2] * a + w[2] * c) * FS,
+            n, lit, h: b.y, at: at + rng() * 0.15, curv: (rng() - 0.5) * 0.5
+          });
+        }
+      });
     });
-    // floor lattice (the voxel grid) under the build
+    // floor lattice: the voxel grid under the build (cell corners)
     const g = Math.ceil(d.ext) + 2, floor = [];
     for (let x = -g; x <= g; x++) for (let z = -g; z <= g; z++) {
-      const r = Math.hypot(x, z) / (g + 0.5);
+      const r = Math.hypot(x, z) / (g + 0.3);
       if (r > 1) continue;
-      floor.push({ x, y: -0.5, z, fade: 1 - r * r, at: rng() * T_GRID * 0.7 });
+      floor.push({ x: x + 0.5, z: z + 0.5, fade: 1 - r * r, at: 0.3 + r * 0.9 + rng() * 0.2 });
     }
-    // random galaxy stars for each target, without repeats
     const need = pts.length + floor.length;
     const idx = [];
     for (let i = 0; i < need; i++) idx.push(i);
     for (let i = need - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); const tmp = idx[i]; idx[i] = idx[j]; idx[j] = tmp; }
-    // spread the picks over the whole available pool rather than only the innermost stars
-    P = { d, nb, per, pts, floor, need, idx, curv: pts.map(() => (rng() - 0.5) * 0.6) };
+    P = { d, nb, pts, floor, need, idx };
   }
   plan();
 
+  const q = [0, 0, 0];
   const self = {
     spiralDim: 0,
     update(dt) {
       t += dt;
-      yaw += dt * (t > T_GRID + T_BUILD ? 0.28 : 0.16);
       if (t >= LOOP) { t -= LOOP; di = (di + 1) % DESIGNS.length; plan(); }
+      // slow drift while building, kept clear of the flat side-on view; then a calm quarter turn
+      yaw = 0.35 + 0.035 * t + (Math.PI / 2) * smooth((t - T_DONE - 0.5) / 3.6);
       // spiral fades as the stars are drawn out, returns during the dissolve
-      const tin = clamp(t / 1.4), tout = clamp((t - (T_GRID + T_BUILD + T_HOLD)) / T_OUT);
-      self.spiralDim = 0.9 * ease3(tin) * (1 - ease3(tout));
+      self.spiralDim = 0.9 * smooth(t / 1.4) * (1 - smooth((t - T_BACK) / T_OUT));
     },
     draw(ctx, cx, cy, R, alpha) {
       if (alpha < 0.01 || !P) return;
-      const S = api.stars(MAXS), cols = api.colors(), acc = api.accent();
+      const S = api.stars(MAXS), pool = S.n;
+      if (pool < 1) return;
+      const cols = api.colors(), acc = api.accent(), dark = api.dark();
       const d = P.d;
-      const pool = S.n;
-      // block size so the build (plus floor) fits within ~0.95 R tall and wide
-      const s = Math.min(R * 1.2 / (d.top + 2.5), R * 0.95 / (Math.ceil(d.ext) + 2.5));
-      const el = 0.5, ce = Math.cos(el), se = Math.sin(el);
+      // block size so the build (and floor) fits the galaxy at any turn
+      const s = Math.min(R * 1.25 / (d.top + 3), R * 1.5 / (2 * d.ext + 4));
+      const el = 0.55, ce = Math.cos(el), se = Math.sin(el);
       const cyaw = Math.cos(yaw), syaw = Math.sin(yaw);
-      const oy = cy + (d.top + 1) * s * ce * 0.5;        // vertical centring of the build
-      const proj = (x, y, z, out) => {
+      const oy = cy + (d.top + 1) * s * ce * 0.5;                                          // centre the build vertically
+      const proj = (x, y, z) => {
         const rx = x * cyaw - z * syaw, dz = x * syaw + z * cyaw;
-        out[0] = cx + rx * s; out[1] = oy - y * s * ce - dz * s * se; out[2] = dz;
+        q[0] = cx + rx * s; q[1] = oy - (y + 0.5) * s * ce - dz * s * se; q[2] = dz;
       };
-      const tb = T_GRID + T_BUILD + T_HOLD;
-      const back = ease3(clamp((t - tb) / T_OUT));       // 0 built .. 1 returned to the spiral
-      const vis = alpha * (1 - clamp((t - tb - T_OUT * 0.75) / (T_OUT * 0.25)));
-      const q = [0, 0, 0];
+      const back = smooth((t - T_BACK) / T_OUT);                                          // 0 built .. 1 back in the spiral
+      const vis = alpha * (1 - smooth((t - T_BACK - T_OUT * 0.7) / (T_OUT * 0.3)));
+      const wait = self.spiralDim / 0.9;                                                   // how far the spiral has dimmed
       const step = Math.max(1, Math.floor(pool / P.need));
       const star = i => (P.idx[i] * step) % pool;
-      const r0 = Math.max(0.9, Math.min(1.7, s * 0.075));
+      const sq = clamp(s * 0.1, 1.3, 2.2);                                               // star size on the build
+
+      ctx.save();
+      ctx.globalCompositeOperation = dark ? 'lighter' : 'source-over';
 
       // floor lattice
       const fl = P.floor, base = P.pts.length;
@@ -143,54 +163,61 @@ GALAXY_ANIMS['minecraft'] = function (api) {
         const f = fl[i], j = star(base + i);
         const gx = S.x[j], gy = S.y[j];
         if (gx < -1e3) continue;
-        const k = ease3(clamp((t - f.at) / 1.0)) * (1 - back);
-        proj(f.x, f.y, f.z, q);
+        const k = ease3((t - f.at) / 1.0) * (1 - back);
+        proj(f.x, -0.5, f.z);
         const x = gx + (q[0] - gx) * k, y = gy + (q[1] - gy) * k;
-        api.dot(ctx, x, y, r0 * 0.8, cols[1], vis * mixA(0.45 * self.spiralDim / 0.9, 0.3 * f.fade + 0.08, k));
+        const a = vis * ((1 - k) * 0.4 * wait + k * (0.12 + 0.3 * f.fade));
+        api.dot(ctx, x, y, 0.9, cols[1], a);
       }
 
       // block stars
-      let placed = 0;
-      const pts = P.pts, per = P.per;
+      const tc = t - T_DONE, wave = tc > 0 && tc < 2.6 && back === 0;
+      const pts = P.pts;
       for (let i = 0; i < pts.length; i++) {
         const p = pts[i], j = star(i);
         const gx = S.x[j], gy = S.y[j];
         if (gx < -1e3) continue;
         const u = clamp((t - p.at) / FLY), k = ease3(u) * (1 - back);
-        if (u >= 1 && i % per === 0) placed++;
-        proj(p.x, p.y, p.z, q);
-        // gentle arc in flight
-        const nx = -(q[1] - gy) * P.curv[i], ny = (q[0] - gx) * P.curv[i];
-        const w = 1 - Math.abs(2 * k - 1);
-        let x = gx + (q[0] - gx) * k + nx * w * 0.5, y = gy + (q[1] - gy) * k + ny * w * 0.5;
-        // shading: top of the build lighter, near faces brighter
-        const h = p.y / (d.top + 1), near = clamp(0.5 - q[2] / (2 * (d.ext + 1)));
-        let col = cols[k > 0.5 ? (h > 0.6 ? 3 : 2) : S.b[j]];
-        let a;
-        if (u <= 0) a = 0.4 * self.spiralDim / 0.9;                   // still in the spiral, waiting
-        else a = mixA(0.6, 0.45 + 0.5 * near, k);
-        // completion moment: a soft accent wave climbs the finished build
-        const tc = t - (T_GRID + T_BUILD + FLY);
-        if (tc > 0 && tc < 2.2 && back === 0) {
-          const wv = Math.exp(-Math.pow((h - tc / 1.6) * 6, 2));
-          col = mixC(col, acc, wv * 0.85);
-          a = Math.min(1, a + wv * 0.3);
+        if (u <= 0) {                                                                      // still in the spiral, waiting
+          api.dot(ctx, gx, gy, 0.9, cols[S.b[j]], vis * 0.4 * wait);
+          continue;
         }
-        api.dot(ctx, x, y, r0 * (u > 0 && u < 1 ? 1.15 : 1), col, vis * a);
+        proj(p.x, p.y, p.z);
+        // gentle arc in flight
+        const cv = p.curv * (1 - Math.abs(2 * k - 1)) * 0.5;
+        const x = gx + (q[0] - gx) * k - (q[1] - gy) * cv, y = gy + (q[1] - gy) * k + (q[0] - gx) * cv;
+        // face shading: faces turned away fade out, lit faces brighter
+        const n = p.n, ndz = n[0] * syaw + n[2] * cyaw;
+        const facing = smooth((n[1] * se - ndz * ce + 0.05) / 0.35);
+        const shade = n[1] > 0 ? 1 : 0.35 + 0.8 * p.lit;
+        let col = k > 0.5 ? (n[1] > 0 ? cols[3] : p.lit > 0.3 ? cols[2] : cols[1]) : cols[S.b[j]];
+        let a = (1 - k) * 0.6 + k * facing * (0.2 + 0.8 * shade);
+        // completion: a soft accent wave climbs the finished build
+        if (wave) {
+          const wv = Math.exp(-Math.pow((p.h / (d.top + 1) - (tc / 2.0 - 0.15)) * 5, 2));
+          col = mixC(col, acc, wv * 0.9);
+          a = Math.min(1, a + wv * 0.25 * facing);
+        }
+        a *= vis * (dark ? 1 : 0.95);
+        if (a < 0.01) continue;
+        const r = u < 1 ? sq * 1.1 : sq;
+        ctx.fillStyle = api.rgba(col, clamp(a));
+        ctx.fillRect(x - r / 2, y - r / 2, r, r);
       }
+      ctx.restore();
 
-      // counter + label, small mono, below the build
-      const la = vis * clamp(t / 1.2) * (1 - back);
+      // command + block counter, small mono, below the build
+      const la = vis * smooth(t / 1.2) * (1 - back);
       if (la > 0.01) {
-        const ty = oy + (Math.ceil(d.ext) + 2) * s * se + 22;
-        const done = t > T_GRID + T_BUILD + FLY && t < T_GRID + T_BUILD + FLY + 1.6;
-        const n = Math.min(P.nb, placed);
-        api.text(ctx, '/build ' + d.name, cx, ty, cols[2], la * 0.7);
-        api.text(ctx, String(n).padStart(4, '0') + ' / ' + P.nb + ' blocks', cx, ty + 15, done ? acc : cols[3], la * 0.85);
+        let placed = 0;
+        for (let i = 0; i < P.nb; i++) if (t >= T_GRID + (i / P.nb) * T_BUILD + FLY) placed++;
+        const ty = oy + (d.ext + 1.5) * s * se + 26;
+        const done = t >= T_DONE && t < T_DONE + 2.4;
+        api.text(ctx, '!design ' + d.name, cx, ty, cols[2], la * 0.7);
+        api.text(ctx, placed + ' / ' + P.nb + ' blocks', cx, ty + 15, done ? acc : cols[3], la * 0.8);
       }
     }
   };
-  function mixA(a, b, k) { return a + (b - a) * k; }
   function mixC(c1, c2, k) { return [c1[0] + (c2[0] - c1[0]) * k, c1[1] + (c2[1] - c1[1]) * k, c1[2] + (c2[2] - c1[2]) * k]; }
   return self;
 };
