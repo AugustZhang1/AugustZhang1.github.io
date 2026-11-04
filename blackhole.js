@@ -11,6 +11,7 @@ window.createBlackHole = function (canvas, onLost) {
   const MAX_PIXELS = 2.4e6;   // about 8 ms on an integrated Intel Arc at the heaviest zoom
   const MIN_QUALITY = .5;     // lowest resolution, as a share of full width and height
   const SLOW_MS = 22, CALM_MS = 19;   // median frame times that lower and allow raising it
+  const ROCK_START = 8.5, ROCK_CYCLE = 26;   // where the rock appears, and seconds between rocks
   const prefersReduced = matchMedia('(prefers-reduced-motion: reduce)');
   let reduced = prefersReduced.matches;
   const diagnostics = window.__blackhole = { ready:false, state:'far', distance:FAR_DISTANCE, goal:FAR_DISTANCE, elevation:0, azimuth:0, frames:0, frameMs:0, gpuMs:0, gpuSamples:0, gpuAvailable:false, internalResolution:'', quality:1 };
@@ -36,7 +37,7 @@ window.createBlackHole = function (canvas, onLost) {
     const float PI=3.14159265, TAU=6.28318531;
     const float R_OUT=7.2;       // outer edge of the disc, Rs=1
     const float STEP=PI/22.;     // RK4 step in orbit angle
-    const float ROCK_R=.012;
+    const float ROCK_R=.1;
 
     float hash21(vec2 p){ p=fract(p*vec2(123.34,456.21)); p+=dot(p,p+45.32); return fract(p.x*p.y); }
     float hash31(vec3 p){ p=fract(p*0.1031); p+=dot(p,p.yzx+33.33); return fract((p.x+p.y)*p.z); }
@@ -148,7 +149,9 @@ window.createBlackHole = function (canvas, onLost) {
       // The rock is only tested on rays whose plane passes through it.
       float rockGap=abs(dot(uRock,nrm)), rockFoot=pixel*length(uRock-uCam);
       float rockPhi=atan(dot(uRock,e2),dot(uRock,e1)); if(rockPhi<0.) rockPhi+=TAU;
-      bool rockNear=rockGap<ROCK_R*1.3+rockFoot;
+      // It fades up as it drifts in from the dark, and shrinks away at the shadow.
+      float rockDist=length(uRock), rockR=ROCK_R*smoothstep(1.3,2.2,rockDist)*(1.-smoothstep(7.5,8.5,rockDist));
+      bool rockNear=rockGap<rockR*1.3+rockFoot;
 
       float lum=0., trans=1.;
       light=0.; skyTrans=0.; skyDir=vec3(0);
@@ -167,11 +170,16 @@ window.createBlackHole = function (canvas, onLost) {
           if(s.x>.8){ light=1.-exp(-1.3*lum); return; }
           if(rockNear && phi>=rockPhi){
             vec4 rs=rk4(prev,rockPhi-(phi-h));
-            vec3 hit=(cos(rockPhi)*e1+sin(rockPhi)*e2)/rs.x;
-            float size=ROCK_R*(.82+.25*noise(hit.xz*22.)), gap=length(hit-uRock);
+            vec3 out1=cos(rockPhi)*e1+sin(rockPhi)*e2, side=-sin(rockPhi)*e1+cos(rockPhi)*e2;
+            // The ray is straight at the rock's scale, so take its nearest point to the centre.
+            vec3 dir=normalize(side-out1*rs.y/rs.x), hit=out1/rs.x;
+            vec3 off=hit+dir*dot(uRock-hit,dir)-uRock;
+            float size=rockR*(.82+.25*noise(off.xy/ROCK_R*1.8+off.z/ROCK_R)), gap=length(off);
             float cover=(1.-smoothstep(size-rockFoot,size+rockFoot,gap))*min(1.,size*size/(rockFoot*rockFoot+1e-9));
+            vec3 normal=normalize(off-dir*sqrt(max(size*size-gap*gap,0.)));
             vec3 toDisc=normalize(-uRock+vec3(0.,.34,0.));
-            float lit=.08+2.2*max(dot(normalize(hit-uRock),toDisc),0.);
+            // Lit by the disc, then glowing from the heat as it nears the hole.
+            float lit=.08+2.2*max(dot(normal,toDisc),0.)+2.5*(1.-smoothstep(1.6,3.2,rockDist));
             lum+=.4*lit*cover*trans; trans*=1.-cover;
             rockPhi+=TAU;
           }
@@ -281,7 +289,7 @@ window.createBlackHole = function (canvas, onLost) {
   // Zoom lives in log distance. zoomGoal is what input moves; zoom follows it with
   // the live site's exponential ease. A flight only drives the goal, so any input
   // can take over mid-flight with no jump.
-  let running=false, azimuth=0, elevation=.045, zoom=Math.log(FAR_DISTANCE), zoomGoal=zoom, flight=null, last=performance.now(), simTime=0, drift=0;
+  let running=false, azimuth=0, elevation=.045, zoom=Math.log(FAR_DISTANCE), zoomGoal=zoom, flight=null, last=performance.now(), simTime=12, drift=0;   // 12 s in, so the first rock is already on its way
   function zoomBy(delta){ flight=null; zoomGoal=clamp(zoomGoal+delta*(1-.45*closeness(zoomGoal)),LOG_MIN,LOG_MAX); if(reduced) zoom=zoomGoal; }
   function flyTo(distance,duration){ const to=Math.log(distance); if(reduced){ flight=null; zoom=zoomGoal=to; return; } flight={from:zoomGoal,to,duration,start:performance.now()}; }
   function toggle(){ const requested=flight?flight.to:zoomGoal; if(requested<Math.log(20)) flyTo(FAR_DISTANCE,5200); else flyTo(NEAR_DISTANCE,6900); }
@@ -344,8 +352,10 @@ window.createBlackHole = function (canvas, onLost) {
     }
     let gpuActive=false;
     if(gpuExt && !gpuQuery){ gpuQuery=gl.createQuery(); gl.beginQuery(gpuExt.TIME_ELAPSED_EXT,gpuQuery); gpuActive=true; }
-    const view=camera(), rockAngle=1.2+simTime*.16;
-    gl.uniform2f(loc.uResolution,canvas.width,canvas.height); gl.uniform1f(loc.uTime,simTime); gl.uniform3fv(loc.uCam,view.cam); gl.uniformMatrix3fv(loc.uBasis,false,view.basis); gl.uniform1f(loc.uFov,view.fov); gl.uniform2fv(loc.uShift,shift); gl.uniform3f(loc.uRock,Math.cos(rockAngle)*4.05,.13*Math.sin(rockAngle),Math.sin(rockAngle)*4.05); gl.drawArrays(gl.TRIANGLES,0,3);
+    const view=camera();
+    // The rock spirals in, faster as it falls, then the next one starts somewhere else.
+    const rockRadius=Math.sqrt(Math.max(ROCK_START**2-3*(simTime%ROCK_CYCLE),1)), rockAngle=1.2+2.4*Math.floor(simTime/ROCK_CYCLE)+5.6*(Math.sqrt(ROCK_START)-Math.sqrt(rockRadius));
+    gl.uniform2f(loc.uResolution,canvas.width,canvas.height); gl.uniform1f(loc.uTime,simTime); gl.uniform3fv(loc.uCam,view.cam); gl.uniformMatrix3fv(loc.uBasis,false,view.basis); gl.uniform1f(loc.uFov,view.fov); gl.uniform2fv(loc.uShift,shift); gl.uniform3f(loc.uRock,Math.cos(rockAngle)*rockRadius,.03*rockRadius*Math.sin(rockAngle),Math.sin(rockAngle)*rockRadius); gl.drawArrays(gl.TRIANGLES,0,3);
     if(gpuActive) gl.endQuery(gpuExt.TIME_ELAPSED_EXT);
     requestAnimationFrame(draw); }
 

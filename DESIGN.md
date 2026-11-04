@@ -45,7 +45,7 @@ Each animation is **made of that galaxy's own stars**, which leave the spiral an
 | Video To Reels | Stars pour into a tall phone frame and fill its screen as a dot-matrix picture; a swipe sends the reel up, and a star "most replayed" curve lifts its peak, which becomes the next 30 s reel. |
 | Calendar Clerk | An email made of star lines drifts into an extraction ring; the date and title stars split out and land on a star calendar grid as a draft event, which lights only once an approval star is pressed. |
 | AI Snake Game | Stars leave the spiral to build a Snake board, then a star-ribbon snake plays three training games for one food star at a time: random moves at game 1, steadier at game 40, and no random moves by game 80. |
-| Desktop Pet (black hole) | Opening it fades into a full-screen ray-traced black hole, with a small rock orbiting the disc. Scroll zooms toward the pointer, drag orbits, and click flies in. Resolution drops by itself on weak GPUs. Without WebGL2 the 2D hole stays. |
+| Desktop Pet (black hole) | Opening it fades into a full-screen ray-traced black hole, with a small rock that spirals in, glows and vanishes at the shadow, then another follows. Scroll zooms toward the pointer, drag orbits, and click flies in. Resolution drops by itself on weak GPUs. Without WebGL2 the 2D hole stays. |
 
 ## Ruled out
 - All earlier mockup rounds (rejected and removed; see git history).
