@@ -104,7 +104,7 @@ window.createBlackHole = function (canvas, onLost) {
     }
 
     // A thin slab. fr and fa are the pixel footprint in ln(r) and in turns.
-    void discMaterial(float r, float a, float fr, float fa, float order, out float tau, out float source){
+    void discMaterial(float r, float a, float fr, float fa, out float tau, out float source){
       float rf=fr*r;
       float inner=smoothstep(1.34-rf,1.66+rf,r), outer=1.-smoothstep(2.8,7.2,r); outer*=outer;
       float gas=exp(1.6*gasField(a,log(r),fr,fa));
@@ -112,9 +112,6 @@ window.createBlackHole = function (canvas, onLost) {
       tau=.7*fall*sqrt(fall)*inner*outer*gas;
       // Broad patches of brighter gas riding the flow, so the disc shimmers as it turns.
       source=3.6*fall*fall*fall*gas*(.7+.6*gasOctave(a,log(r),3.,5.,131u));
-      // Light that has already crossed the plane once forms the lower arc. Keep
-      // only the hot inner edge there so that arc stays thin against the shadow.
-      source*=mix(1.,1.6*(1.-smoothstep(1.5,2.05,r)),min(order,1.));
     }
     // Colour follows intensity: each channel rises on its own curve through gold to
     // white-hot, and green and blue never fall below amber's share of red, so dim
@@ -192,7 +189,7 @@ window.createBlackHole = function (canvas, onLost) {
           float fr=(abs(s.z)*pixel+abs(s.y*dphi)*tangent)*r;
           float fa=abs(dot(dphi*T+sp*nrm,az))*tangent/TAU;
           float tau, source;
-          discMaterial(r,atan(R.z,R.x)/TAU+.5,fr,fa,float(k),tau,source);
+          discMaterial(r,atan(R.z,R.x)/TAU+.5,fr,fa,tau,source);
           float cosI=abs(T.y)*s.x/max(length(s.xy),1e-6);
           float depth=tau/max(cosI,.03);
           float seen=exp(-depth);
@@ -284,7 +281,7 @@ window.createBlackHole = function (canvas, onLost) {
   // Zoom lives in log distance. zoomGoal is what input moves; zoom follows it with
   // the live site's exponential ease. A flight only drives the goal, so any input
   // can take over mid-flight with no jump.
-  let running=false, azimuth=0, elevation=.11, zoom=Math.log(FAR_DISTANCE), zoomGoal=zoom, flight=null, last=performance.now(), simTime=0, drift=0;
+  let running=false, azimuth=0, elevation=.045, zoom=Math.log(FAR_DISTANCE), zoomGoal=zoom, flight=null, last=performance.now(), simTime=0, drift=0;
   function zoomBy(delta){ flight=null; zoomGoal=clamp(zoomGoal+delta*(1-.45*closeness(zoomGoal)),LOG_MIN,LOG_MAX); if(reduced) zoom=zoomGoal; }
   function flyTo(distance,duration){ const to=Math.log(distance); if(reduced){ flight=null; zoom=zoomGoal=to; return; } flight={from:zoomGoal,to,duration,start:performance.now()}; }
   function toggle(){ const requested=flight?flight.to:zoomGoal; if(requested<Math.log(20)) flyTo(FAR_DISTANCE,5200); else flyTo(NEAR_DISTANCE,6900); }
@@ -369,16 +366,25 @@ window.createBlackHole = function (canvas, onLost) {
   canvas.addEventListener('webglcontextlost',e=>{ e.preventDefault(); diagnostics.ready=running=false; onLost(); });
   diagnostics.elevation=elevation;
 
+  let closeFrom=null;
   return {
     ready,
     // Each visit starts from the far view.
     start(){
       if(running) return;
-      azimuth=0; elevation=.11; zoom=zoomGoal=Math.log(FAR_DISTANCE); flight=null; drift=0;
+      azimuth=0; elevation=.045; zoom=zoomGoal=Math.log(FAR_DISTANCE); flight=null; drift=0;
       aim[0]=aim[1]=cursor[0]=cursor[1]=0; frameTimes=[]; last=windowStart=calmSince=performance.now();
-      running=true; resize(); requestAnimationFrame(draw);
+      closeFrom=null; running=true; resize(); requestAnimationFrame(draw);
     },
     stop(){ running=false; },
+    // The fly-in and out: e runs from 0, matching the site's hole (rs is its shadow radius
+    // in CSS pixels), to 1 at the far view. Closing starts from however close you are.
+    follow(rs,e,closing){
+      const small=Math.log(Math.min(600,2.6*innerHeight/(1.06*Math.max(1,.95*canvas.height/canvas.width)*Math.max(rs,1))));
+      if(closing && closeFrom===null) closeFrom=zoom;
+      if(!closing) closeFrom=null;
+      flight=null; zoom=zoomGoal=small+((closing?closeFrom:Math.log(FAR_DISTANCE))-small)*e;
+    },
     // Screen point, in CSS pixels, the hole should sit on.
     centre(x,y){ shift[0]=(innerWidth-2*x)/innerHeight; shift[1]=2*y/innerHeight-1; }
   };

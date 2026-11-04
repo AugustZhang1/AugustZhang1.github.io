@@ -63,7 +63,7 @@
   #hole:active { cursor: grabbing; }
   /* The hole is always dark, so the text over it is too, even in the light theme. */
   .in-hole .top, .in-hole .crumbs { --bg: #05060a; --ink: #e9e9e7; --muted: #8f949c; color: var(--ink); }
-  .in-hole .detail { background: var(--bg); }
+  .in-hole .detail { background: var(--bg); -webkit-backdrop-filter: none; backdrop-filter: none; }   /* blurring the moving hole costs a lot of GPU */
 
   .top {
     position: fixed; top: 0; left: 0; right: 0;
@@ -1893,7 +1893,7 @@
   // Opening a galaxy flies the camera in; closing flies back out.
   // ---------------------------------------------------------------------
   const holeCv = document.getElementById('hole');
-  let blackHole = null, holeA = 0, holeShown = false;
+  let blackHole = null, holeA = 0, holeShown = false, holeFrom = [0, 0, 1];
   // Its shader builds in the background soon after load, so opening the project doesn't freeze.
   if (window.createBlackHole) setTimeout(() => { blackHole = window.createBlackHole(holeCv, () => { blackHole = null; }); }, 1500);
   function openProject(k) {
@@ -2823,16 +2823,29 @@
     });
     updateCrumbs();
 
-    // The 2D hole leads the zoom, then the ray trace fades in over it and takes over.
-    const inHole = !!blackHole && selected === 'pet' && sun < 0 && zt > 0.6 && blackHole.ready();
-    holeA = blackHole ? holeA + ((inHole ? 1 : 0) - holeA) * sm(4) : 0;
+    // The ray trace appears right over the 2D hole, at the same place and size, then flies
+    // straight to its spot beside the panel. Closing is the same in reverse: it stays solid
+    // until it is back over the 2D hole, then fades, so two holes never show at once. It
+    // takes its own path because the site's camera swings the hole off screen.
+    const inHole = !!blackHole && selected === 'pet' && sun < 0 && blackHole.ready();
+    if (!blackHole) holeA = 0;
+    else if (inHole) holeA += (1 - holeA) * sm(7);
+    else if (selected) holeA -= holeA * sm(7);   // moved on to another project or a star
+    else holeA = Math.min(holeA, sstep((zt - 0.02) / 0.13));
     const holeOn = !!blackHole && (inHole || holeA > 0.01);
     if (holeOn !== holeShown) {
       holeShown = holeOn;
       holeCv.style.display = holeOn ? 'block' : 'none';
       if (blackHole) { if (holeOn) blackHole.start(); else blackHole.stop(); }
+      if (holeOn) holeFrom = [GAL.pet.sx, GAL.pet.sy, GAL.pet.px * 0.2];
     }
-    if (holeOn) { holeCv.style.opacity = holeA; blackHole.centre(CX, CY); }
+    if (!inHole) holeFrom = [GAL.pet.sx, GAL.pet.sy, GAL.pet.px * 0.2];   // closing heads for where it is now
+    if (holeOn) {
+      holeCv.style.opacity = holeA;
+      const e = sstep(zt);
+      blackHole.centre(holeFrom[0] + (CX - holeFrom[0]) * e, holeFrom[1] + (CY - holeFrom[1]) * e);
+      if (zt < 0.995) blackHole.follow(holeFrom[2], e, !inHole);
+    }
     document.documentElement.classList.toggle('in-hole', holeA > 0.5);
     if (holeA > 0.995) { requestAnimationFrame(frame); return; }   // fully covered: skip the 2D draw
 
