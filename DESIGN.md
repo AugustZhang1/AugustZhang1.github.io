@@ -41,6 +41,7 @@ Each animation is **made of that galaxy's own stars**, which leave the spiral an
 | SenseWay | Stars form the logo, then a starlit crosswalk with LiDAR and GPS sensing, data streaming to a dashboard. |
 | Video To Reels | Stars pour into a tall phone frame and fill its screen as a dot-matrix picture; a swipe sends the reel up, and a star "most replayed" curve lifts its peak, which becomes the next 30 s reel. |
 | Calendar Clerk | An email made of star lines drifts into an extraction ring; the date and title stars split out and land on a star calendar grid as a draft event, which lights only once an approval star is pressed. |
+| AI Snake Game | Stars leave the spiral to build a Snake board, then a star-ribbon snake plays three training games for one food star at a time: random moves at game 1, steadier at game 40, and no random moves by game 80. |
 | Desktop Pet (black hole) | A small rock made of disc stars orbits the black hole and slowly spirals in; you can grab and fling it, and it always falls back. |
 
 ## Other prototypes (for comparison)
@@ -55,7 +56,7 @@ Each animation is **made of that galaxy's own stars**, which leave the spiral an
 ## Content decisions
 - Remove the Real-Time Chat and E-Hotel projects (their repos are private).
 - Private repos get no GitHub link (JobApply, RAG, Ark Eagle, ArkProject, Video To Reels, Calendar Clerk, Desktop Pet).
-- Trimmed Housing Price Prediction and AI Snake Game (weakest projects); their plugin files stay in `anims/` unused.
+- Trimmed Housing Price Prediction (weakest project); its plugin file stays in `anims/` unused. AI Snake Game is back in.
 - Education: Computer Engineering, University of Ottawa, Dec 2027.
 - Resume: AugustZhang_Resume_Final.pdf (from Desktop/Job; not in the repo yet, so the Resume link 404s until it's added).
 - Keep the GoatCounter script.

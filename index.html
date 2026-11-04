@@ -338,6 +338,7 @@
 <script src="anims/senseway.js"></script>
 <script src="anims/reels.js"></script>
 <script src="anims/clerk.js"></script>
+<script src="anims/snake.js"></script>
 <script src="anims/pet.js"></script>
 <script src="embeddings.js"></script>
 <script>
@@ -429,6 +430,9 @@
   { id: "clerk-01", project: "clerk", kind: "project", text: "Calendar Clerk turns pasted email text or selected Gmail messages into editable Google Calendar event drafts.", terms: ["Calendar Clerk", "Gmail", "Google Calendar", "email text", "event drafts"] },
   { id: "clerk-02", project: "clerk", kind: "project", text: "Groq strict structured output extracts event details and dateparser normalizes dates to your time zone.", terms: ["Groq", "dateparser", "structured output", "event details", "time zone"] },
   { id: "clerk-03", project: "clerk", kind: "project", text: "No event is created without explicit approval, and the browser never sees API keys or OAuth tokens.", terms: ["explicit approval", "API keys", "OAuth tokens", "browser"] },
+  { id: "snake-01", project: "snake", kind: "project", text: "A neural network teaches itself to play Snake with deep Q-learning, built in PyTorch.", terms: ["deep Q-learning", "PyTorch", "neural network", "Snake"] },
+  { id: "snake-02", project: "snake", kind: "project", text: "The agent reads 11 game-state inputs and a 256-unit hidden layer chooses one of 3 moves.", terms: ["11 inputs", "256 units", "3 moves"] },
+  { id: "snake-03", project: "snake", kind: "project", text: "It replays up to 100,000 remembered moves in batches of 1,000, and random exploration fades out over the first 80 games.", terms: ["replay memory", "100,000 moves", "exploration", "80 games"] },
   { id: "pet-01", project: "pet", kind: "project", text: "A draggable, transparent desktop pet Chrome extension that floats on every webpage and remembers its position.", terms: ["Chrome extension", "desktop pet", "draggable", "every webpage", "transparent"] },
   { id: "pet-02", project: "pet", kind: "project", text: "Unfinished: it lives in the black hole with the other half-built ideas.", terms: ["unfinished", "black hole", "half-built ideas"] }
   ];
@@ -527,6 +531,13 @@
       stats: [],
       tech: ['Python', 'FastAPI', 'Pydantic', 'Groq', 'Google OAuth', 'React', 'TypeScript', 'Vite', 'Pytest'],
       links: []
+    },
+    snake: {
+      label: 'AI Snake Game', title: 'AI Snake Game', cat: 'AI',
+      desc: 'A neural network that teaches itself to play Snake with deep Q-learning, built in PyTorch. It starts by moving at random, learns from up to 100,000 remembered moves, and stops exploring after about 80 games.',
+      stats: [['11', 'game-state inputs'], ['100K', 'moves of replay memory']],
+      tech: ['Python', 'PyTorch', 'NumPy'],
+      links: [['GitHub', 'https://github.com/AugustZhang1/PythonAI']]
     },
     pet: {
       label: 'Black hole: unfinished projects', title: 'Desktop Pet', cat: 'Unfinished',
@@ -1738,7 +1749,7 @@
   // dots in the galaxy palette and one accent for key moments.
   // Time only runs while you are inside. Reduced motion shows a static end state.
   // ---------------------------------------------------------------------
-  const ANIM_KEYS = ['league', 'minecraft', 'rag', 'arbitrage', 'audiobook', 'ark-eagle', 'medihub', 'arkproject', 'jobapply', 'sinai', 'senseway', 'reels', 'clerk', 'pet'];
+  const ANIM_KEYS = ['league', 'minecraft', 'rag', 'arbitrage', 'audiobook', 'ark-eagle', 'medihub', 'arkproject', 'jobapply', 'sinai', 'senseway', 'reels', 'clerk', 'snake', 'pet'];
   const PORTRAIT_KEYS = ['minecraft', 'league', 'sinai', 'senseway'];
   const MONO = '11px ui-monospace, "SF Mono", Menlo, Consolas, monospace';
   const ease3 = x => { const u = clamp(x); return 1 - Math.pow(1 - u, 3); };
@@ -2225,6 +2236,7 @@
     const inside = g.key === selected && sun < 0 ? zt : 0;
     const col = toneC(mix(g.ccol, pal.accent, g.acc * 0.35));
     const cFill = rgba(col, 0.95 * ga);
+    const quiet = inside > 0 && ANIMS[g.key] && ANIMS[g.key].quietChunks;
     ctx.globalCompositeOperation = dark ? 'lighter' : 'source-over';
     g.chunkIdx.forEach(i => {
       if (i === sun) return;   // the sun is drawn over its own star
@@ -2232,14 +2244,15 @@
       if (!toScreen(g, c.local[0], c.local[1], c.local[2])) return;
       const hot = hoverIdx === i;
       const hitStar = !hot && qT > 0.01 && hitSet.has(i);
-      if (inside > 0) {
+      if (inside > 0 && (!quiet || hot || hitStar)) {
         const breath = reduce ? 0 : Math.sin(t * TAU / 3.6 + i * 2.4);
         ctx.lineWidth = 0.75;
         ctx.strokeStyle = rgba(hot || hitStar ? pal.accent : col, (0.3 + 0.05 * breath) * ga * inside);
         ctx.beginPath(); ctx.arc(P[0], P[1], 6.5 + 0.5 * breath, 0, TAU); ctx.stroke();
       }
-      ctx.fillStyle = hot || hitStar ? rgba(pal.accent, ga) : cFill;
-      const r = ((hot ? 2.6 : hitStar ? 2.2 : 1.5) + 0.9 * inside) * clamp(P[2], 0.7, 1.4);
+      const calm = quiet && !hot && !hitStar;
+      ctx.fillStyle = hot || hitStar ? rgba(pal.accent, ga) : calm ? rgba(col, 0.3 * ga) : cFill;
+      const r = calm ? 1.2 : ((hot ? 2.6 : hitStar ? 2.2 : 1.5) + 0.9 * inside) * clamp(P[2], 0.7, 1.4);
       ctx.beginPath(); ctx.arc(P[0], P[1], r, 0, TAU); ctx.fill();
     });
     ctx.lineWidth = 1;

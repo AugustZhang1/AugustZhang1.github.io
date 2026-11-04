@@ -9,12 +9,12 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const GOLD = [
-  ['python', ['league', 'minecraft', 'rag', 'audiobook', 'jobapply', 'clerk'], ['league', 'minecraft', 'rag', 'audiobook', 'jobapply', 'clerk']],
+  ['python', ['league', 'minecraft', 'rag', 'audiobook', 'jobapply', 'clerk'], ['snake', 'league', 'minecraft', 'rag', 'audiobook', 'jobapply', 'clerk']],
   ['lidar', ['senseway'], ['senseway']],
   ['react', ['sinai', 'arkproject'], ['sinai', 'arkproject', 'clerk', 'league', 'ark-eagle']],
-  ['python postgres', ['rag'], ['rag', 'senseway', 'arbitrage', 'arkproject', 'ark-eagle', 'league', 'clerk', 'audiobook', 'minecraft', 'jobapply']],
+  ['python postgres', ['rag'], ['snake', 'rag', 'senseway', 'arbitrage', 'arkproject', 'ark-eagle', 'league', 'clerk', 'audiobook', 'minecraft', 'jobapply']],
   ['database', ['arbitrage', 'senseway'], ['arbitrage', 'senseway', 'arkproject', 'medihub', 'ark-eagle', 'rag', 'league']],
-  ['machine learning', ['league'], ['league', 'rag', 'minecraft', 'jobapply', 'clerk', 'audiobook']],
+  ['machine learning', ['league'], ['snake', 'league', 'rag', 'minecraft', 'jobapply', 'clerk', 'audiobook']],
   ['mobile app', ['medihub'], ['medihub', 'ark-eagle', 'senseway', 'arkproject']],
   ['chrome extension', ['reels', 'jobapply'], ['reels', 'pet', 'jobapply']],
   ['testing', ['sinai'], ['sinai', 'rag', 'clerk', 'ark-eagle']],
