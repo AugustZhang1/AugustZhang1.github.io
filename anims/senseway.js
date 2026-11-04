@@ -342,14 +342,24 @@ GALAXY_ANIMS['senseway'] = function (api) {
 
       // Minimal labels, only while the scene holds.
       if (ovA > 0.01) {
-        const tc = dark ? col[2] : col[3];
-        api.text(ctx, 'GPS', cx + SATS[1][0] * R, cy + (SATS[1][1] + 0.07) * R, tc, ovA * 0.55);
-        api.text(ctx, 'LiDAR', lx, ly - (LIDAR_R + 0.06) * R, tc, ovA * 0.5 * lOn * clamp((5 - s) / 1));
-        ctx.save(); ctx.font = api.mono; ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
-        ctx.fillStyle = api.rgba(tc, clamp(ovA * (dark ? 0.55 : 0.8)));
-        ctx.fillText('GPS track', cx + (DB_X0 + 0.05) * R, cy + (TR_Y - 0.08) * R);
+        const tc = dark ? col[3] : mix(col[3], api.ink, 0.6);
+        ctx.save();
+        ctx.font = '11px ui-monospace, "SF Mono", Menlo, Consolas, monospace';
+        ctx.textBaseline = 'middle';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = api.rgba(tc, clamp(ovA * (dark ? 0.82 : 0.9)));
+        ctx.fillText('GPS', cx + SATS[1][0] * R, cy + (SATS[1][1] + 0.07) * R);
+        const lOnA = clamp(ovA * (dark ? 0.75 : 0.85) * lOn * clamp((5 - s) / 1));
+        if (lOnA > 0.01) {
+          ctx.fillStyle = api.rgba(tc, lOnA);
+          ctx.fillText('LiDAR', lx, ly - (LIDAR_R + 0.06) * R);
+        }
+        ctx.textAlign = 'left';
+        ctx.fillStyle = api.rgba(tc, clamp(ovA * (dark ? 0.88 : 0.92)));
+        ctx.fillText('dashboard', cx + (DB_X0 + 0.05) * R, cy + (DB_Y0 + 0.05) * R);
+        ctx.fillText('GPS track', cx + (DB_X0 + 0.05) * R, cy + (TR_Y - 0.06) * R);
         ctx.fillText('LiDAR m', cx + (DB_X0 + 0.05) * R, cy + (SP_Y0 - SP_H - 0.07) * R);
-        ctx.fillText('dashboard', cx + DB_X0 * R, cy + (DB_Y0 - 0.06) * R);
+
         const sy = cy + (DB_Y1 - 0.08) * R;
         if (det > 0.01) {
           const pulse = onX ? 0.75 + 0.25 * Math.sin(T * 5) : 0.6;
@@ -357,8 +367,8 @@ GALAXY_ANIMS['senseway'] = function (api) {
           ctx.fillStyle = api.rgba(acc, clamp(ovA * det * 0.95));
           ctx.fillText('crosswalk detected', cx + (DB_X0 + 0.11) * R, sy);
         } else {
-          api.dot(ctx, cx + (DB_X0 + 0.07) * R, sy, 2.2, tc, ovA * 0.35);
-          ctx.fillStyle = api.rgba(tc, clamp(ovA * (dark ? 0.4 : 0.6)));
+          api.dot(ctx, cx + (DB_X0 + 0.07) * R, sy, 2.2, tc, ovA * (dark ? 0.5 : 0.65));
+          ctx.fillStyle = api.rgba(tc, clamp(ovA * (dark ? 0.72 : 0.82)));
           ctx.fillText('scanning', cx + (DB_X0 + 0.11) * R, sy);
         }
         ctx.restore();

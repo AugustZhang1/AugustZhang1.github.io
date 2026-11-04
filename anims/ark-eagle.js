@@ -123,8 +123,7 @@ GALAXY_ANIMS['ark-eagle'] = function (api) {
       if (!ready) { if (S.n < 200 || A < 0.995) return; init(S, cx, cy, R); }
       if (S.n < n) return;
       const dk = api.dark(), acc = api.accent();
-      // Light theme: deepen the toned palette so orbits and satellites read on paper.
-      const col = dk ? api.colors() : api.colors().map(q => api.mix(q, api.ink, 0.4));
+      const col = api.colors();
       const vis = self.spiralDim / 0.97;
       c.save();
       c.globalCompositeOperation = dk ? 'lighter' : 'source-over';
@@ -216,7 +215,7 @@ GALAXY_ANIMS['ark-eagle'] = function (api) {
         const hot = d === cd ? smooth((T - TC) / 0.5) * (1 - smooth((T - TDOCK - 1.6) / 0.8)) : 0;
         const tx = dk ? col[2] : col[3];                          // light: darker ink for text
         const cl = hot > 0.01 ? api.mix(tx, acc, hot) : tx;
-        c.fillStyle = api.rgba(cl, clamp(A * vis * f * (0.55 + 0.4 * hot)));
+        c.fillStyle = api.rgba(cl, clamp(A * vis * f * (0.75 + 0.25 * hot)));
         c.fillText(DAYS[d], lx, ly + 0.5);
       }
 
@@ -257,7 +256,7 @@ GALAXY_ANIMS['ark-eagle'] = function (api) {
         const [wx, wy] = P(RINGS - 1, Math.PI / 2);
         const short = T > TC + 0.3 && T < TDOCK;
         c.textAlign = 'center';
-        c.fillStyle = api.rgba(short ? acc : dk ? col[2] : col[3], clamp(A * vis * cf * (short ? 0.85 : 0.6)));
+        c.fillStyle = api.rgba(short ? acc : dk ? col[2] : col[3], clamp(A * vis * cf * (short ? 0.9 : 0.75)));
         c.fillText(filled + ' / ' + NSLOT + ' shifts filled', wx, wy + 30 * sz);
       }
       c.restore();

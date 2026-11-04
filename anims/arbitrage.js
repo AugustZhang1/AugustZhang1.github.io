@@ -199,7 +199,7 @@ GALAXY_ANIMS['arbitrage'] = function (api) {
 
       // Labels: each book's two prices, the gauge reading, the locked profit.
       ctx.globalCompositeOperation = 'source-over';
-      const ink = col[3], soft = dark ? col[2] : col[3];
+      const ink = col[3], soft = col[2];
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       const txt = (s, x, y, c, a, f) => { if (a < 0.01) return; ctx.font = f; ctx.fillStyle = api.rgba(c, clamp(a)); ctx.fillText(s, x, y); };
       const tv = alpha * vis;
@@ -208,15 +208,15 @@ GALAXY_ANIMS['arbitrage'] = function (api) {
         const ly = y0 + (down ? 1 : -1) * (0.07 * R + 18);
         const aA = i === iA, bB = i === iB;
         const cA = arb > 0.5 && aA ? acc : aA ? ink : soft, cB = arb > 0.5 && bB ? acc : bB ? ink : soft;
-        txt(oA[i].toFixed(2), x0 - 24, ly, cA, tv * (aA ? 1 : 0.6), FONT(aA ? 600 : 400, 13));
-        txt(oB[i].toFixed(2), x0 + 24, ly, cB, tv * (bB ? 1 : 0.6), FONT(bB ? 600 : 400, 13));
+        txt(oA[i].toFixed(2), x0 - 24, ly, cA, tv * (aA ? 1 : 0.6), FONT(aA ? 500 : 400, 11));
+        txt(oB[i].toFixed(2), x0 + 24, ly, cB, tv * (bB ? 1 : 0.6), FONT(bB ? 500 : 400, 11));
       }
       const pct = (S * 100).toFixed(1) + '%';
-      txt(pct, cx, cy + gr + 0.075 * R + 10, arb > 0.5 ? acc : ink, tv * 0.95, FONT(600, 17));
+      txt(pct, cx, cy + gr + 0.075 * R + 10, arb > 0.5 ? acc : ink, tv * 0.95, FONT(500, 12));
       txt('implied', cx, cy + gr + 0.075 * R + 30, soft, tv * 0.6, FONT(400, 11));
       if (lock) {
         const la = smooth((t - RET + 0.3) / 0.6) * (1 - smooth((t - 19.2) / 0.9)) * tv;
-        txt('+' + (lock.profit * 100).toFixed(1) + '% locked', cx, cy - gr - 0.065 * R - 18, acc, la, FONT(600, 15));
+        txt('+' + (lock.profit * 100).toFixed(1) + '% locked', cx, cy - gr - 0.065 * R - 18, acc, la, FONT(500, 11));
       }
       ctx.restore();
     }

@@ -109,7 +109,7 @@ GALAXY_ANIMS['clerk'] = function (api) {
       if (!ready) { if (S.n < 200 || A < 0.995) return; init(S, cx, cy, R); }
       if (S.n < n) return;
       const dk = api.dark(), acc = api.accent();
-      const col = dk ? api.colors() : api.colors().map(q => api.mix(q, api.ink, 0.4));
+      const col = api.colors();
       const vis = self.spiralDim / 0.92, sz = Math.max(1, R / 330), lt = dk ? 1 : 1.3;
       const X = x => cx + x * R, Y = y => cy + y * R;
       c.save();

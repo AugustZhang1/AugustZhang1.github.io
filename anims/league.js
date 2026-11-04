@@ -75,6 +75,7 @@ GALAXY_ANIMS['league'] = function (api) {
   }
 
   const anim = {
+    wp: WP,
     get spiralDim() { return spiralDim; },
     update(dt) { T = (T + Math.min(dt, 0.7)) % LOOP; },
     draw(ctx, cx, cy, R, alpha) {
@@ -163,11 +164,11 @@ GALAXY_ANIMS['league'] = function (api) {
       if (fa > 0.01) {
         const lc = col[3];
         ctx.save(); ctx.font = api.mono; ctx.textBaseline = 'middle';
-        ctx.textAlign = 'right'; ctx.fillStyle = rgba(lc, fa * 0.45);
+        ctx.textAlign = 'right'; ctx.fillStyle = rgba(lc, fa * 0.7);
         ctx.fillText('50%', X0 - 10, py(0.5));
-        ctx.textAlign = 'center'; ctx.fillStyle = rgba(lc, fa * 0.4);
+        ctx.textAlign = 'center'; ctx.fillStyle = rgba(lc, fa * 0.65);
         ['0:00', '10:00', '20:00', '30:00'].forEach((s, i) => ctx.fillText(s, px(i / 3), py(0) + 16));
-        ctx.textAlign = 'left'; ctx.fillStyle = rgba(lc, fa * 0.35);
+        ctx.textAlign = 'left'; ctx.fillStyle = rgba(lc, fa * 0.6);
         ctx.fillText('win probability', X0, py(1) - 14);
         ctx.restore();
         flares.forEach(f => {

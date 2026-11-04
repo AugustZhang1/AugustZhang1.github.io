@@ -18,7 +18,7 @@
     color-scheme: light;
     --bg: #f5f5f3;
     --ink: #17181a;
-    --muted: #6e727a;
+    --muted: #5c6068;
     --rule: rgba(23, 24, 26, 0.14);
     --accent: #e0643a;
   }
@@ -127,6 +127,27 @@
     cursor: pointer;
   }
   .back:hover, .back:focus-visible { color: var(--accent); outline: none; }
+
+  @media (min-width: 721px) {
+    .detail {
+      background: color-mix(in srgb, var(--bg) 78%, transparent);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+      border-radius: 8px;
+      padding: 20px;
+      text-align: left;
+    }
+    .back {
+      position: sticky;
+      top: -20px;
+      z-index: 1;
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: var(--bg);
+      padding: 16px 0 10px;
+    }
+  }
 
   .d-cat {
     margin: 26px 0 0;
@@ -355,7 +376,7 @@
   const INK = [23, 24, 27];
   const WHITE = [255, 255, 255];
   const PAL = {
-    light: { accent: [224, 100, 58], line: [23, 24, 27], dust: [120, 100, 84], dustA: 0.35 },
+    light: { accent: [224, 100, 58], line: [23, 24, 27], dust: [100, 80, 68], dustA: 0.42 },
     dark:  { accent: [255, 138, 92], line: [226, 228, 232], dust: [110, 80, 64], dustA: 0.3 }
   };
   const CORE_PAL = [[255, 238, 204], [255, 224, 176], [255, 244, 222]];
@@ -419,24 +440,24 @@
       desc: 'Chess.com-style game review for League of Legends: a LightGBM model scores your win chance every 15 seconds and grades each fight and objective by how much it swung the game. A 24/7 crawler on Google Cloud collected 200K+ high-elo matches at the Riot API rate limit; the model is calibrated to within about 1 point on 60K games.',
       stats: [['200K+', 'high-elo matches crawled'], ['15 s', 'per win-chance update'], ['60K', 'games used for calibration']],
       tech: ['Python', 'FastAPI', 'React', 'Scikit-learn', 'Pandas', 'SQLite', 'GitHub Actions', 'Linux'],
-      links: [['Live review', 'https://augustzhang1.github.io/LeagueVODreview/review/NA1_5650873814?p=1']]
+      links: [['Live review', 'https://augustzhang.ca/LeagueVODreview/review/NA1_5650873814?p=1']]
     },
     minecraft: {
-      label: 'AI Builder for Minecraft', title: 'AI Builder for Minecraft', cat: 'AI',
+      label: 'AI Builder for Minecraft', short: 'Minecraft Builder', title: 'AI Builder for Minecraft', cat: 'AI',
       desc: 'In-game AI builder for Minecraft Java servers: an op types !design with a prompt or image link, Claude or Gemini writes OpenSCAD code, and the rendered meshes are voxelized into blocks and placed over RCON in seconds. Also builds pixel art and 1.4M-block 3D statues from a single picture, with no mods or plugins needed.',
       stats: [['1.4M', 'blocks in a single statue']],
       tech: ['Python', 'Docker', 'Linux'],
       links: [['GitHub', 'https://github.com/AugustZhang1/AI-Builder-Minecraft']]
     },
     arbitrage: {
-      label: 'Sports Odds Arbitrage Engine', title: 'Sports Odds Arbitrage Engine', cat: 'Web Dev',
+      label: 'Sports Odds Arbitrage Engine', short: 'Arbitrage', title: 'Sports Odds Arbitrage Engine', cat: 'Web Dev',
       desc: 'Concurrent Go service ingesting live betting lines from 5+ bookmakers in near real time, converting odds to implied probabilities and flagging arbitrage where combined margins fall below 100%. A time-series PostgreSQL schema tracks historical line movement for trend analysis and backtesting.',
       stats: [['5+', 'bookmakers ingested live']],
       tech: ['Go', 'Vue.js', 'PostgreSQL'],
       links: [['GitHub', 'https://github.com/AugustZhang1/Sports-arbitage']]
     },
     rag: {
-      label: 'RAG Evaluation Toolkit', title: 'RAG Evaluation and Observability Toolkit', cat: 'AI',
+      label: 'RAG Evaluation Toolkit', short: 'RAG Toolkit', title: 'RAG Evaluation and Observability Toolkit', cat: 'AI',
       desc: 'Zero-cost RAG evaluation platform: pgvector hybrid search, LLM-as-judge scoring on versioned gold sets, and LangFuse tracing. Cut hallucinated answers from 11/33 to 7/33 by tuning chunk size and retrieval-k; the eval harness runs in CI on every commit and Presidio guardrails with Luhn validation keep secrets and PII out of traces.',
       stats: [['11 to 7', 'hallucinated answers out of 33']],
       tech: ['Python', 'FastAPI', 'PostgreSQL', 'Docker', 'GitHub Actions', 'TypeScript', 'Next.js'],
@@ -450,7 +471,7 @@
       links: [['GitHub', 'https://github.com/AugustZhang1/AudiobookFree']]
     },
     'ark-eagle': {
-      label: 'Ark Eagle Volunteer Scheduler', title: 'Ark Eagle Volunteer Scheduler', cat: 'Web Dev',
+      label: 'Ark Eagle Volunteer Scheduler', short: 'Ark Eagle', title: 'Ark Eagle Volunteer Scheduler', cat: 'Web Dev',
       desc: 'Mobile-first volunteer operations system that auto-generates weekly assignments, sends reminders, and handles urgent replacements so coordinators only manage exceptions. TypeScript modular monolith with a separate worker, PostgreSQL audit history, and Docker Compose deployment.',
       stats: [],
       tech: ['TypeScript', 'React', 'Next.js', 'Node.js', 'PostgreSQL', 'Docker', 'GitHub Actions', 'Tailwind'],
@@ -787,6 +808,8 @@
   let sun = -1;            // chunk index of the solar system open inside `selected`, or -1
   let zs = 0;              // 0 galaxy level, 1 solar level (eased)
   let hoverPlanet = -1;    // planet under the pointer at the solar level
+  let tappedPlanet = -1;   // tapped planet kept selected on touch
+  let lastPlanets = [];    // latest planets list for hit-testing
   let sunSX = 0, sunSY = 0;   // sun screen position this frame
   const sunW = [0, 0, 0];     // sun world position (camera target at the solar level)
   const focus = [0, 0, 0];
@@ -862,6 +885,7 @@
   cv.addEventListener('pointermove', e => {
     pointer.x = e.clientX; pointer.y = e.clientY;
     pointer.on = true; pointer.touch = e.pointerType === 'touch';
+    if (!pointer.touch) tappedPlanet = -1;
   });
   cv.addEventListener('pointerleave', () => { pointer.on = false; });
 
@@ -916,7 +940,17 @@
     const rr = pointer.touch ? 22 : 10;
     if (selected && sun >= 0) {
       // Solar level: a click on empty space steps back to the galaxy.
-      if (hoverPlanet < 0 && !sunHit(pointer.x, pointer.y)) exitSun();
+      if (pointer.touch) {
+        let hitP = -1, bd = Infinity;
+        lastPlanets.forEach((p, j) => {
+          const d = Math.hypot(p.x - pointer.x, p.y - pointer.y);
+          if (d < p.r + 14 && d < bd) { bd = d; hitP = j; }
+        });
+        if (hitP >= 0) tappedPlanet = hitP;
+        else if (!sunHit(pointer.x, pointer.y)) exitSun();
+      } else {
+        if (hoverPlanet < 0 && !sunHit(pointer.x, pointer.y)) exitSun();
+      }
     } else {
       const hit = pick(pointer.x, pointer.y, rr);
       if (hit && hit.i >= 0) enterSun(hit.i);            // chunk star: fly to it, solar level
@@ -924,7 +958,7 @@
       else if (cluster.on && Math.hypot(pointer.x - cluster.x, pointer.y - cluster.y) < cluster.r + 20) zoomGoal = 1;
       else if (selected) {
         const g = GAL[selected];
-        if (Math.hypot(pointer.x - g.sx, pointer.y - g.sy) > g.px * 1.1) closeProject();
+        if (Math.hypot(pointer.x - g.sx, pointer.y - g.sy) > g.px * (animFor(selected) ? 1.5 : 1.1)) closeProject();
       }
     }
     if (pointer.touch) pointer.on = false;
@@ -1217,7 +1251,7 @@
   // ---------------------------------------------------------------------
   const IMG = 'img/';
   const PEEK = {
-    league:    { live: 'https://augustzhang1.github.io/LeagueVODreview/review/NA1_5650873814?p=1', img: 'league.jpg' },
+    league:    { live: 'https://augustzhang.ca/LeagueVODreview/review/NA1_5650873814?p=1', img: 'league.jpg' },
     minecraft: { img: 'minecraft.jpg', video: 'minecraft.mp4' },   // statue timelapse; the jpg is its poster
     sinai:     { img: 'sinai.jpg', fit: 'contain' },              // logo: contained, never cropped
     senseway:  { img: 'senseway.png', fit: 'contain' }
@@ -1241,8 +1275,13 @@
         peekFrame = document.createElement('iframe');
         peekFrame.src = m.live; peekFrame.tabIndex = -1; peekFrame.loading = 'eager';
         peekFrame.onload = () => setTimeout(() => {
-          peekFrame.ready = true;
-          if (peekKey === k) { peekFrame.classList.add('show'); peekImg.classList.remove('show'); }
+          try {
+            const txt = peekFrame.contentDocument.body.innerText;
+            if (txt && txt.trim() && !/something went wrong/i.test(txt)) {
+              peekFrame.ready = true;
+              if (peekKey === k) { peekFrame.classList.add('show'); peekImg.classList.remove('show'); }
+            }
+          } catch (e) {}
         }, 1500);
         peek.appendChild(peekFrame);
       }
@@ -1701,7 +1740,7 @@
   // ---------------------------------------------------------------------
   const ANIM_KEYS = ['league', 'minecraft', 'rag', 'arbitrage', 'audiobook', 'ark-eagle', 'medihub', 'arkproject', 'jobapply', 'sinai', 'senseway', 'reels', 'clerk', 'pet'];
   const PORTRAIT_KEYS = ['minecraft', 'league', 'sinai', 'senseway'];
-  const MONO = '10px ui-monospace, "SF Mono", Menlo, Consolas, monospace';
+  const MONO = '11px ui-monospace, "SF Mono", Menlo, Consolas, monospace';
   const ease3 = x => { const u = clamp(x); return 1 - Math.pow(1 - u, 3); };
   // Flat helpers use the supplied colour as given.
   const dotC = (c, x, y, r, col, a) => { if (a < 0.01) return; c.fillStyle = rgba(col, clamp(a)); c.beginPath(); c.arc(x, y, r, 0, TAU); c.fill(); };
@@ -1792,8 +1831,8 @@
     sun = -1;
     detail.classList.remove('open');
   }
-  function enterSun(i) { if (selected && GAL[selected].chunkIdx.includes(i)) sun = i; }
-  function exitSun() { sun = -1; }
+  function enterSun(i) { if (selected && GAL[selected].chunkIdx.includes(i)) { sun = i; tappedPlanet = -1; } }
+  function exitSun() { sun = -1; tappedPlanet = -1; lastPlanets = []; }
   // Back and Esc go up one level.
   function goUp() {
     if (sun >= 0) exitSun();
@@ -1861,18 +1900,16 @@
   });
   window.addEventListener('blur', () => { tour.pointerDown = false; tour.spaceDown = false; tour.boost = false; tour.fast = 1; });
 
-  // Illustrative win-probability series (61 samples over 30 minutes).
-  const SERIES = (() => {
-    const r = mulberry32(42);
-    const out = [];
-    let p = 0.5;
-    for (let i = 0; i <= 60; i++) {
-      out.push(p);
-      p += (r() - 0.5) * 0.14 + (i > 40 ? 0.012 : -0.002);
-      p = clamp(p, 0.03, 0.97);
-    }
-    return out;
-  })();
+  // Win-probability series (61 samples over 30 minutes) from anims/league.js.
+  const SERIES = new Array(61).fill(0.5);
+  let seriesReady = false;
+  function loadSeries() {
+    if (seriesReady) return;
+    const an = animFor('league');
+    if (!an || !an.wp) return;
+    for (let i = 0; i <= 60; i++) SERIES[i] = an.wp[i * 2];
+    seriesReady = true;
+  }
 
   // ---------------------------------------------------------------------
   // WIN-PROBABILITY SCRUBBER (LeagueVODreview)
@@ -1880,6 +1917,7 @@
   let scrubIdx = 30;
   let scrubDrag = false;
   function drawScrub() {
+    loadSeries();
     scCanvas.setAttribute('aria-valuenow', scrubIdx / 2);
     scCanvas.setAttribute('aria-valuetext', 'minute ' + (scrubIdx / 2).toFixed(1) + ', ' + Math.round(SERIES[scrubIdx] * 100) + '% win probability');
     const w = scCanvas.clientWidth, h = scCanvas.clientHeight;
@@ -1948,7 +1986,7 @@
   // ---------------------------------------------------------------------
   // DRAW
   // ---------------------------------------------------------------------
-  const toneC = c => (dark ? c : mix(c, INK, 0.55));
+  const toneC = c => (dark ? c : mix(c, INK, 0.68));
   // Screen position of a world point, or null if it is behind the camera.
   function pr(x, y, z) { return project(x, y, z) ? [P[0], P[1]] : null; }
   // Galaxy-local point to world.
@@ -2111,8 +2149,8 @@
     if (ga < 0.01) return;
     const tint = c => toneC(mix(c, pal.accent, g.acc * 0.35));
     const bcol = g.bcol.map(tint);
-    const BA = [0.28, 0.5, 0.75, 0.92];
-    const BS = [0.9, 1.0, 1.35, 1.8];
+    const BA = dark ? [0.28, 0.5, 0.75, 0.92] : [0.38, 0.62, 0.85, 0.98];
+    const BS = dark ? [0.9, 1.0, 1.35, 1.8] : [1.15, 1.3, 1.65, 2.15];
     // Level of detail: fewer stars when the galaxy is small on screen.
     const target = clamp(g.px * g.px * 0.5, 120, g.Ns);
     const stride = Math.max(1, Math.round(g.Ns / target));
@@ -2127,6 +2165,7 @@
       ctx.fillStyle = rgba(dark ? WHITE : pal.accent, bA);
       ctx.beginPath(); ctx.arc(g.sx, g.sy, 1.6, 0, TAU); ctx.fill();
     }
+    const anD = g.key === selected && ANIMS[g.key] ? clamp(ANIMS[g.key].spiralDim || 0) : 0;
     // Soft core glow (dark theme only).
     if (dark && g.px > 3 && !g.hole) {
       const rad = g.px * 0.5;
@@ -2134,19 +2173,19 @@
       const hr = g.px * 1.3 * (1 - 0.8 * zt);
       if (hr > 2) {
         const hg = ctx.createRadialGradient(g.sx, g.sy, 0, g.sx, g.sy, hr);
-        hg.addColorStop(0, rgba(bcol[2], 0.22 * ga));
+        hg.addColorStop(0, rgba(bcol[2], 0.22 * ga * (1 - anD)));
         hg.addColorStop(1, rgba(bcol[2], 0));
         ctx.fillStyle = hg;
         ctx.beginPath(); ctx.arc(g.sx, g.sy, hr, 0, TAU); ctx.fill();
       }
       const grd = ctx.createRadialGradient(g.sx, g.sy, 0, g.sx, g.sy, rad);
-      grd.addColorStop(0, rgba(bcol[3], 0.5 * ga));
-      grd.addColorStop(0.35, rgba(bcol[3], 0.14 * ga));
+      grd.addColorStop(0, rgba(bcol[3], 0.5 * ga * (1 - anD)));
+      grd.addColorStop(0.35, rgba(bcol[3], 0.14 * ga * (1 - anD)));
       grd.addColorStop(1, rgba(bcol[3], 0));
       ctx.fillStyle = grd;
       ctx.beginPath(); ctx.arc(g.sx, g.sy, rad, 0, TAU); ctx.fill();
     }
-    const anD = g.key === selected && ANIMS[g.key] ? clamp(ANIMS[g.key].spiralDim || 0) : 0;
+
     const spir = ga * (1 - anD);
 
     // Dust lanes, one batched fill.
@@ -2163,14 +2202,14 @@
     // Arm, bulge and halo stars, one fill per brightness bucket.
     const X = g.X;
     if (!g.hole) for (let b = 0; b < 4; b++) {
-      ctx.fillStyle = rgba(bcol[b], BA[b] * spir * (dark ? 1 : 0.9));
+      ctx.fillStyle = rgba(bcol[b], BA[b] * spir * (dark ? 1 : 1.15));
       const s1 = g.bStart[b + 1];
       for (let i = g.bStart[b]; i < s1; i += stride) {
         const q = 3 * i;
         if (!toScreen(g, X[q], X[q + 1], X[q + 2])) continue;
         const sx = P[0], sy = P[1];
         if (sx < -2 || sx > W + 2 || sy < -2 || sy > H + 2) continue;
-        const s = BS[b] * clamp(P[2], 0.7, 1.4);
+        const s = BS[b] * clamp(P[2], 0.7, 1.4) * (dark ? 1 : 1.1);
         ctx.fillRect(sx, sy, s, s);
       }
     }
@@ -2566,7 +2605,7 @@
       const sp = pr(sunW[0], sunW[1], sunW[2]);
       if (sp) {
         sunSX = sp[0]; sunSY = sp[1];
-        planets = solarPlanets(CHUNKS[sun], sunSX, sunSY, Math.min(W, H));
+        lastPlanets = planets = solarPlanets(CHUNKS[sun], sunSX, sunSY, Math.min(W, H));
         if (pointer.on) {
           planets.forEach((p, j) => {
             if (hoverPlanet < 0 && Math.hypot(p.x - pointer.x, p.y - pointer.y) < p.r + 7) hoverPlanet = j;
@@ -2574,6 +2613,8 @@
         }
       }
     }
+
+    if (hoverPlanet < 0 && tappedPlanet >= 0 && tappedPlanet < planets.length) hoverPlanet = tappedPlanet;
 
     // Hover: galaxy, search hit or chunk; a planet when at the solar level.
     const hit = pointer.on && hoverPlanet < 0 && !tour.on ? pick(pointer.x, pointer.y, pointer.touch ? 22 : 10) : null;
@@ -2669,16 +2710,57 @@
 
     // Zoomed far out: when the projects bunch together, one ring marks them all
     // (click it to fly back); once they spread apart, each gets its name.
-    const nameA = (1 - zt) * clamp((0.5 - userZoom) / 0.2);
+    const nameA = (selected || tour.on) ? 0 : (1 - zt) * (1 - tourT);
+    const farA = (1 - zt) * clamp((0.5 - userZoom) / 0.2);
     cluster.on = false;
     if (nameA > 0.01) {
       const vk = KEYS.filter(k => GAL[k].vis && k !== 'pet');
       const bh = GAL.pet;
-      if (bh.vis) {
+      ctx.font = '10px ui-monospace, "SF Mono", Menlo, Consolas, monospace';
+      ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
+      const placed = [];
+      if (hovered && GAL[hovered] && GAL[hovered].vis && sun < 0) {
+        const ax = GAL[hovered].sx, ay = GAL[hovered].sy;
+        const hw = ctx.measureText(META[hovered].label).width;
+        let lx = ax + 12;
+        if (lx + hw > W - 12) lx = Math.max(12, ax - 12 - hw);
+        placed.push({ x0: lx - 4, y0: ay - 24, x1: lx + hw + 4, y1: ay + 2 });
+      }
+      const placeName = (g, text, alpha) => {
+        const w = ctx.measureText(text).width, off = g.px + 6;
+        const preferLeft = g.sx + off + w > W - 8;
+        const candidates = preferLeft ? [
+          [g.sx - off - w, g.sy],
+          [g.sx - off - w, g.sy + 12],
+          [g.sx - off - w, g.sy - 12],
+          [g.sx + off, g.sy],
+          [g.sx + off, g.sy + 12],
+          [g.sx + off, g.sy - 12]
+        ] : [
+          [g.sx + off, g.sy],
+          [g.sx + off, g.sy + 12],
+          [g.sx + off, g.sy - 12],
+          [g.sx - off - w, g.sy],
+          [g.sx - off - w, g.sy + 12],
+          [g.sx - off - w, g.sy - 12]
+        ];
+        for (let i = 0; i < candidates.length; i++) {
+          const cx = candidates[i][0], cy = candidates[i][1];
+          const nx = clamp(cx, 8, Math.max(8, W - 8 - w));
+          const ny = clamp(cy, 10, H - 10);
+          const b = { x0: nx - 2, y0: ny - 6, x1: nx + w + 2, y1: ny + 6 };
+          if (!placed.some(p => !(b.x1 < p.x0 || b.x0 > p.x1 || b.y1 < p.y0 || b.y0 > p.y1))) {
+            placed.push(b);
+            ctx.fillStyle = rgba(pal.line, alpha);
+            ctx.fillText(text, nx, ny);
+            break;
+          }
+        }
+      };
+      if (bh.vis && hovered !== 'pet') {
         ctx.font = '10px ui-monospace, "SF Mono", Menlo, Consolas, monospace';
         ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
-        ctx.fillStyle = rgba(pal.line, 0.6 * nameA * bh.alpha);
-        ctx.fillText('black hole?', bh.sx + 12, bh.sy);
+        placeName(bh, 'black hole?', 0.5 * nameA * bh.alpha);
       }
       if (vk.length) {
         let mx = 0, my = 0;
@@ -2688,14 +2770,13 @@
         const packA = clamp((140 - spread) / 50);   // 1 when packed tight
         ctx.font = '10px ui-monospace, "SF Mono", Menlo, Consolas, monospace';
         ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
-        if (packA < 1) vk.forEach(k => {
+        if (packA < 1) vk.slice().sort((a, b) => GAL[b].k - GAL[a].k).forEach(k => {
           const g = GAL[k];
           if (k === hovered) return;
-          ctx.fillStyle = rgba(pal.line, 0.6 * nameA * (1 - packA) * g.alpha);
-          ctx.fillText(META[k].label, g.sx + 10, g.sy);
+          placeName(g, META[k].short || META[k].label, 0.5 * nameA * (1 - packA) * g.alpha);
         });
-        if (packA > 0) {
-          const r = spread + 18, a = nameA * packA;
+        if (packA > 0 && farA > 0.01) {
+          const r = spread + 18, a = farA * packA;
           Object.assign(cluster, { on: true, x: mx, y: my, r });
           ctx.strokeStyle = rgba(pal.accent, 0.55 * a);
           ctx.lineWidth = 1;
