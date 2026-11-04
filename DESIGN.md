@@ -1,6 +1,6 @@
 # Site redesign: direction
 
-Working notes; expect changes. The live site is `index.html`; the previous site is kept at `old.html`.
+Working notes; expect changes. The live site is `index.html`.
 
 ## Concept
 August's work as a **universe**, styled like a RAG vector store a recruiter can explore.
@@ -44,12 +44,8 @@ Each animation is **made of that galaxy's own stars**, which leave the spiral an
 | AI Snake Game | Stars leave the spiral to build a Snake board, then a star-ribbon snake plays three training games for one food star at a time: random moves at game 1, steadier at game 40, and no random moves by game 80. |
 | Desktop Pet (black hole) | A small rock made of disc stars orbits the black hole and slowly spirals in; you can grab and fling it, and it always falls back. |
 
-## Other prototypes (for comparison)
-- `mockups/v4/map.html`: the minimal vector point cloud (navy and coral, points coloured by domain).
-- `mockups/v4/halftone.html`: ink on paper, where hovered projects decode into halftone prints.
-
 ## Ruled out
-- Everything in the `mockups/` image rounds (all rejected).
+- All earlier mockup rounds (rejected and removed; see git history).
 - Neon or cyan "AI dashboard" looks, the beige paper and serif journal look, Swiss-minimal or topographic styles, and the Codex engineering-instrument redesign.
 - Flat animations drawn on top of the galaxies, and halftone portraits made from weak or AI-looking images.
 
