@@ -13,7 +13,7 @@ August's work as a **universe**, styled like a RAG vector store a recruiter can 
 - **Populated void.** A faint deep field of distant galaxies and layered starfields, so the universe feels vast but calm. The 13 project galaxies are clearly the brightest.
 - **Minimal chrome.** The name "August Zhang", "Computer Engineering @ uOttawa", Resume / GitHub / LinkedIn / Email in small spaced monospace capitals, and a theme toggle. A small clickable breadcrumb (Universe / Project / Chunk) is the only navigation text.
 - **No self-explaining text.** No instructions, status lines or technical labels beyond small mono numbers that carry meaning.
-- **Lightweight build.** Plain canvas and vanilla JS, with no libraries.
+- **Lightweight build.** Plain canvas and vanilla JS, with no libraries. Raw WebGL is allowed where 2D cannot do the job (the tour ship in `ship.js`, the background sky in `stars.js`, the black hole in `blackhole.js`).
 
 ## Three zoom levels
 1. **Universe.** All galaxies, slowly rotating. Drag to orbit, scroll to zoom.
@@ -22,6 +22,9 @@ August's work as a **universe**, styled like a RAG vector store a recruiter can 
    - Faint x/y/z axes and arrows from the origin, in the overview only.
 2. **Galaxy (click).** The camera flies in, the detail panel opens on the right, and the project's animation plays (see below).
 3. **Solar system (click a chunk star).** The star becomes a sun showing the chunk text, with 2 to 5 planets, one per key term (tech or metric). Back or Esc goes up a level; arrow keys step between stars or galaxies.
+
+## Search tour
+Enter on a search sends a sculpted needle ship through the top 3 matching galaxies, strongest last. Each galaxy opens with the project name and summary, then the ship moves between its best 2 points and its path stays as a constellation. The ship carries its direction through each star, so the route reads as one sweep. The camera pulls back to show the whole figure for the search, with other matching galaxies linked faintly, then dives into the top match with its constellation still lit.
 
 ## In-galaxy animations
 Each animation is **made of that galaxy's own stars**, which leave the spiral and form the idea. They are never flat overlays drawn on top. The mood is calm and elegant, with one accent for key moments. Each lives in `anims/<project>.js` (API in `anims/README.md`).
@@ -42,7 +45,7 @@ Each animation is **made of that galaxy's own stars**, which leave the spiral an
 | Video To Reels | Stars pour into a tall phone frame and fill its screen as a dot-matrix picture; a swipe sends the reel up, and a star "most replayed" curve lifts its peak, which becomes the next 30 s reel. |
 | Calendar Clerk | An email made of star lines drifts into an extraction ring; the date and title stars split out and land on a star calendar grid as a draft event, which lights only once an approval star is pressed. |
 | AI Snake Game | Stars leave the spiral to build a Snake board, then a star-ribbon snake plays three training games for one food star at a time: random moves at game 1, steadier at game 40, and no random moves by game 80. |
-| Desktop Pet (black hole) | A small rock made of disc stars orbits the black hole and slowly spirals in; you can grab and fling it, and it always falls back. |
+| Desktop Pet (black hole) | Opening it fades into a full-screen ray-traced black hole, with a small rock orbiting the disc. Scroll zooms toward the pointer, drag orbits, and click flies in. Resolution drops by itself on weak GPUs. Without WebGL2 the 2D hole stays. |
 
 ## Ruled out
 - All earlier mockup rounds (rejected and removed; see git history).
