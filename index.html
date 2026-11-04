@@ -257,7 +257,9 @@
   .peek.on { opacity: 1; }
   .peek > * { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: none; }
   .peek > .show { display: block; }
-  .peek img.contain { object-fit: contain; padding: 12%; box-sizing: border-box; }
+  /* Logos float on the sky with no card; each cut-out has a dark and a light theme file. */
+  .peek.logo { border: 0; background: none; overflow: visible; }
+  .peek.logo img { object-fit: contain; padding: 6%; box-sizing: border-box; filter: drop-shadow(0 0 10px var(--bg)); }
   .peek iframe {
     width: 1280px; height: 800px; border: 0;
     transform: scale(0.21875); transform-origin: 0 0;
@@ -1264,8 +1266,8 @@
   const PEEK = {
     league:    { live: 'https://augustzhang.ca/LeagueVODreview/review/NA1_5650873814?p=1', img: 'league.jpg' },
     minecraft: { img: 'minecraft.jpg', video: 'minecraft.mp4' },   // statue timelapse; the jpg is its poster
-    sinai:     { img: 'sinai.jpg', fit: 'contain' },              // logo: contained, never cropped
-    senseway:  { img: 'senseway.png', fit: 'contain' }
+    sinai:     { img: 'sinai.jpg', fit: 'contain', cutout: 'sinai-logo' },   // img feeds the star grid; cutout is the hover
+    senseway:  { img: 'senseway.png', fit: 'contain', cutout: 'senseway-logo' }
   };
   const peek = document.getElementById('peek');
   const peekImg = document.getElementById('peekImg');
@@ -1279,6 +1281,7 @@
     peekVid.pause();
     if (!k || !PEEK[k]) { peekKey = null; peek.classList.remove('on'); return; }
     const m = PEEK[k];
+    peek.classList.toggle('logo', !!m.cutout);
     if (m.live) {
       // Created once and kept, so the live page doesn't reload on every hover.
       // The screenshot stands in until the page has loaded and drawn, so there is no black flash.
@@ -1299,7 +1302,6 @@
       if (peekFrame.ready) peekFrame.classList.add('show');
       else {
         peekImg.src = IMG + m.img;
-        peekImg.classList.remove('contain');
         peekImg.classList.add('show');
       }
     } else if (m.video && vidOk[k] !== false) {
@@ -1311,8 +1313,8 @@
       peekVid.classList.add('show');
       peekVid.play().catch(() => {});
     } else {
-      peekImg.src = IMG + m.img;
-      peekImg.classList.toggle('contain', m.fit === 'contain');
+      const light = document.documentElement.getAttribute('data-theme') !== 'dark';
+      peekImg.src = IMG + (m.cutout ? `${m.cutout}${light ? '-light' : ''}.png` : m.img);
       peekImg.classList.add('show');
     }
     peek.classList.add('on');
