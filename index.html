@@ -254,6 +254,15 @@
   }
   .query input::placeholder { color: var(--muted); }
   .query input:focus { border-color: var(--accent); }
+  .query-status {
+    position: absolute; left: 0; top: 100%; width: 100%;
+    margin-top: 6px;
+    color: var(--muted);
+    font: 11px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    line-height: 1;
+    text-align: center;
+    pointer-events: none;
+  }
 
   .peek {
     position: fixed; left: 0; top: 0;
@@ -338,6 +347,7 @@
 <form class="query" id="queryForm" role="search">
   <label for="q" hidden>Search my work</label>
   <input id="q" type="search" placeholder="Search my work" autocomplete="off" spellcheck="false">
+  <span class="query-status" id="queryStatus" role="status"></span>
 </form>
 
 <script>window.GALAXY_ANIMS = {};</script>
@@ -1099,7 +1109,9 @@
   let qT = 0;                    // query visibility ease
   const qInput = document.getElementById('q');
   const queryForm = document.getElementById('queryForm');
+  const queryStatus = document.getElementById('queryStatus');
   function runQuery() {
+    queryStatus.textContent = '';
     hits = scoreQuery(qInput.value);
     hitSet = new Set(hits.map(h => h.i));
     hitGal.clear();
@@ -1109,7 +1121,12 @@
   // Enter: the ship tours the best matches and lands on the top one.
   // Reduced motion skips the flight and opens the top match with its constellation.
   function submitSearch() {
-    if (selected || !hits.length) return;
+    if (selected) return;
+    if (!hits.length) {
+      queryStatus.textContent = qInput.value.trim() ? 'No matches' : '';
+      return;
+    }
+    queryStatus.textContent = '';
     qInput.blur();
     if (!reduce) { startTour(); return; }
     buildTour();
@@ -2884,11 +2901,14 @@
         const R = GAL[selected].R * SC;
         if (!reduce) an.update(dt * (zt > 0.9 ? 1 : 0));
         else if (!an.warm) {
-          // Reduced motion: an invisible draw gives the plugin its layout, then it runs
-          // forward once and holds that static end state.
+          // Reduced motion: an invisible draw gives the plugin its layout. If its image
+          // is still loading, leave it cold so the next frame can retry the build.
           an.draw(ctx, CX, CY, R, 0);
-          for (let i = 0; i < 300; i++) an.update(0.04);
-          an.warm = true;
+          an.update(0);
+          if (!(an.pending && an.pending())) {
+            for (let i = 0; i < 300; i++) an.update(0.04);
+            an.warm = true;
+          }
         }
         an.draw(ctx, CX, CY, R, zt * (1 - zs));
       }

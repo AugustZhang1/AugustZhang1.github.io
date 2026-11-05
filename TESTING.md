@@ -5,28 +5,25 @@
 Static personal portfolio served directly from HTML, CSS and vanilla JavaScript.
 `index.html` is the root page: Canvas 2D rendering, inline application JavaScript and
 animation plugins in `anims/*.js`. No application server, database,
-compilation step, credentials or seed data are required. The npm dependencies
-are not needed to serve these pages.
+compilation step, credentials or seed data are required.
 
 ## Setup (once)
 
 Verified on Windows PowerShell with Python 3.13.14, Node 24.18.0 and npm 11.16.0.
-Run from the repository root. All tooling, copied manifests and test artifacts
-below go into the system temp directory; the repository manifests stay untouched.
+Run from the repository root. All tooling and test artifacts below go into the
+system temp directory.
 
 ```powershell
 $qaDir = Join-Path ([IO.Path]::GetTempPath()) ('portfolio-qa-' + [guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $qaDir | Out-Null
-Copy-Item package.json,package-lock.json -Destination $qaDir
 Push-Location $qaDir
-npm ci --ignore-scripts --no-audit --no-fund --offline=false --cache "$qaDir/npm-cache"
 New-Item -ItemType Directory -Path "$qaDir/browser" -Force | Out-Null
 npm install --prefix "$qaDir/browser" --no-save --package-lock=false --ignore-scripts --no-audit --no-fund --offline=false --cache "$qaDir/npm-cache" playwright@1.61.1
 Pop-Location
 $env:CHROMIUM_PATH = Join-Path $env:LOCALAPPDATA 'ms-playwright/chromium-1248/chrome-win64/chrome.exe'
 ```
 
-Both installs succeeded (11 locked dependency packages, 2 browser-tool packages).
+The Playwright install succeeded (2 browser-tool packages).
 Lifecycle scripts are deliberately disabled. Initial installation with the
 sandbox's offline cache failed with `ENOTCACHED`; enabling network access and
 using the temporary cache succeeded. Registry access is needed for a fresh setup.
@@ -60,23 +57,6 @@ reusing it. Stop a server you started with Ctrl+C in its terminal. Do not stop a
 server owned by someone else. The verification run started and stopped its own
 server.
 
-## Automated checks
-
-These commands were actually run against the copied manifests in `$qaDir`:
-
-```powershell
-Push-Location $qaDir
-npm run build
-npm test
-npm run lint
-Pop-Location
-```
-
-All three fail with `Missing script`; there is no configured build, unit-test or
-lint runner. `npm run` at the root succeeds and lists no scripts. These are
-absence checks, not passing test suites. Serving the site does not require them.
-The Playwright smoke check below supplies observable browser coverage.
-
 ## End to end
 
 Keep the server running. Save the following JavaScript block as
@@ -99,7 +79,7 @@ prove every frame or every nested canvas interaction.
 `?open=<key>&dtmax=0.7` opens a project and allows animation time to advance under
 headless frame throttling. Supported keys in this recipe: `league`, `minecraft`,
 `rag`, `arbitrage`, `audiobook`, `ark-eagle`, `medihub`,
-`arkproject`, `jobapply`, `sinai`, `senseway`, `reels`, `clerk`, `pet`. Browser-console helpers are
+`arkproject`, `jobapply`, `sinai`, `senseway`, `reels`, `clerk`, `snake`, `pet`. Browser-console helpers are
 `__galaxy.open(key)` and `__galaxy.close()`. The actual theme button is
 `#themeBtn`; the stored preference is localStorage key `theme`. Each viewport
 uses a fresh browser context. No accounts, remote APIs or seed step are needed;
@@ -110,7 +90,7 @@ const { chromium } = require('./browser/node_modules/playwright');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const keys = 'league minecraft rag arbitrage audiobook ark-eagle medihub arkproject jobapply sinai senseway reels clerk pet'.split(' ');
+const keys = 'league minecraft rag arbitrage audiobook ark-eagle medihub arkproject jobapply sinai senseway reels clerk snake pet'.split(' ');
 (async () => {
   const browser = await chromium.launch({headless:true, executablePath:process.env.CHROMIUM_PATH});
   const failures = [];
@@ -172,7 +152,7 @@ Verification results (2026-11-03): all 56 project/viewport/theme combinations (1
 ## Search quality
 
 Semantic search uses precomputed embeddings in `embeddings.js`. Run
-`node tools/search-eval.cjs` from the repository root; it runs 13 gold queries
+`node tools/search-eval.cjs` from the repository root; it runs 14 gold queries
 through the page's own scoring code and exits 1 on any failure. After editing chunk text or
 project metadata, regenerate the embeddings first (see the header of `tools/embed.py`).
 

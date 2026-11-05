@@ -175,6 +175,7 @@ GALAXY_ANIMS['senseway'] = function (api) {
 
   const self = {
     spiralDim: 0,
+    pending: () => !ready,
     update(dt) {
       if (!ready) { ready = build(); return; }
       T += dt;
